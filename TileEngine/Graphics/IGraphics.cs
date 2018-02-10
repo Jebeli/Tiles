@@ -19,6 +19,8 @@ namespace TileEngine.Graphics
 
         void BeginFrame();
         void EndFrame();
+        void SetSize(int width, int height);
+        void SetScale(float scale);
         void ClearScreen();
         Texture CreateTexture(string textureId, int width, int height);
         Texture GetTexture(string textureId, IFileResolver fileResolver);

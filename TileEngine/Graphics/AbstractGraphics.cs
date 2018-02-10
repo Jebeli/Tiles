@@ -64,6 +64,20 @@ namespace TileEngine.Graphics
         {
             inFrame = false;
         }
+
+        public void SetSize(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+            viewWidth = (int)(width * viewScale);
+            viewHeight = (int)(height * viewScale);
+        }
+        public void SetScale(float scale)
+        {
+            viewScale = scale;
+            viewWidth = (int)(width * viewScale);
+            viewHeight = (int)(height * viewScale);
+        }
         public abstract void ClearScreen();
         public abstract Texture CreateTexture(string textureId, int width, int height);
 

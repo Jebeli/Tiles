@@ -49,6 +49,7 @@ namespace GDITiles
             {
                 if (engine.Update())
                 {
+                    engine.Graphics.SetSize(ClientSize.Width, ClientSize.Height);
                     Invalidate();
                 }
             }
