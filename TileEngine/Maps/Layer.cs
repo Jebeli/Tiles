@@ -15,13 +15,36 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Screens
+namespace TileEngine.Maps
 {
-    public class NullScreen : AbstractScreen
+    using Core;
+    public class Layer : NamedObject
     {
-        public NullScreen(Engine engine)
-            : base(engine, "NullScreen")
+        private int width;
+        private int height;
+        private Map map;
+
+        internal Layer(string name, Map map, int width, int height)
+            : base(name)
         {
+            this.width = width;
+            this.height = height;
+            this.map = map;
+        }
+
+        public Map Map
+        {
+            get { return map; }
+        }
+
+        public int Width
+        {
+            get { return width; }
+        }
+
+        public int Height
+        {
+            get { return height; }
         }
     }
 }

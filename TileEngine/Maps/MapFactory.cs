@@ -15,13 +15,21 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Screens
+namespace TileEngine.Maps
 {
-    public class NullScreen : AbstractScreen
+    public static class MapFactory
     {
-        public NullScreen(Engine engine)
-            : base(engine, "NullScreen")
+        public static Map MakeNullMap()
         {
+            Map map = new Map("null", 1, 1);
+            Layer layer = map.AddLayer("null");
+            return map;
+        }
+        public static Map MakeDummyMap()
+        {
+            Map map = new Map("dummy", 50, 50);
+            Layer layer = map.AddLayer("dummy");
+            return map;
         }
     }
 }

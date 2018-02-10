@@ -18,11 +18,12 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine
 {
     using System;
-    using TileEngine.Core;
-    using TileEngine.Files;
-    using TileEngine.Graphics;
-    using TileEngine.Resources;
-    using TileEngine.Screens;
+    using Core;
+    using Files;
+    using Graphics;
+    using Maps;
+    using Resources;
+    using Screens;
 
     public class Engine : ITimeInfoProvider
     {
@@ -32,6 +33,8 @@ namespace TileEngine
         private ITimeInfoProvider timeProvider;
         private ResourceManager<Texture> textureManager;
         private IScreen currentScreen;
+        private MapScreen mapScreen;
+        private Map map;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -40,6 +43,8 @@ namespace TileEngine
             timeProvider = new StopWatchTimeInfoProvider();
             textureManager = new ResourceManager<Texture>();
             currentScreen = new NullScreen(this);
+            mapScreen = new MapScreen(this);
+            map = MapFactory.MakeNullMap();
         }
         public IFileResolver FileResolver
         {
@@ -59,6 +64,11 @@ namespace TileEngine
         public IScreen Screen
         {
             get { return currentScreen; }
+        }
+
+        public Map Map
+        {
+            get { return map; }
         }
 
         public int MaxFramesPerSecond
@@ -113,12 +123,6 @@ namespace TileEngine
             return timeProvider.GetCurrentTime();
         }
 
-        public void SetScreen(IScreen screen)
-        {
-            currentScreen.Hide();            
-            currentScreen = screen;
-            currentScreen.Show();            
-        }
         public Texture GetTexture(string textureId)
         {
             Texture tex = null;
@@ -132,6 +136,23 @@ namespace TileEngine
                 if (tex != null) textureManager.Add(tex);
             }
             return tex;
+        }
+
+        public void SwitchToMapScreen()
+        {
+            SetScreen(mapScreen);
+        }
+
+        internal void SetScreen(IScreen screen)
+        {
+            currentScreen.Hide();
+            currentScreen = screen;
+            currentScreen.Show();
+        }
+
+        internal void SetMap(Map map)
+        {
+            this.map = map;
         }
 
     }

@@ -50,11 +50,15 @@
     <Compile Include="Graphics\TextureRegion.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Maps\Layer.cs" />
+    <Compile Include="Maps\Map.cs" />
+    <Compile Include="Maps\MapFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
     <Compile Include="Screens\IScreen.cs" />
+    <Compile Include="Screens\MapScreen.cs" />
     <Compile Include="Screens\NullScreen.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

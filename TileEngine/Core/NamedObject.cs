@@ -45,6 +45,11 @@ namespace TileEngine.Core
             return name;
         }
 
+        public static T Find<T>(IEnumerable<T> list, string identifier) where T : NamedObject
+        {
+            return list.FirstOrDefault(m => m.HasName(identifier));
+        }
+
         public static bool CheckNameClash<T>(IEnumerable<T> list, string identifier, bool throwException = true) where T : NamedObject
         {
             if (list.Any(m => m.HasName(identifier)))

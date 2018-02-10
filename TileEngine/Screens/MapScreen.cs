@@ -17,10 +17,10 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Screens
 {
-    public class NullScreen : AbstractScreen
+    public class MapScreen : AbstractScreen
     {
-        public NullScreen(Engine engine)
-            : base(engine, "NullScreen")
+        public MapScreen(Engine engine)
+            : base(engine, "MapScreen")
         {
         }
     }
