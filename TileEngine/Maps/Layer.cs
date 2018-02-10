@@ -23,6 +23,7 @@ namespace TileEngine.Maps
         private int width;
         private int height;
         private Map map;
+        private Tile[] tiles;
 
         internal Layer(string name, Map map, int width, int height)
             : base(name)
@@ -30,6 +31,7 @@ namespace TileEngine.Maps
             this.width = width;
             this.height = height;
             this.map = map;
+            InitTiles();
         }
 
         public Map Map
@@ -45,6 +47,35 @@ namespace TileEngine.Maps
         public int Height
         {
             get { return height; }
+        }
+        public Tile this[int index]
+        {
+            get { return tiles[index]; }
+        }
+        public Tile this[int x, int y]
+        {
+            get { return tiles[XYToIndex(x, y)]; }
+        }
+
+        private int XYToIndex(int x, int y)
+        {
+            return y * width + x;
+        }
+        private void IndexToXY(int index, out int x, out int y)
+        {
+            y = index / width;
+            x = index - y * width;
+        }
+        private void InitTiles()
+        {
+            tiles = new Tile[width * height];
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                int x;
+                int y;
+                IndexToXY(i, out x, out y);
+                tiles[i] = new Tile(this, x, y);
+            }
         }
     }
 }
