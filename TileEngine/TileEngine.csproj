@@ -37,7 +37,10 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ITimeInfoProvider.cs" />
     <Compile Include="Core\NamedObject.cs" />
+    <Compile Include="Core\StopWatchTimeInfoProvider.cs" />
+    <Compile Include="Core\TimeInfo.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Files\AbstractFileResolver.cs" />
     <Compile Include="Files\IFileResolver.cs" />
