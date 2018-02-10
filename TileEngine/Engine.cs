@@ -1,14 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TileEngine.Core;
-using TileEngine.Files;
-using TileEngine.Graphics;
-using TileEngine.Resources;
+﻿/*
+Copyright © 2018 Jean Pascal Bellot
+
+This file is part of Tiles.
+
+Tiles is free software: you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+Tiles is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+Tiles.  If not, see http://www.gnu.org/licenses/
+*/
 
 namespace TileEngine
 {
+    using System;
+    using TileEngine.Core;
+    using TileEngine.Files;
+    using TileEngine.Graphics;
+    using TileEngine.Resources;
+    using TileEngine.Screens;
+
     public class Engine : ITimeInfoProvider
     {
         private int maxFramesPerSecond = 60;
@@ -16,7 +31,7 @@ namespace TileEngine
         private IGraphics graphics;
         private ITimeInfoProvider timeProvider;
         private ResourceManager<Texture> textureManager;
-
+        private IScreen currentScreen;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -24,6 +39,7 @@ namespace TileEngine
             this.graphics = graphics;
             timeProvider = new StopWatchTimeInfoProvider();
             textureManager = new ResourceManager<Texture>();
+            currentScreen = new NullScreen(this);
         }
         public IFileResolver FileResolver
         {
@@ -38,6 +54,11 @@ namespace TileEngine
         public ITimeInfoProvider TimeProvider
         {
             get { return timeProvider; }
+        }
+
+        public IScreen Screen
+        {
+            get { return currentScreen; }
         }
 
         public int MaxFramesPerSecond
@@ -59,6 +80,7 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
+                currentScreen.Update(time);
                 return true;
             }
             return false;
@@ -73,6 +95,7 @@ namespace TileEngine
         {
             graphics.BeginFrame();
             graphics.ClearScreen();
+            currentScreen.Render(time);
             graphics.EndFrame();
         }
 
@@ -90,6 +113,12 @@ namespace TileEngine
             return timeProvider.GetCurrentTime();
         }
 
+        public void SetScreen(IScreen screen)
+        {
+            currentScreen.Hide();            
+            currentScreen = screen;
+            currentScreen.Show();            
+        }
         public Texture GetTexture(string textureId)
         {
             Texture tex = null;
