@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TileEngine.Files;
 using TileEngine.Graphics;
+using TileEngine.Logging;
 
 namespace GDITiles
 {
@@ -78,6 +79,7 @@ namespace GDITiles
         }
         protected override void InitGraphics()
         {
+            Logger.Info("Gfx", $"Init Graphics {viewWidth} x {viewHeight} scale = {viewScale}");
             gfx?.Dispose();
             view?.Dispose();
             view = new System.Drawing.Bitmap(viewWidth, viewHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
