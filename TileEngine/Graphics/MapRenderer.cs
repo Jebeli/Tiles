@@ -15,25 +15,38 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Screens
+namespace TileEngine.Graphics
 {
-    using Core;
-    using Graphics;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Maps;
 
-    public class MapScreen : AbstractScreen
+    internal class MapRenderer
     {
-        private MapRenderer renderer;
-        public MapScreen(Engine engine)
-            : base(engine, "MapScreen")
+        private Engine engine;
+        private IGraphics gfx;
+        internal MapRenderer(Engine engine)
         {
-            renderer = new MapRenderer(engine);
+            this.engine = engine;
+            gfx = engine.Graphics;
+        }
+        public void RenderMap(Map map)
+        {
+            RenderGrid(map);
         }
 
-
-        public override void Render(TimeInfo time)
+        private void RenderGrid(Map map)
         {
-            base.Render(time);
-            renderer.RenderMap(engine.Map);
+            for (int y = 0; y < map.Height; y++)
+            {
+                for (int x = 0; x < map.Width; x++)
+                {
+                   
+                }
+            }
         }
     }
 }
