@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="GDIGraphics.cs" />
     <Compile Include="GDITexture.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GDIForm.resx">

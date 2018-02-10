@@ -16,6 +16,11 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
+                System.Windows.Forms.Application.Idle -= HandleApplicationIdle;
+            }
+            if (disposing && gdiGraphics != null)
+            {
+                gdiGraphics.Dispose();
             }
             base.Dispose(disposing);
         }

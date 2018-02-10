@@ -26,6 +26,7 @@ namespace GDITiles
             gdiFileResolver = new GDIFileResolver("Content/images");
             gdiGraphics = new GDIGraphics();
             engine = new Engine(gdiFileResolver, gdiGraphics);
+            Application.Idle += HandleApplicationIdle;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -41,6 +42,15 @@ namespace GDITiles
             base.OnPaint(e);
         }
 
-
+        private void HandleApplicationIdle(object sender, EventArgs e)
+        {
+            while (NativeMethods.IsApplicationIdle())
+            {
+                if (engine.Update())
+                {
+                    Invalidate();
+                }
+            }
+        }
     }
 }

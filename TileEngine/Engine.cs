@@ -63,6 +63,17 @@ namespace TileEngine
             }
             return false;
         }
+
+        public void Render()
+        {
+            Render(GetRenderTimeInfo());
+        }
+
+        public void Render(TimeInfo time)
+        {
+
+        }
+
         public TimeInfo GetRenderTimeInfo()
         {
             return timeProvider.GetRenderTimeInfo();
