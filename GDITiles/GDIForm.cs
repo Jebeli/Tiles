@@ -24,7 +24,7 @@ namespace GDITiles
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             UpdateStyles();
             gdiFileResolver = new GDIFileResolver("Content/images");
-            gdiGraphics = new GDIGraphics();
+            gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height);
             engine = new Engine(gdiFileResolver, gdiGraphics);
             Application.Idle += HandleApplicationIdle;
         }
@@ -38,7 +38,8 @@ namespace GDITiles
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            e.Graphics.DrawImage(bg.GetBitmap(), 0, 0);
+            engine.Render();
+            gdiGraphics.RenderTo(e.Graphics, ClientRectangle);
             base.OnPaint(e);
         }
 

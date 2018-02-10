@@ -71,7 +71,9 @@ namespace TileEngine
 
         public void Render(TimeInfo time)
         {
-
+            graphics.BeginFrame();
+            graphics.ClearScreen();
+            graphics.EndFrame();
         }
 
         public TimeInfo GetRenderTimeInfo()
