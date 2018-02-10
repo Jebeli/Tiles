@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Resources;
 
 namespace TileEngine.Graphics
 {
-    public abstract class Texture : IDisposable
+    public abstract class Texture : Resource
     {
+        public Texture(string name)
+            : base(name)
+        {
+
+        }
         public abstract int Width { get; }
         public abstract int Height { get; }
 
@@ -16,14 +22,5 @@ namespace TileEngine.Graphics
             return new TextureRegion(this, clipX, clipY, clipW, clipH, offsetX, offsetY);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-
-        }
     }
 }

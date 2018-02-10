@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Files;
 using TileEngine.Graphics;
 
 namespace GDITiles
@@ -11,23 +12,27 @@ namespace GDITiles
     {
         private System.Drawing.Imaging.PixelFormat pixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
 
-        public override Texture CreateTexture(int width, int height)
+        public override Texture CreateTexture(string textureId, int width, int height)
         {
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height, pixelFormat);
-            return new GDITexture(bmp);
+            return new GDITexture(textureId, bmp);
         }
 
-        public override Texture GetTexture(string textureId)
+        public override Texture GetTexture(string textureId, IFileResolver fileResolver)
         {
-            return LoadTexture(textureId);
+            string fileName = fileResolver.Resolve(textureId);
+            return LoadTexture(textureId, fileName);
         }
 
-        private GDITexture LoadTexture(string fileName)
+        private GDITexture LoadTexture(string textureId, string fileName)
         {
-            System.Drawing.Bitmap bmp = System.Drawing.Image.FromFile(fileName) as System.Drawing.Bitmap;
-            if (bmp != null)
+            if (fileName != null)
             {
-                return new GDITexture(bmp);
+                System.Drawing.Bitmap bmp = System.Drawing.Image.FromFile(fileName) as System.Drawing.Bitmap;
+                if (bmp != null)
+                {
+                    return new GDITexture(textureId, bmp);
+                }
             }
             return null;
         }

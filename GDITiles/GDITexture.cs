@@ -11,7 +11,8 @@ namespace GDITiles
     {
         private System.Drawing.Bitmap bitmap;
 
-        public GDITexture(System.Drawing.Bitmap bitmap)
+        public GDITexture(string name, System.Drawing.Bitmap bitmap)
+            : base(name)
         {
             this.bitmap = bitmap;
         }
