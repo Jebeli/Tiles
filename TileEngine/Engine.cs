@@ -154,6 +154,13 @@ namespace TileEngine
             this.map = map;
         }
 
+        public void SetViewSize(int width, int height)
+        {
+            graphics.SetSize(width, height);
+            camera.ViewWidth = graphics.ViewWidth;
+            camera.ViewHeight = graphics.ViewHeight;
+        }
+
         internal void SetScreen(IScreen screen)
         {
             currentScreen.Hide();

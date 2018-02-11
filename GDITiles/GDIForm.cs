@@ -35,6 +35,7 @@ namespace GDITiles
             InitializeComponent();
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             UpdateStyles();
+            KeyPreview = true;
             Logger.AddLogger(new ConsoleLogger());
             gdiFileResolver = new GDIFileResolver("Content/images");
             gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height);
@@ -58,13 +59,52 @@ namespace GDITiles
             base.OnPaint(e);
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Up:
+                    engine.Camera.CameraY--;
+                    break;
+                case Keys.Down:
+                    engine.Camera.CameraY++;
+                    break;
+                case Keys.Left:
+                    engine.Camera.CameraX--;
+                    break;
+                case Keys.Right:
+                    engine.Camera.CameraX++;
+                    break;
+            }
+            base.OnKeyDown(e);
+        }
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Up:
+                    engine.Camera.CameraY--;
+                    break;
+                case Keys.Down:
+                    engine.Camera.CameraY++;
+                    break;
+                case Keys.Left:
+                    engine.Camera.CameraX--;
+                    break;
+                case Keys.Right:
+                    engine.Camera.CameraX++;
+                    break;
+            }
+            base.OnKeyUp(e);
+        }
+
         private void HandleApplicationIdle(object sender, EventArgs e)
         {
             while (NativeMethods.IsApplicationIdle())
             {
                 if (engine.Update())
                 {
-                    engine.Graphics.SetSize(ClientSize.Width, ClientSize.Height);
+                    engine.SetViewSize(ClientSize.Width, ClientSize.Height);
                     Invalidate();
                 }
             }

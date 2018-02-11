@@ -23,9 +23,15 @@ namespace TileEngine.Graphics
         private int tileHeight;
         private int halfTileWidth;
         private int halfTileHeight;
+        private int viewWidth;
+        private int viewHeight;
+        private int halfViewWidth;
+        private int halfViewHeight;
+        private int cameraX;
+        private int cameraY;
 
         public Camera()
-            : this(64, 64)
+            : this(64, 32)
         {
 
         }
@@ -56,6 +62,38 @@ namespace TileEngine.Graphics
                 halfTileHeight = value;
             }
         }
+
+        public int ViewWidth
+        {
+            get { return viewWidth; }
+            set
+            {
+                viewWidth = value;
+                halfViewWidth = value / 2;
+            }
+        }
+
+        public int ViewHeight
+        {
+            get { return viewHeight; }
+            set
+            {
+                viewHeight = value;
+                halfViewHeight = value / 2;
+            }
+        }
+
+        public int CameraX
+        {
+            get { return cameraX; }
+            set { cameraX = value; }
+        }
+
+        public int CameraY
+        {
+            get { return cameraY; }
+            set { cameraY = value; }
+        }
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
             screenX = (int)(mapX * tileWidth);
@@ -69,8 +107,8 @@ namespace TileEngine.Graphics
         }
         public void IsoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            screenX = (int)((mapX - mapY) * halfTileWidth);
-            screenY = (int)((mapX + mapY) * halfTileHeight);
+            screenX = (int)((mapX - mapY) * halfTileWidth) + cameraX + halfViewWidth;
+            screenY = (int)((mapX + mapY) * halfTileHeight) + cameraY + halfViewHeight;
         }
 
         public void IsoScreenToMap(int screenX, int screenY, out float mapX, out float mapY)
