@@ -45,6 +45,7 @@
     <Compile Include="Files\AbstractFileResolver.cs" />
     <Compile Include="Files\IFileResolver.cs" />
     <Compile Include="Graphics\AbstractGraphics.cs" />
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\IGraphics.cs" />
     <Compile Include="Graphics\MapRenderer.cs" />
     <Compile Include="Graphics\Texture.cs" />

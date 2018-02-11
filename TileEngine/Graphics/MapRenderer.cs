@@ -17,11 +17,6 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Graphics
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Maps;
 
     internal class MapRenderer
@@ -40,11 +35,16 @@ namespace TileEngine.Graphics
 
         private void RenderGrid(Map map)
         {
+            int tileWidth = engine.Camera.TileWidth;
+            int tileHeight = engine.Camera.TileHeight;
             for (int y = 0; y < map.Height; y++)
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                   
+                    int sX;
+                    int sY;
+                    engine.Camera.IsoMapToScreen(x, y, out sX, out sY);
+                    gfx.DrawTileGrid(sX, sY, tileWidth, tileHeight);
                 }
             }
         }

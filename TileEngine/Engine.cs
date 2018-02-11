@@ -35,6 +35,7 @@ namespace TileEngine
         private IScreen currentScreen;
         private MapScreen mapScreen;
         private Map map;
+        private Camera camera;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -45,6 +46,7 @@ namespace TileEngine
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             map = MapFactory.MakeNullMap();
+            camera = new Camera();
         }
         public IFileResolver FileResolver
         {
@@ -69,6 +71,11 @@ namespace TileEngine
         public Map Map
         {
             get { return map; }
+        }
+
+        public Camera Camera
+        {
+            get { return camera; }
         }
 
         public int MaxFramesPerSecond
@@ -142,6 +149,10 @@ namespace TileEngine
         {
             SetScreen(mapScreen);
         }
+        public void SetMap(Map map)
+        {
+            this.map = map;
+        }
 
         internal void SetScreen(IScreen screen)
         {
@@ -150,10 +161,6 @@ namespace TileEngine
             currentScreen.Show();
         }
 
-        internal void SetMap(Map map)
-        {
-            this.map = map;
-        }
 
     }
 }

@@ -92,6 +92,7 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void ClearScreen();
+        public abstract void DrawTileGrid(int x, int y, int width, int height);
         public abstract Texture CreateTexture(string textureId, int width, int height);
 
         public abstract Texture GetTexture(string textureId, IFileResolver fileResolver);

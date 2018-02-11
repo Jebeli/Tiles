@@ -22,13 +22,14 @@ namespace GDITiles
     using TileEngine;
     using TileEngine.Graphics;
     using TileEngine.Logging;
+    using TileEngine.Maps;
 
     public partial class GDIForm : Form
     {
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
         private Engine engine;
-        private Texture bg;
+        //private Texture bg;
         public GDIForm()
         {
             InitializeComponent();
@@ -43,7 +44,9 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            bg = engine.GetTexture("WP_20160910_011.jpg");
+            //bg = engine.GetTexture("WP_20160910_011.jpg");
+            engine.SetMap(MapFactory.MakeDummyMap());
+            engine.SwitchToMapScreen();
             base.OnLoad(e);
         }
 
