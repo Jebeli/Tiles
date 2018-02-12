@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Graphics
 {
+    using System;
     public class Camera
     {
         private int tileWidth;
@@ -29,6 +30,8 @@ namespace TileEngine.Graphics
         private int halfViewHeight;
         private int cameraX;
         private int cameraY;
+        private int hoverTileX;
+        private int hoverTileY;
 
         public Camera()
             : this(64, 32)
@@ -94,6 +97,18 @@ namespace TileEngine.Graphics
             get { return cameraY; }
             set { cameraY = value; }
         }
+
+        public int HoverTileX
+        {
+            get { return hoverTileX; }
+            set { hoverTileX = value; }
+        }
+
+        public int HoverTileY
+        {
+            get { return hoverTileY; }
+            set { hoverTileY = value; }
+        }
         public void SetPosition(float posX, float posY)
         {
             cameraX = (int)posX;
@@ -109,10 +124,10 @@ namespace TileEngine.Graphics
             screenY = (int)(mapY * tileHeight);
         }
 
-        public void OrthoScreenToMap(int screenX, int screenY, out float mapX, out float mapY)
+        public void OrthoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            mapX = ((float)screenX / tileWidth);
-            mapY = ((float)screenY / tileHeight);
+            mapX = (screenX / tileWidth);
+            mapY = (screenY / tileHeight);
         }
         public void IsoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
@@ -120,12 +135,19 @@ namespace TileEngine.Graphics
             screenY = (int)((mapX + mapY) * halfTileHeight) + cameraY + halfViewHeight;
         }
 
-        public void IsoScreenToMap(int screenX, int screenY, out float mapX, out float mapY)
+        public void IsoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
             screenX -= (cameraX + halfViewWidth);
             screenY -= (cameraY + halfViewHeight);
-            mapX = ((float)screenX / tileWidth) + ((float)screenY / tileHeight);
-            mapY = ((float)screenY / tileHeight) - ((float)screenX / tileWidth);
+            screenX -= halfTileWidth;
+            mapX = (screenX / tileWidth) + (screenY / tileHeight);
+            mapY = (screenY / tileHeight) - (screenX / tileWidth);
+        }
+
+        public void IsoMapToTile(float mapX, float mapY, out int tileX, out int tileY)
+        {
+            tileX = (int)(Math.Floor(mapX));
+            tileY = (int)(Math.Floor(mapY));
         }
 
     }

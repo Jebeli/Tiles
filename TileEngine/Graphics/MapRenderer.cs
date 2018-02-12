@@ -31,6 +31,7 @@ namespace TileEngine.Graphics
         public void RenderMap(Map map)
         {
             RenderGrid(map);
+            RenderSelected(map);
         }
 
         private void RenderGrid(Map map)
@@ -47,6 +48,18 @@ namespace TileEngine.Graphics
                     gfx.DrawTileGrid(sX, sY, tileWidth, tileHeight);
                 }
             }
+        }
+
+        private void RenderSelected(Map map)
+        {
+            int tileWidth = engine.Camera.TileWidth;
+            int tileHeight = engine.Camera.TileHeight;
+            int x = engine.Camera.HoverTileX;
+            int y = engine.Camera.HoverTileY;
+            int sX;
+            int sY;
+            engine.Camera.IsoMapToScreen(x, y, out sX, out sY);
+            gfx.DrawTileSelected(sX, sY, tileWidth, tileHeight);
         }
     }
 }

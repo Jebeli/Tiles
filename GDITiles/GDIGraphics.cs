@@ -28,6 +28,7 @@ namespace GDITiles
         private System.Drawing.Bitmap view;
         private System.Drawing.Graphics gfx;
         private System.Drawing.Pen gridPen;
+        private System.Drawing.Pen selectPen;
 
 
         public GDIGraphics(int width, int height)
@@ -53,6 +54,11 @@ namespace GDITiles
         public override void DrawTileGrid(int x, int y, int width, int height)
         {
             DrawTile(x, y, width, height, gridPen);
+        }
+
+        public override void DrawTileSelected(int x, int y, int width, int height)
+        {
+            DrawTile(x, y, width, height, selectPen);
         }
         public override Texture CreateTexture(string textureId, int width, int height)
         {
@@ -92,6 +98,7 @@ namespace GDITiles
             if (disposing)
             {
                 gridPen.Dispose();
+                selectPen.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -121,6 +128,7 @@ namespace GDITiles
         private void InitPens()
         {
             gridPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
+            selectPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Gold));
         }
         private void DrawTile(int x, int y, int width, int height, System.Drawing.Pen pen)
         {

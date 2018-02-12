@@ -71,11 +71,27 @@ namespace TileEngine.Screens
             {
                 Pan(dX, dY);
             }
+            else
+            {
+                Hover(mouseX, mouseY);
+            }
         }
 
         private void Pan(float dx, float dy)
         {
             engine.Camera.Shift(dx, dy);
+        }
+
+        private void Hover(float x, float y)
+        {
+            float mapX;
+            float mapY;
+            int tileX;
+            int tileY;
+            engine.Camera.IsoScreenToMap(x, y, out mapX, out mapY);
+            engine.Camera.IsoMapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.HoverTileX = tileX;
+            engine.Camera.HoverTileY = tileY;
         }
     }
 }

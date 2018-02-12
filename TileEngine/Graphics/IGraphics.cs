@@ -35,6 +35,8 @@ namespace TileEngine.Graphics
         void SetScale(float scale);
         void ClearScreen();
         void DrawTileGrid(int x, int y, int width, int height);
+        void DrawTileSelected(int x, int y, int width, int height);
+
         Texture CreateTexture(string textureId, int width, int height);
         Texture GetTexture(string textureId, IFileResolver fileResolver);
     }
