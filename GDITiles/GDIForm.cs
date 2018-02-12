@@ -37,7 +37,7 @@ namespace GDITiles
             UpdateStyles();
             KeyPreview = true;
             Logger.AddLogger(new ConsoleLogger());
-            gdiFileResolver = new GDIFileResolver("Content/images");
+            gdiFileResolver = new GDIFileResolver("Content");
             gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, new DebugOptions()
             {
                 ShowGrid = true,

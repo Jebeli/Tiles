@@ -29,7 +29,7 @@ namespace TileEngine.Maps
         {
             Map map = new Map("dummy", 64, 84);
             Layer layer = map.AddLayer("dummy");
-            layer.TileSet = engine.GetTileSet("part4_tileset.png");
+            layer.TileSet = engine.GetTileSet("images/part4_tileset.png");
             layer.TileSet.AutoFill(64, 64);
 
             layer[0, 3].TileId = 3;

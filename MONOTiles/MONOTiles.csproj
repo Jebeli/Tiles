@@ -42,7 +42,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="ExtendedSpriteBatch.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="MONOExtensions.cs" />
+    <Compile Include="MONOFileResolver.cs" />
+    <Compile Include="MONOGraphics.cs" />
     <Compile Include="MONOTexture.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,18 +15,18 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace GDITiles
+namespace MONOTiles
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using TileEngine.Files;
-
-    public class GDIFileResolver : AbstractFileResolver
+    public class MONOFileResolver :  AbstractFileResolver
     {
         private IDictionary<string, string> cache;
         private IList<string> dirs;
 
-        public GDIFileResolver(params string[] roots)
+        public MONOFileResolver(params string[] roots)
         {
             dirs = new List<string>();
             cache = new Dictionary<string, string>();
@@ -53,7 +53,12 @@ namespace GDITiles
             string fileName = null;
             if (!cache.TryGetValue(fileId, out fileName))
             {
-                if (File.Exists(fileId))
+                string assetName = MakeAssetName(fileId);
+                if (assetName != null)
+                {
+                    fileName = assetName;
+                }
+                else if (File.Exists(fileId))
                 {
                     fileName = Path.GetFullPath(fileId);
                 }
@@ -82,6 +87,42 @@ namespace GDITiles
                 return File.Open(fileName, FileMode.Open);
             }
             return null;
+        }
+
+        private string MakeAssetName(string fileId)
+        {
+            if (!string.IsNullOrEmpty(fileId))
+            {
+                if (fileId.StartsWith("images/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
+                else if (fileId.StartsWith("music/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
+                else if (fileId.StartsWith("music/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
+                else if (fileId.StartsWith("soundfx/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
+                else if (fileId.StartsWith("soundfx/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
+            }
+            return null;
+        }
+
+        private static string MakeAssetId(string fileId)
+        {
+            string assetName = fileId;
+            assetName = Path.ChangeExtension(assetName, null);
+            assetName = assetName.Trim('.');
+            return assetName;
         }
     }
 }
