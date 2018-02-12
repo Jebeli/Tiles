@@ -79,12 +79,27 @@ namespace MONOTiles
 
         public override void DrawTileGrid(int x, int y, int width, int height)
         {
+            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Wheat * 0.48f);
         }
 
         public override void DrawTileSelected(int x, int y, int width, int height)
         {
+            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Gold * 0.48f);
         }
 
+        private void DrawTile(int x, int y, int width, int height, Microsoft.Xna.Framework.Color color)
+        {
+            float x1 = x;
+            float x2 = x + width / 2;
+            float x3 = x + width;
+            float y1 = y;
+            float y2 = y + height / 2;
+            float y3 = y + height;
+            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x1, y2), new Microsoft.Xna.Framework.Vector2(x2, y1), color);
+            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y1), new Microsoft.Xna.Framework.Vector2(x3, y2), color);
+            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x3, y2), new Microsoft.Xna.Framework.Vector2(x2, y3), color);
+            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y3), new Microsoft.Xna.Framework.Vector2(x1, y2), color);
+        }
         public override Texture CreateTexture(string textureId, int width, int height)
         {
             var bmp = new Microsoft.Xna.Framework.Graphics.RenderTarget2D(game.GraphicsDevice,

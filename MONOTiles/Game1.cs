@@ -21,6 +21,7 @@ namespace MONOTiles
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
     using TileEngine;
+    using TileEngine.Graphics;
     using TileEngine.Input;
     using TileEngine.Logging;
     using TileEngine.Maps;
@@ -55,7 +56,13 @@ namespace MONOTiles
             Window.AllowUserResizing = true;
             IsMouseVisible = true;
             fileResolver = new MONOFileResolver();
-            monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height);
+            monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height, new DebugOptions()
+            {
+                ShowGrid = true,
+                ShowHighlight = true,
+                ShowTileCounter = false,
+                ShowCoordinates = false
+            });
             engine = new Engine(fileResolver, monoGraphics);
             base.Initialize();
         }
