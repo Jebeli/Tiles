@@ -137,7 +137,7 @@ namespace GDITiles
             gridPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
             selectPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Gold));
             textBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
-            smallFont = new System.Drawing.Font("Segoe UI", 10);
+            smallFont = new System.Drawing.Font("Segoe UI", 8);
         }
         private void DrawTile(int x, int y, int width, int height, System.Drawing.Pen pen)
         {

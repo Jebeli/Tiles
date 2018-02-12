@@ -42,7 +42,8 @@ namespace GDITiles
             {
                 ShowGrid = true,
                 ShowHighlight = true,
-                ShowTileCounter = true
+                ShowTileCounter = true,
+                ShowCoordinates = true
             });
             engine = new Engine(gdiFileResolver, gdiGraphics);
             Application.Idle += HandleApplicationIdle;
