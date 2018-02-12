@@ -107,7 +107,7 @@ namespace TileEngine
         {
             get
             {
-                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height})";
+                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY})";
             }
         }
         public bool Update()

@@ -38,7 +38,12 @@ namespace GDITiles
             KeyPreview = true;
             Logger.AddLogger(new ConsoleLogger());
             gdiFileResolver = new GDIFileResolver("Content/images");
-            gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height);
+            gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, new DebugOptions()
+            {
+                ShowGrid = true,
+                ShowHighlight = true,
+                ShowTileCounter = true
+            });
             engine = new Engine(gdiFileResolver, gdiGraphics);
             Application.Idle += HandleApplicationIdle;
         }

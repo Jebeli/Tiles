@@ -28,12 +28,14 @@ namespace TileEngine.Graphics
         float ViewScale { get; }
         long FrameId { get; }
         bool InFrame { get; }
+        DebugOptions DebugOptions { get; set; }
 
         void BeginFrame();
         void EndFrame();
         void SetSize(int width, int height);
         void SetScale(float scale);
         void ClearScreen();
+        void DrawText(string text, int x, int y);
         void DrawTileGrid(int x, int y, int width, int height);
         void DrawTileSelected(int x, int y, int width, int height);
 

@@ -29,12 +29,13 @@ namespace GDITiles
         private System.Drawing.Graphics gfx;
         private System.Drawing.Pen gridPen;
         private System.Drawing.Pen selectPen;
+        private System.Drawing.Font smallFont;
+        private System.Drawing.Brush textBrush;
 
-
-        public GDIGraphics(int width, int height)
-            : base(width, height)
+        public GDIGraphics(int width, int height, DebugOptions debugOptions = null)
+            : base(width, height, debugOptions)
         {
-            InitPens();
+            InitPensAndFonts();
         }
 
         public void RenderTo(System.Drawing.Graphics graphics, System.Drawing.Rectangle dst)
@@ -49,6 +50,10 @@ namespace GDITiles
             {
                 gfx.Clear(System.Drawing.Color.Black);
             }
+        }
+        public override void DrawText(string text, int x, int y)
+        {
+            gfx.DrawString(text, smallFont, textBrush, x, y);
         }
 
         public override void DrawTileGrid(int x, int y, int width, int height)
@@ -99,6 +104,8 @@ namespace GDITiles
             {
                 gridPen.Dispose();
                 selectPen.Dispose();
+                textBrush.Dispose();
+                smallFont.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -125,10 +132,12 @@ namespace GDITiles
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
         }
 
-        private void InitPens()
+        private void InitPensAndFonts()
         {
             gridPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
             selectPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Gold));
+            textBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
+            smallFont = new System.Drawing.Font("Segoe UI", 10);
         }
         private void DrawTile(int x, int y, int width, int height, System.Drawing.Pen pen)
         {

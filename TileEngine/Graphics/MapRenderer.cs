@@ -30,23 +30,36 @@ namespace TileEngine.Graphics
         }
         public void RenderMap(Map map)
         {
-            RenderGrid(map);
-            RenderSelected(map);
+            if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter) RenderGrid(map);
+            if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
         }
 
         private void RenderGrid(Map map)
         {
             int tileWidth = engine.Camera.TileWidth;
             int tileHeight = engine.Camera.TileHeight;
+            int maxScreenX = engine.Camera.ViewWidth - tileWidth;
+            int maxScreenY = engine.Camera.ViewHeight - tileHeight;
+            int minScreenX = 0;
+            int minScreenY = 0;
+            int tileCounter = 0;
             for (int y = 0; y < map.Height; y++)
             {
+                int columnCounter = 0;
                 for (int x = 0; x < map.Width; x++)
                 {
                     int sX;
                     int sY;
                     engine.Camera.IsoMapToScreen(x, y, out sX, out sY);
-                    gfx.DrawTileGrid(sX, sY, tileWidth, tileHeight);
+                    if (sX >= maxScreenX || sY >= maxScreenY) break;
+                    if (sX <= minScreenX || sY <= minScreenY) continue;
+                    if (gfx.DebugOptions.ShowGrid) gfx.DrawTileGrid(sX, sY, tileWidth, tileHeight);
+                    if (gfx.DebugOptions.ShowTileCounter) gfx.DrawText(tileCounter.ToString(), sX + tileWidth / 3, sY + tileHeight / 3);
+                    tileCounter++;
+                    columnCounter++;
+
                 }
+                if (columnCounter == 0 && tileCounter > 0) break;
             }
         }
 

@@ -15,29 +15,29 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Core
+namespace TileEngine.Graphics
 {
-    using System;
-    public class FrameCounter
+    public class DebugOptions
     {
-        private static readonly TimeSpan oneSec = new TimeSpan(0, 0, 1);
-        private TimeSpan timer = oneSec;
-        private int frameCounter;
-        private int framesPerSecond;
-
-        public int FramesPerSecond
+        private bool showGrid;
+        private bool showTileCounter;
+        private bool showHighlight;
+        public bool ShowGrid
         {
-            get { return framesPerSecond; }
+            get { return showGrid; }
+            set { showGrid = value; }
         }
 
-        public void FrameRendering(TimeInfo time)
+        public bool ShowHighlight
         {
-            frameCounter++;
-            timer += time.ElapsedGameTime;
-            if (timer <= oneSec) return;
-            framesPerSecond = frameCounter;
-            frameCounter = 0;
-            timer -= oneSec;
+            get { return showHighlight; }
+            set { showHighlight = value; }
+        }
+
+        public bool ShowTileCounter
+        {
+            get { return showTileCounter; }
+            set { showTileCounter = value; }
         }
     }
 }

@@ -24,19 +24,21 @@ namespace TileEngine.Graphics
     {
         private long frameId;
         private bool inFrame;
+        private DebugOptions debugOptions;
         protected int width;
         protected int height;
         protected int viewWidth;
         protected int viewHeight;
         protected float viewScale;
 
-        public AbstractGraphics(int width, int height)
+        public AbstractGraphics(int width, int height, DebugOptions debugOptions = null)
         {
             this.width = width;
             this.height = height;
             viewWidth = width;
             viewHeight = height;
             viewScale = 1.0f;
+            this.debugOptions = debugOptions ?? new DebugOptions();
         }
         public int Width
         {
@@ -67,6 +69,13 @@ namespace TileEngine.Graphics
         {
             get { return inFrame; }
         }
+
+        public DebugOptions DebugOptions
+        {
+            get { return debugOptions; }
+            set { debugOptions = value; }
+        }
+
         public void BeginFrame()
         {
             frameId++;
@@ -92,6 +101,7 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void ClearScreen();
+        public abstract void DrawText(string text, int x, int y);
         public abstract void DrawTileGrid(int x, int y, int width, int height);
         public abstract void DrawTileSelected(int x, int y, int width, int height);
         public abstract Texture CreateTexture(string textureId, int width, int height);
