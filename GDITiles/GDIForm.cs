@@ -29,7 +29,6 @@ namespace GDITiles
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
         private Engine engine;
-        //private Texture bg;
         public GDIForm()
         {
             InitializeComponent();
@@ -51,7 +50,6 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            //bg = engine.GetTexture("WP_20160910_011.jpg");
             engine.SetMap(MapFactory.MakeDummyMap(engine));
             engine.SwitchToMapScreen();
             base.OnLoad(e);
