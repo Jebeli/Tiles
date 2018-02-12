@@ -38,6 +38,7 @@ namespace TileEngine
         private MapScreen mapScreen;
         private Map map;
         private Camera camera;
+        private FrameCounter frameCounter;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -50,6 +51,7 @@ namespace TileEngine
             mapScreen = new MapScreen(this);
             map = MapFactory.MakeNullMap();
             camera = new Camera();
+            frameCounter = new FrameCounter();
         }
         public IFileResolver FileResolver
         {
@@ -95,6 +97,19 @@ namespace TileEngine
         {
             get { return 1.0 / maxFramesPerSecond; }
         }
+
+        public int FPS
+        {
+            get { return frameCounter.FramesPerSecond; }
+        }
+
+        public string DebugInfoText
+        {
+            get
+            {
+                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height})";
+            }
+        }
         public bool Update()
         {
             return Update(GetUpdateTimeInfo());
@@ -117,6 +132,7 @@ namespace TileEngine
 
         public void Render(TimeInfo time)
         {
+            frameCounter.FrameRendering(time);
             graphics.BeginFrame();
             graphics.ClearScreen();
             currentScreen.Render(time);

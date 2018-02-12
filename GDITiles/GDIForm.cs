@@ -56,6 +56,7 @@ namespace GDITiles
         {
             engine.Render();
             gdiGraphics.RenderTo(e.Graphics, ClientRectangle);
+            Text = engine.DebugInfoText;
             base.OnPaint(e);
         }
 

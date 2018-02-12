@@ -27,7 +27,7 @@ namespace TileEngine.Maps
         }
         public static Map MakeDummyMap()
         {
-            Map map = new Map("dummy", 50, 50);
+            Map map = new Map("dummy", 64, 84);
             Layer layer = map.AddLayer("dummy");
             return map;
         }

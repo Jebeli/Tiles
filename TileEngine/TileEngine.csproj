@@ -37,6 +37,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\ITimeInfoProvider.cs" />
     <Compile Include="Core\NamedObject.cs" />
     <Compile Include="Core\StopWatchTimeInfoProvider.cs" />
