@@ -19,16 +19,44 @@ namespace TileEngine.Maps
 {
     public static class MapFactory
     {
-        public static Map MakeNullMap()
+        public static Map MakeNullMap(Engine engine)
         {
             Map map = new Map("null", 1, 1);
             Layer layer = map.AddLayer("null");
             return map;
         }
-        public static Map MakeDummyMap()
+        public static Map MakeDummyMap(Engine engine)
         {
             Map map = new Map("dummy", 64, 84);
             Layer layer = map.AddLayer("dummy");
+            layer.TileSet = engine.GetTileSet("part4_tileset.png");
+            layer.TileSet.AutoFill(64, 64);
+
+            layer[0, 3].TileId = 3;
+            layer[0, 4].TileId = 3;
+            layer[0, 5].TileId = 1;
+            layer[0, 6].TileId = 1;
+            layer[0, 7].TileId = 1;
+
+            layer[1, 3].TileId = 3;
+            layer[1, 4].TileId = 1;
+            layer[1, 5].TileId = 1;
+            layer[1, 6].TileId = 1;
+            layer[1, 7].TileId = 1;
+
+            layer[2, 2].TileId = 3;
+            layer[2, 3].TileId = 1;
+            layer[2, 4].TileId = 1;
+            layer[2, 5].TileId = 1;
+            layer[2, 6].TileId = 1;
+            layer[2, 7].TileId = 1;
+
+            layer[3, 2].TileId = 3;
+            layer[3, 3].TileId = 1;
+            layer[3, 4].TileId = 1;
+            layer[3, 5].TileId = 1;
+            layer[3, 6].TileId = 1;
+            layer[3, 7].TileId = 1;
             return map;
         }
     }

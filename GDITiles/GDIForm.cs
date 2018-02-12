@@ -42,8 +42,8 @@ namespace GDITiles
             {
                 ShowGrid = true,
                 ShowHighlight = true,
-                ShowTileCounter = true,
-                ShowCoordinates = true
+                ShowTileCounter = false,
+                ShowCoordinates = false
             });
             engine = new Engine(gdiFileResolver, gdiGraphics);
             Application.Idle += HandleApplicationIdle;
@@ -52,7 +52,7 @@ namespace GDITiles
         protected override void OnLoad(EventArgs e)
         {
             //bg = engine.GetTexture("WP_20160910_011.jpg");
-            engine.SetMap(MapFactory.MakeDummyMap());
+            engine.SetMap(MapFactory.MakeDummyMap(engine));
             engine.SwitchToMapScreen();
             base.OnLoad(e);
         }

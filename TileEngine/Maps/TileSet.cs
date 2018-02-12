@@ -32,6 +32,24 @@ namespace TileEngine.Maps
             tiles = new List<TextureRegion>();
         }
 
+        public void AutoFill(int tileWidth, int tileHeight)
+        {
+            int index = 0;
+            int y = 0;
+            while (y < texture.Height)
+            {
+                int x = 0;
+                while (x < texture.Width)
+                {
+                    //AddTile(index, x, y, tileWidth, tileHeight, -tileWidth / 2, -tileHeight / 2);
+                    AddTile(index, x, y, tileWidth, tileHeight, 0, -tileHeight / 2);
+                    x += tileWidth;
+                    index++;
+                }
+                y += tileHeight;
+            }
+        }
+
         public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY)
         {
             if (texture != null)
@@ -44,7 +62,7 @@ namespace TileEngine.Maps
 
         public TextureRegion GetTile(int id)
         {
-            if (id > 0 && id < tiles.Count)
+            if (id >= 0 && id < tiles.Count)
             {
                 return tiles[id];
             }

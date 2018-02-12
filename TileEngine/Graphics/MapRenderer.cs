@@ -32,10 +32,57 @@ namespace TileEngine.Graphics
             oversizeX = 1;
             oversizeY = 1;
         }
+
+        public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
         public void RenderMap(Map map)
         {
+            foreach (Layer layer in map.Layers)
+            {
+                RenderLayer(layer);
+            }
             if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
             if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
+        }
+
+        private void RenderLayer(Layer layer)
+        {
+            TileLoop(layer, RenderTile);
+        }
+
+        private void RenderTile(Layer layer, Tile tile, int screenX, int screenY, int width, int height)
+        {
+            TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
+            gfx.Render(tex, screenX, screenY);
+        }
+
+        private void TileLoop(Layer layer, PerTileFunction function)
+        {
+            int tileWidth = engine.Camera.TileWidth;
+            int tileHeight = engine.Camera.TileHeight;
+            int maxOversizeX = oversizeX * tileWidth;
+            int maxOversizeY = oversizeY * tileHeight;
+            int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
+            int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
+            int minScreenX = 0 - maxOversizeX;
+            int minScreenY = 0 - maxOversizeY;
+            int tileCounter = 0;
+            for (int y = 0; y < layer.Height; y++)
+            {
+                int columnCounter = 0;
+                for (int x = 0; x < layer.Width; x++)
+                {
+                    int sX;
+                    int sY;
+                    engine.Camera.IsoMapToScreen(x, y, out sX, out sY);
+                    if (sX >= maxScreenX || sY >= maxScreenY) break;
+                    if (sX <= minScreenX || sY <= minScreenY) continue;
+                    function(layer, layer[x, y], sX, sY, tileWidth, tileHeight);
+                    tileCounter++;
+                    columnCounter++;
+                }
+                if (columnCounter == 0 && tileCounter > 0) break;
+            }
+
         }
 
         private void RenderGrid(Map map)

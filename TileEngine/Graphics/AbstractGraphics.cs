@@ -101,6 +101,22 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void ClearScreen();
+
+        public void Render(TextureRegion textureRegion, int x, int y)
+        {
+            if (textureRegion != null)
+                Render(textureRegion.Texture,
+                    x + textureRegion.OffsetX,
+                    y + textureRegion.OffsetY,
+                    textureRegion.Width,
+                    textureRegion.Height,
+                    textureRegion.X,
+                    textureRegion.Y,
+                    textureRegion.Width,
+                    textureRegion.Height);
+        }
+        public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
+
         public abstract void DrawText(string text, int x, int y);
         public abstract void DrawTileGrid(int x, int y, int width, int height);
         public abstract void DrawTileSelected(int x, int y, int width, int height);

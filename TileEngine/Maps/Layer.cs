@@ -24,6 +24,7 @@ namespace TileEngine.Maps
         private int height;
         private Map map;
         private Tile[] tiles;
+        private TileSet tileSet;
 
         internal Layer(string name, Map map, int width, int height)
             : base(name)
@@ -37,6 +38,12 @@ namespace TileEngine.Maps
         public Map Map
         {
             get { return map; }
+        }
+
+        public TileSet TileSet
+        {
+            get { return tileSet; }
+            set { tileSet = value; }
         }
 
         public int Width

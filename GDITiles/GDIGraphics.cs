@@ -51,6 +51,18 @@ namespace GDITiles
                 gfx.Clear(System.Drawing.Color.Black);
             }
         }
+
+        public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)
+        {
+            var bmp = texture.GetBitmap();
+            if (bmp != null)
+            {
+                System.Drawing.Rectangle dstRect = new System.Drawing.Rectangle(x, y, width, height);
+                System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(srcX, srcY, srcWidth, srcHeight);
+                gfx.DrawImage(bmp, dstRect, srcRect, System.Drawing.GraphicsUnit.Pixel);
+            }
+        }
+
         public override void DrawText(string text, int x, int y)
         {
             gfx.DrawString(text, smallFont, textBrush, x, y);

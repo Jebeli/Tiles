@@ -34,6 +34,7 @@ namespace TileEngine
         private ITimeInfoProvider timeProvider;
         private IInput input;
         private ResourceManager<Texture> textureManager;
+        private ResourceManager<TileSet> tileSetManager;
         private IScreen currentScreen;
         private MapScreen mapScreen;
         private Map map;
@@ -47,9 +48,10 @@ namespace TileEngine
             timeProvider = new StopWatchTimeInfoProvider();
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
+            tileSetManager = new ResourceManager<TileSet>();
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
-            map = MapFactory.MakeNullMap();
+            map = MapFactory.MakeNullMap(this);
             camera = new Camera();
             frameCounter = new FrameCounter();
         }
@@ -151,6 +153,25 @@ namespace TileEngine
         public TimeSpan GetCurrentTime()
         {
             return timeProvider.GetCurrentTime();
+        }
+
+        public TileSet GetTileSet(string tilesetId)
+        {
+            TileSet tileSet = null;
+            if (tileSetManager.Exists(tilesetId))
+            {
+                tileSet = tileSetManager.Get(tilesetId);
+            }
+            else
+            {
+                Texture tex = GetTexture(tilesetId);
+                if (tex != null)
+                {
+                    tileSet = new TileSet(tilesetId, tex);
+                    tileSetManager.Add(tileSet);
+                }
+            }
+            return tileSet;
         }
 
         public Texture GetTexture(string textureId)
