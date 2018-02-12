@@ -59,6 +59,30 @@ namespace GDITiles
             base.OnPaint(e);
         }
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            engine.Input.MouseDown(e.X, e.Y, e.Button.GetMouseButton());
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            engine.Input.MouseUp(e.X, e.Y, e.Button.GetMouseButton());
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            engine.Input.MouseMove(e.X, e.Y, e.Button.GetMouseButton());
+            base.OnMouseMove(e);
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            engine.Input.MouseWheel(e.X, e.Y, e.Delta);
+            base.OnMouseWheel(e);
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -109,5 +133,6 @@ namespace GDITiles
                 }
             }
         }
+
     }
 }

@@ -29,5 +29,13 @@ namespace GDITiles
             }
             return null;
         }
+
+        public static TileEngine.Input.MouseButton GetMouseButton(this System.Windows.Forms.MouseButtons mb)
+        {
+            if ((mb & System.Windows.Forms.MouseButtons.Left) == System.Windows.Forms.MouseButtons.Left) return TileEngine.Input.MouseButton.Left;
+            if ((mb & System.Windows.Forms.MouseButtons.Right) == System.Windows.Forms.MouseButtons.Right) return TileEngine.Input.MouseButton.Right;
+            if ((mb & System.Windows.Forms.MouseButtons.Middle) == System.Windows.Forms.MouseButtons.Middle) return TileEngine.Input.MouseButton.Middle;
+            return TileEngine.Input.MouseButton.None;
+        }
     }
 }

@@ -19,14 +19,20 @@ namespace TileEngine.Screens
 {
     using Core;
     using Graphics;
+    using Input;
 
     public class MapScreen : AbstractScreen
     {
         private MapRenderer renderer;
+        private float mouseX;
+        private float mouseY;
+        private bool mousePanning;
+        private bool panning;
         public MapScreen(Engine engine)
             : base(engine, "MapScreen")
         {
             renderer = new MapRenderer(engine);
+            mousePanning = true;
         }
 
 
@@ -34,6 +40,42 @@ namespace TileEngine.Screens
         {
             base.Render(time);
             renderer.RenderMap(engine.Map);
+        }
+
+        protected override void OnMouseDown(float x, float y, MouseButton button)
+        {
+            base.OnMouseDown(x, y, button);
+            mouseX = x;
+            mouseY = y;
+            panning = button == MouseButton.Right;
+        }
+
+        protected override void OnMouseUp(float x, float y, MouseButton button)
+        {
+            base.OnMouseUp(x, y, button);
+            mouseX = x;
+            mouseY = y;
+            panning = false;
+        }
+
+        protected override void OnMouseMove(float x, float y, MouseButton button)
+        {
+            base.OnMouseMove(x, y, button);
+            float oldMouseX = mouseX;
+            float oldMouseY = mouseY;
+            mouseX = x;
+            mouseY = y;
+            float dX = oldMouseX - mouseX;
+            float dY = oldMouseY - mouseY;
+            if (mousePanning && panning && (dX != 0 || dY != 0))
+            {
+                Pan(dX, dY);
+            }
+        }
+
+        private void Pan(float dx, float dy)
+        {
+            engine.Camera.Shift(dx, dy);
         }
     }
 }

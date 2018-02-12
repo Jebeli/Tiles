@@ -94,6 +94,15 @@ namespace TileEngine.Graphics
             get { return cameraY; }
             set { cameraY = value; }
         }
+        public void SetPosition(float posX, float posY)
+        {
+            cameraX = (int)posX;
+            cameraY = (int)posY;
+        }
+        public void Shift(float dX, float dY)
+        {
+            SetPosition(cameraX - dX, cameraY - dY);
+        }
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
             screenX = (int)(mapX * tileWidth);
@@ -113,6 +122,8 @@ namespace TileEngine.Graphics
 
         public void IsoScreenToMap(int screenX, int screenY, out float mapX, out float mapY)
         {
+            screenX -= (cameraX + halfViewWidth);
+            screenY -= (cameraY + halfViewHeight);
             mapX = ((float)screenX / tileWidth) + ((float)screenY / tileHeight);
             mapY = ((float)screenY / tileHeight) - ((float)screenX / tileWidth);
         }

@@ -50,6 +50,9 @@
     <Compile Include="Graphics\MapRenderer.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureRegion.cs" />
+    <Compile Include="Input\BasicInput.cs" />
+    <Compile Include="Input\IInput.cs" />
+    <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Maps\Layer.cs" />

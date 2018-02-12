@@ -24,6 +24,7 @@ namespace TileEngine
     using Maps;
     using Resources;
     using Screens;
+    using Input;
 
     public class Engine : ITimeInfoProvider
     {
@@ -31,6 +32,7 @@ namespace TileEngine
         private IFileResolver fileResolver;
         private IGraphics graphics;
         private ITimeInfoProvider timeProvider;
+        private IInput input;
         private ResourceManager<Texture> textureManager;
         private IScreen currentScreen;
         private MapScreen mapScreen;
@@ -42,6 +44,7 @@ namespace TileEngine
             this.fileResolver = fileResolver;
             this.graphics = graphics;
             timeProvider = new StopWatchTimeInfoProvider();
+            input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
@@ -63,6 +66,10 @@ namespace TileEngine
             get { return timeProvider; }
         }
 
+        public IInput Input
+        {
+            get { return input; }
+        }
         public IScreen Screen
         {
             get { return currentScreen; }
