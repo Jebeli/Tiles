@@ -32,6 +32,8 @@ namespace TileEngine.Graphics
         private int cameraY;
         private int hoverTileX;
         private int hoverTileY;
+        private int clickTileX;
+        private int clickTileY;
 
         public Camera()
             : this(64, 32)
@@ -109,6 +111,19 @@ namespace TileEngine.Graphics
             get { return hoverTileY; }
             set { hoverTileY = value; }
         }
+
+        public int ClickTileX
+        {
+            get { return clickTileX; }
+            set { clickTileX = value; }
+        }
+
+        public int ClickTileY
+        {
+            get { return clickTileY; }
+            set { clickTileY = value; }
+        }
+
         public void SetPosition(float posX, float posY)
         {
             cameraX = (int)posX;

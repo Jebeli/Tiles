@@ -55,7 +55,14 @@ namespace TileEngine.Screens
             base.OnMouseUp(x, y, button);
             mouseX = x;
             mouseY = y;
-            panning = false;
+            if (panning)
+            {
+                panning = false;
+            }
+            else
+            {
+                Click(mouseX, mouseY);
+            }
         }
 
         protected override void OnMouseMove(float x, float y, MouseButton button)
@@ -92,6 +99,18 @@ namespace TileEngine.Screens
             engine.Camera.IsoMapToTile(mapX, mapY, out tileX, out tileY);
             engine.Camera.HoverTileX = tileX;
             engine.Camera.HoverTileY = tileY;
+        }
+
+        private void Click(float x, float y)
+        {
+            float mapX;
+            float mapY;
+            int tileX;
+            int tileY;
+            engine.Camera.IsoScreenToMap(x, y, out mapX, out mapY);
+            engine.Camera.IsoMapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.ClickTileX = tileX;
+            engine.Camera.ClickTileY = tileY;
         }
     }
 }

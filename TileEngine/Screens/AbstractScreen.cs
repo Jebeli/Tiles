@@ -27,6 +27,9 @@ namespace TileEngine.Screens
         private bool rendered;
         private TimeSpan startTime;
         protected Engine engine;
+        private static readonly float[] scales = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f };
+        private int scaleIndex = 9;
+
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
@@ -64,7 +67,14 @@ namespace TileEngine.Screens
 
         protected virtual void OnMouseWheel(float x, float y, int delta)
         {
-
+            if (delta > 0)
+            {
+                ZoomOut();
+            }
+            else if (delta < 0)
+            {
+                ZoomIn();
+            }
         }
         protected virtual void OnMouseDown(float x, float y, MouseButton button)
         {
@@ -112,6 +122,20 @@ namespace TileEngine.Screens
         private void Input_OnMouseWheel(object sender, MouseEventArgs e)
         {
             OnMouseWheel(e.X, e.Y, e.Delta);
+        }
+
+        private void ZoomIn()
+        {
+            scaleIndex++;
+            if (scaleIndex >= scales.Length) scaleIndex = scales.Length - 1;
+            engine.SetViewScale(scales[scaleIndex]);
+        }
+
+        private void ZoomOut()
+        {
+            scaleIndex--;
+            if (scaleIndex < 0) scaleIndex = 0;
+            engine.SetViewScale(scales[scaleIndex]);
         }
     }
 }

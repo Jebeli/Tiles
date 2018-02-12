@@ -168,6 +168,14 @@ namespace TileEngine
             camera.ViewHeight = graphics.ViewHeight;
         }
 
+        public void SetViewScale(float scale)
+        {
+            graphics.SetScale(scale);
+            camera.ViewWidth = graphics.ViewWidth;
+            camera.ViewHeight = graphics.ViewHeight;
+            input.ViewScale = scale;
+        }
+
         internal void SetScreen(IScreen screen)
         {
             currentScreen.Hide();
