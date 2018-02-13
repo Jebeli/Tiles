@@ -170,6 +170,7 @@ namespace GDITiles
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
         }
 
         private void InitPensAndFonts()
