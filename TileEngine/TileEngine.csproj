@@ -57,6 +57,8 @@
     <Compile Include="Input\BasicInput.cs" />
     <Compile Include="Input\IInput.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
+    <Compile Include="Loaders\AbstractLoader.cs" />
+    <Compile Include="Loaders\ILoader.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Maps\Layer.cs" />

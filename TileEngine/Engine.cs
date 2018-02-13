@@ -25,6 +25,8 @@ namespace TileEngine
     using Resources;
     using Screens;
     using Input;
+    using Loaders;
+    using System.Collections.Generic;
 
     public class Engine : ITimeInfoProvider
     {
@@ -40,6 +42,7 @@ namespace TileEngine
         private Map map;
         private Camera camera;
         private FrameCounter frameCounter;
+        private List<ILoader> loaders;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -54,6 +57,7 @@ namespace TileEngine
             map = MapFactory.MakeNullMap(this);
             camera = new Camera();
             frameCounter = new FrameCounter();
+            loaders = new List<ILoader>();
         }
         public IFileResolver FileResolver
         {
@@ -196,6 +200,41 @@ namespace TileEngine
         public void SetMap(Map map)
         {
             this.map = map;
+        }
+
+        public Map LoadMap(string mapId)
+        {
+            Map map = null;
+            foreach(ILoader loader in loaders)
+            {
+                if (loader.CanLoad(mapId))
+                {
+                    map = loader.LoadMap(mapId);
+                    if (map != null)
+                    {
+                        SetMap(map);
+                        break;
+                    }
+                }
+            }
+            return map;
+        }
+
+        public TileSet LoadTileSet(string tileSetId)
+        {
+            TileSet tileSet = null;
+            foreach (ILoader loader in loaders)
+            {
+                if (loader.CanLoad(tileSetId))
+                {
+                    tileSet = loader.LoadTileSet(tileSetId);
+                    if (tileSet != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return tileSet;
         }
 
         public void SetViewSize(int width, int height)
