@@ -17,9 +17,15 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Loaders
 {
+    using Core;
     using Maps;
     public abstract class AbstractLoader : ILoader
     {
+        protected Engine engine;
+        public AbstractLoader(Engine engine)
+        {
+            this.engine = engine;
+        }
         public abstract FileType DetectFileTpye(string fileId);
 
         public bool CanLoad(string fileId)

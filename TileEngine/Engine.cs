@@ -27,6 +27,7 @@ namespace TileEngine
     using Input;
     using Loaders;
     using System.Collections.Generic;
+    using Savers;
 
     public class Engine : ITimeInfoProvider
     {
@@ -43,6 +44,7 @@ namespace TileEngine
         private Camera camera;
         private FrameCounter frameCounter;
         private List<ILoader> loaders;
+        private List<ISaver> savers;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics)
         {
@@ -58,6 +60,7 @@ namespace TileEngine
             camera = new Camera();
             frameCounter = new FrameCounter();
             loaders = new List<ILoader>();
+            savers = new List<ISaver>();
         }
         public IFileResolver FileResolver
         {

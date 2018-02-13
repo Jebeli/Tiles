@@ -37,6 +37,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Enums.cs" />
     <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\ITimeInfoProvider.cs" />
     <Compile Include="Core\NamedObject.cs" />
@@ -69,6 +70,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Resources\ResourceManager.cs" />
+    <Compile Include="Savers\AbstractSaver.cs" />
+    <Compile Include="Savers\ISaver.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
     <Compile Include="Screens\IScreen.cs" />
     <Compile Include="Screens\MapScreen.cs" />

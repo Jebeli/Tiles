@@ -16,16 +16,13 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
 
-namespace TileEngine.Loaders
-{
-    using Core;
-    using Maps;
+using TileEngine.Maps;
 
-    public interface ILoader
+namespace TileEngine.Savers
+{
+    public interface ISaver
     {
-        FileType DetectFileTpye(string fileId);
-        bool CanLoad(string fileId);
-        Map LoadMap(string fileId);
-        TileSet LoadTileSet(string fileId);
+        void Save(Map map, string fileId);
+        void Save(TileSet tileSet, string fileId);
     }
 }

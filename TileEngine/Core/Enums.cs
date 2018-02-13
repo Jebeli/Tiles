@@ -15,17 +15,12 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-
-namespace TileEngine.Loaders
+namespace TileEngine.Core
 {
-    using Core;
-    using Maps;
-
-    public interface ILoader
+    public enum FileType
     {
-        FileType DetectFileTpye(string fileId);
-        bool CanLoad(string fileId);
-        Map LoadMap(string fileId);
-        TileSet LoadTileSet(string fileId);
+        None,
+        Map,
+        TileSet
     }
 }

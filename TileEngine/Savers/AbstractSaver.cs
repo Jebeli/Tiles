@@ -16,16 +16,18 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
 
-namespace TileEngine.Loaders
+namespace TileEngine.Savers
 {
-    using Core;
     using Maps;
 
-    public interface ILoader
+    public abstract class AbstractSaver : ISaver
     {
-        FileType DetectFileTpye(string fileId);
-        bool CanLoad(string fileId);
-        Map LoadMap(string fileId);
-        TileSet LoadTileSet(string fileId);
+        protected Engine engine;
+        public AbstractSaver(Engine engine)
+        {
+            this.engine = engine;
+        }
+        public abstract void Save(Map map, string fileId);
+        public abstract void Save(TileSet tileSet, string fileId);
     }
 }
