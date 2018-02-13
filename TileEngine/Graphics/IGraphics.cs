@@ -35,6 +35,7 @@ namespace TileEngine.Graphics
         void SetSize(int width, int height);
         void SetScale(float scale);
         void ClearScreen();
+        void DrawTextures(Texture texture, int[] vertices, int offset, int count);
         void Render(TextureRegion textureRegion, int x, int y);
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
 

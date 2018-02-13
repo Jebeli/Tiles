@@ -30,6 +30,7 @@ namespace TileEngine.Graphics
         protected int viewWidth;
         protected int viewHeight;
         protected float viewScale;
+        protected const int NUM_VERTICES = 10;
 
         public AbstractGraphics(int width, int height, DebugOptions debugOptions = null)
         {
@@ -101,7 +102,7 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void ClearScreen();
-
+        public abstract void DrawTextures(Texture texture, int[] vertices, int offset, int count);
         public void Render(TextureRegion textureRegion, int x, int y)
         {
             if (textureRegion != null)

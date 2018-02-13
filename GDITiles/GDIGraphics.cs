@@ -52,6 +52,34 @@ namespace GDITiles
             }
         }
 
+        public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)
+        {
+            var bmp = texture.GetBitmap();
+            if (bmp != null)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = offset;
+                    int x = vertices[idx];
+                    int y = vertices[idx + 1];
+                    int width = vertices[idx + 2];
+                    int height = vertices[idx + 3];
+                    int srcX = vertices[idx + 4];
+                    int srcY = vertices[idx + 5];
+                    int srcWidth = vertices[idx + 6];
+                    int srcHeight = vertices[idx + 7];
+                    int trans = vertices[idx + 8];
+                    int tint = vertices[idx + 9];
+                    var dstRect = new System.Drawing.Rectangle(x, y, width, height);
+                    var srcRect = new System.Drawing.Rectangle(srcX, srcY, srcWidth, srcHeight);
+                    gfx.DrawImage(bmp, dstRect, srcRect, System.Drawing.GraphicsUnit.Pixel);
+                    offset += NUM_VERTICES;
+
+                }
+            }
+        }
+
+
         public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)
         {
             var bmp = texture.GetBitmap();

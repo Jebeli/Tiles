@@ -25,10 +25,12 @@ namespace TileEngine.Graphics
         private IGraphics gfx;
         private int oversizeX;
         private int oversizeY;
+        private IBatch batch;
         internal MapRenderer(Engine engine)
         {
             this.engine = engine;
             gfx = engine.Graphics;
+            batch = new TextureBatch(gfx);
             oversizeX = 1;
             oversizeY = 1;
         }
@@ -36,10 +38,12 @@ namespace TileEngine.Graphics
         public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
         public void RenderMap(Map map)
         {
+            batch.Begin();
             foreach (Layer layer in map.Layers)
             {
                 RenderLayer(layer);
             }
+            batch.End();
             if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
             if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
         }
@@ -51,8 +55,11 @@ namespace TileEngine.Graphics
 
         private void RenderTile(Layer layer, Tile tile, int screenX, int screenY, int width, int height)
         {
-            TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
-            gfx.Render(tex, screenX, screenY);
+            if (tile.TileId >= 0)
+            {
+                TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
+                batch.Draw(tex, screenX, screenY);
+            }
         }
 
         private void TileLoop(Layer layer, PerTileFunction function)

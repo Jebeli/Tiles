@@ -17,8 +17,11 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Maps
 {
+    using System;
+
     public static class MapFactory
     {
+        private static Random rnd = new Random();
         public static Map MakeNullMap(Engine engine)
         {
             Map map = new Map("null", 1, 1);
@@ -28,35 +31,47 @@ namespace TileEngine.Maps
         public static Map MakeDummyMap(Engine engine)
         {
             Map map = new Map("dummy", 64, 84);
-            Layer layer = map.AddLayer("dummy");
+            Layer layer = map.AddLayer("ground");
             layer.TileSet = engine.GetTileSet("images/part4_tileset.png");
             layer.TileSet.AutoFill(64, 64);
 
-            layer[0, 3].TileId = 3;
-            layer[0, 4].TileId = 3;
-            layer[0, 5].TileId = 1;
-            layer[0, 6].TileId = 1;
-            layer[0, 7].TileId = 1;
+            for (int x = 0; x < layer.Width; x++)
+            {
+                for (int y = 0; y < layer.Height; y++)
+                {
+                    int row = rnd.Next() % 3;
+                    switch (row)
+                    {
+                        case 0:
+                            layer[x, y].TileId = 0 + rnd.Next() % 7;
+                            break;
+                        case 1:
+                            layer[x, y].TileId = 10 + rnd.Next() % 8;
+                            break;
+                        case 2:
+                            layer[x, y].TileId = 20 + rnd.Next() % 4;
+                            break;
+                    }
 
-            layer[1, 3].TileId = 3;
-            layer[1, 4].TileId = 1;
-            layer[1, 5].TileId = 1;
-            layer[1, 6].TileId = 1;
-            layer[1, 7].TileId = 1;
+                }
+            }
 
-            layer[2, 2].TileId = 3;
-            layer[2, 3].TileId = 1;
-            layer[2, 4].TileId = 1;
-            layer[2, 5].TileId = 1;
-            layer[2, 6].TileId = 1;
-            layer[2, 7].TileId = 1;
+            layer = map.AddLayer("lake");
+            layer.TileSet = engine.GetTileSet("images/part4_tileset.png");
 
-            layer[3, 2].TileId = 3;
-            layer[3, 3].TileId = 1;
-            layer[3, 4].TileId = 1;
-            layer[3, 5].TileId = 1;
-            layer[3, 6].TileId = 1;
-            layer[3, 7].TileId = 1;
+
+            layer[10, 10].TileId = 10 * 8 + 3;
+            layer[10, 9].TileId = 10 * 8 + 7;
+            layer[10, 8].TileId = 10 * 8 + 9;
+
+            layer[11, 10].TileId = 10 * 8 + 1;
+            layer[11, 9].TileId = 10 * 8 + 4;
+            layer[11, 8].TileId = 10 * 8 + 8;
+
+            layer[12, 10].TileId = 10 * 8 + 0;
+            layer[12, 9].TileId = 10 * 8 + 2;
+            layer[12, 8].TileId = 10 * 8 + 6;
+
             return map;
         }
     }

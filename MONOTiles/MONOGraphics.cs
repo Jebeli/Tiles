@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace MONOTiles
 {
+    using System;
     using TileEngine.Files;
     using TileEngine.Graphics;
     using TileEngine.Logging;
@@ -58,6 +59,42 @@ namespace MONOTiles
         public override void ClearScreen()
         {
             game.GraphicsDevice.Clear(Microsoft.Xna.Framework.Graphics.ClearOptions.Target, Microsoft.Xna.Framework.Color.Transparent, 1.0f, 0);
+        }
+
+        public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)
+        {
+            var bmp = texture.GetTexture();
+            if (bmp != null)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    int idx = offset;
+                    int x = vertices[idx];
+                    int y = vertices[idx + 1];
+                    int width = vertices[idx + 2];
+                    int height = vertices[idx + 3];
+                    int srcX = vertices[idx + 4];
+                    int srcY = vertices[idx + 5];
+                    int srcWidth = vertices[idx + 6];
+                    int srcHeight = vertices[idx + 7];
+                    int trans = vertices[idx + 8];
+                    int tint = vertices[idx + 9];
+                    var dstRect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+                    var srcRect = new Microsoft.Xna.Framework.Rectangle(srcX, srcY, srcWidth, srcHeight);
+                    var c = Microsoft.Xna.Framework.Color.White;
+                    if (tint != 0xFFFFFF)
+                    {
+                        c = new Microsoft.Xna.Framework.Color((uint)tint);
+                    }
+                    if (trans > 0)
+                    {
+                        c *= (float)((255 - trans) / 256.0);
+                    }
+                    batch.Draw(bmp, dstRect, srcRect, c, 0.0f, Microsoft.Xna.Framework.Vector2.Zero, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 1.0f);
+                    offset += NUM_VERTICES;
+
+                }
+            }
         }
 
         public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)

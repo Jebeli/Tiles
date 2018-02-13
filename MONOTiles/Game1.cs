@@ -58,7 +58,7 @@ namespace MONOTiles
             fileResolver = new MONOFileResolver();
             monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height, new DebugOptions()
             {
-                ShowGrid = true,
+                ShowGrid = false,
                 ShowHighlight = true,
                 ShowTileCounter = false,
                 ShowCoordinates = false

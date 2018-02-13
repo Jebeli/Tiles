@@ -14,42 +14,15 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
-
-namespace TileEngine.Maps
+namespace TileEngine.Graphics
 {
-    public class Tile
+    public interface IBatch
     {
-        private int x;
-        private int y;
-        private Layer layer;
-        private int tileId;
-        internal Tile(Layer layer, int x, int y)
-        {
-            this.layer = layer;
-            this.x = x;
-            this.y = y;
-            tileId = -1;
-        }
-
-        public Layer Layer
-        {
-            get { return layer; }
-        }
-
-        public int X
-        {
-            get { return x; }
-        }
-
-        public int Y
-        {
-            get { return y; }
-        }
-
-        public int TileId
-        {
-            get { return tileId; }
-            set { tileId = value; }
-        }
+        bool IsDrawing { get; }
+        void Begin();
+        void End();
+        void Flush();
+        void Draw(TextureRegion region, int x, int y);
+        void Draw(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
     }
 }

@@ -39,7 +39,7 @@ namespace GDITiles
             gdiFileResolver = new GDIFileResolver("Content");
             gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, new DebugOptions()
             {
-                ShowGrid = true,
+                ShowGrid = false,
                 ShowHighlight = true,
                 ShowTileCounter = false,
                 ShowCoordinates = false
