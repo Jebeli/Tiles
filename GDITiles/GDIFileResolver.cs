@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace GDITiles
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using TileEngine.Files;
@@ -80,6 +81,24 @@ namespace GDITiles
             if (File.Exists(fileName))
             {
                 return File.Open(fileName, FileMode.Open);
+            }
+            return null;
+        }
+
+        public override Stream CreateFile(string fileId)
+        {
+            string fileName = Resolve(fileId);
+            if (fileName == null)
+            {
+                foreach (string dir in dirs)
+                {
+                    fileName = Path.Combine(dir, fileId);
+                    break;
+                }
+            }
+            if (fileName != null)
+            {
+                return File.Create(fileName);
             }
             return null;
         }

@@ -21,7 +21,7 @@ namespace MONOTiles
     using System.Collections.Generic;
     using System.IO;
     using TileEngine.Files;
-    public class MONOFileResolver :  AbstractFileResolver
+    public class MONOFileResolver : AbstractFileResolver
     {
         private IDictionary<string, string> cache;
         private IList<string> dirs;
@@ -88,6 +88,25 @@ namespace MONOTiles
             }
             return null;
         }
+
+        public override Stream CreateFile(string fileId)
+        {
+            string fileName = Resolve(fileId);
+            if (fileName == null)
+            {
+                foreach (string dir in dirs)
+                {
+                    fileName = Path.Combine(dir, fileId);
+                    break;
+                }
+            }
+            if (fileName != null)
+            {
+                return File.Create(fileName);
+            }
+            return null;
+        }
+
 
         private string MakeAssetName(string fileId)
         {

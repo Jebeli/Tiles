@@ -60,7 +60,9 @@ namespace TileEngine
             camera = new Camera();
             frameCounter = new FrameCounter();
             loaders = new List<ILoader>();
+            loaders.Add(new XmlLoader(this));
             savers = new List<ISaver>();
+            savers.Add(new XmlSaver(this));
         }
         public IFileResolver FileResolver
         {
@@ -238,6 +240,15 @@ namespace TileEngine
                 }
             }
             return tileSet;
+        }
+
+        public void SaveTileSet(TileSet tileSet, string fileId)
+        {
+            foreach(ISaver saver in savers)
+            {
+                saver.Save(tileSet, fileId);
+                break;
+            }
         }
 
         public void SetViewSize(int width, int height)

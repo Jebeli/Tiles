@@ -25,6 +25,8 @@ namespace TileEngine.Maps
     {
         private Texture texture;
         private List<TextureRegion> tiles;
+        private int tileWidth;
+        private int tileHeight;
         public TileSet(string name, Texture texture)
             : base(name)
         {
@@ -32,8 +34,44 @@ namespace TileEngine.Maps
             tiles = new List<TextureRegion>();
         }
 
+        public int TileWidth
+        {
+            get { return tileWidth; }
+            set { tileWidth = value; }
+        }
+
+        public int TileHeight
+        {
+            get { return tileHeight; }
+            set { tileHeight = value; }
+        }
+
+        public Texture Texture
+        {
+            get { return texture; }
+        }
+
+        public IEnumerable<int> Tiles
+        {
+            get
+            {
+                List<int> list = new List<int>();
+
+                for (int i = 0; i < tiles.Count; i++)
+                {
+                    if (tiles[i] != null)
+                    {
+                        list.Add(i);
+                    }
+                }
+                return list;
+            }
+        }
+
         public void AutoFill(int tileWidth, int tileHeight)
         {
+            this.tileWidth = tileWidth;
+            this.tileHeight = tileHeight;
             int index = 0;
             int y = 0;
             while (y < texture.Height)
@@ -41,7 +79,6 @@ namespace TileEngine.Maps
                 int x = 0;
                 while (x < texture.Width)
                 {
-                    //AddTile(index, x, y, tileWidth, tileHeight, -tileWidth / 2, -tileHeight / 2);
                     AddTile(index, x, y, tileWidth, tileHeight, 0, -tileHeight / 2);
                     x += tileWidth;
                     index++;

@@ -19,6 +19,8 @@ namespace TileEngine.Loaders
 {
     using Core;
     using Maps;
+    using System.IO;
+
     public abstract class AbstractLoader : ILoader
     {
         protected Engine engine;
@@ -36,5 +38,10 @@ namespace TileEngine.Loaders
         public abstract Map LoadMap(string fileId);
         
         public abstract TileSet LoadTileSet(string fileId);
+
+        protected Stream GetInputStream(string fileId)
+        {
+            return engine.FileResolver.OpenFile(fileId);
+        }
     }
 }

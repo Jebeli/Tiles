@@ -60,6 +60,7 @@
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Loaders\AbstractLoader.cs" />
     <Compile Include="Loaders\ILoader.cs" />
+    <Compile Include="Loaders\XmlLoader.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Maps\Layer.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="Savers\AbstractSaver.cs" />
     <Compile Include="Savers\ISaver.cs" />
+    <Compile Include="Savers\XmlSaver.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
     <Compile Include="Screens\IScreen.cs" />
     <Compile Include="Screens\MapScreen.cs" />

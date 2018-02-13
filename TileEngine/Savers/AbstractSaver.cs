@@ -19,6 +19,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine.Savers
 {
     using Maps;
+    using System.IO;
 
     public abstract class AbstractSaver : ISaver
     {
@@ -29,5 +30,10 @@ namespace TileEngine.Savers
         }
         public abstract void Save(Map map, string fileId);
         public abstract void Save(TileSet tileSet, string fileId);
+
+        protected Stream GetOutputStream(string fileId)
+        {
+            return engine.FileResolver.CreateFile(fileId);
+        }
     }
 }

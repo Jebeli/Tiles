@@ -23,5 +23,6 @@ namespace TileEngine.Files
     {
         string Resolve(string fileId);
         Stream OpenFile(string fileId);
+        Stream CreateFile(string fileId);
     }
 }

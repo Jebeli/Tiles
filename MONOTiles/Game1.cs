@@ -55,7 +55,7 @@ namespace MONOTiles
             Window.AllowAltF4 = false;
             Window.AllowUserResizing = true;
             IsMouseVisible = true;
-            fileResolver = new MONOFileResolver();
+            fileResolver = new MONOFileResolver("Content");
             monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height, new DebugOptions()
             {
                 ShowGrid = false,

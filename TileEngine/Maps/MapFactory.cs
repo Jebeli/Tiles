@@ -30,11 +30,15 @@ namespace TileEngine.Maps
         }
         public static Map MakeDummyMap(Engine engine)
         {
+            TileSet tileSet = engine.LoadTileSet("part4_tileset.xml");
+            if (tileSet == null)
+            {
+                tileSet = engine.GetTileSet("images/part4_tileset.png");
+                tileSet.AutoFill(64, 64);
+            }
             Map map = new Map("dummy", 64, 84);
             Layer layer = map.AddLayer("ground");
-            layer.TileSet = engine.GetTileSet("images/part4_tileset.png");
-            layer.TileSet.AutoFill(64, 64);
-
+            layer.TileSet = tileSet;
             for (int x = 0; x < layer.Width; x++)
             {
                 for (int y = 0; y < layer.Height; y++)
@@ -57,7 +61,7 @@ namespace TileEngine.Maps
             }
 
             layer = map.AddLayer("lake");
-            layer.TileSet = engine.GetTileSet("images/part4_tileset.png");
+            layer.TileSet = tileSet;
 
 
             layer[10, 10].TileId = 10 * 8 + 3;
@@ -71,6 +75,9 @@ namespace TileEngine.Maps
             layer[12, 10].TileId = 10 * 8 + 0;
             layer[12, 9].TileId = 10 * 8 + 2;
             layer[12, 8].TileId = 10 * 8 + 6;
+
+
+            //engine.SaveTileSet(layer.TileSet, "part4_tileset.xml");
 
             return map;
         }
