@@ -6,10 +6,13 @@ Tile Engine
 _Portable Tile Engine_
 
 #TileEngine
+The portable tile engine.
 
 #MONOTiles
+Uses TileEngine with MonoGame.
 
 #GDITiles
+Uses TileEngine with WinForms and GDI+.
 
 ## Copyright and License
 
