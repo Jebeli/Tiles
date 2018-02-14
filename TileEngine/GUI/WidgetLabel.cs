@@ -29,6 +29,7 @@ namespace TileEngine.GUI
         private string text;
 
         public WidgetLabel(string text = "")
+            : base(null, null, null)
         {
             this.text = text;
             Clickable = false;
@@ -46,7 +47,7 @@ namespace TileEngine.GUI
 
         protected override void BoundsChanged()
         {
-            
+
         }
 
         public override string ToString()

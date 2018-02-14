@@ -27,11 +27,16 @@ namespace TileEngine.GUI
     public class WidgetButton : Widget
     {
         private WidgetLabel label;
+
         public WidgetButton(string text = "")
+            : this(WidgetFactory.Button9P, WidgetFactory.Button9PHover, WidgetFactory.Button9PPressed, text)
+        {
+        }
+        public WidgetButton(NinePatch patch, NinePatch patchHover, NinePatch patchPressed, string text = "")
+            : base(patch, patchHover, patchPressed)
         {
             label = new WidgetLabel(text);
             AddWidget(label);
-            
         }
 
         public string Text

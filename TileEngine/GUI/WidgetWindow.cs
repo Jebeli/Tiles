@@ -9,7 +9,16 @@ namespace TileEngine.GUI
 {
     public class WidgetWindow : Widget
     {
+        public WidgetWindow()
+            : this(WidgetFactory.Window9P)
+        {
 
+        }
+        public WidgetWindow(NinePatch patch)
+            : base(patch, patch, patch)
+        {
+
+        }
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
             if (!DrawNinePatch(graphics, x, y, width, height))

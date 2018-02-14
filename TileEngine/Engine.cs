@@ -28,6 +28,7 @@ namespace TileEngine
     using Loaders;
     using System.Collections.Generic;
     using Savers;
+    using GUI;
 
     public class Engine : ITimeInfoProvider
     {
@@ -54,6 +55,7 @@ namespace TileEngine
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
+            WidgetFactory.InitDefault(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             map = MapFactory.MakeNullMap(this);

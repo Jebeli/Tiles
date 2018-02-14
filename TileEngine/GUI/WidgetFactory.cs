@@ -25,32 +25,49 @@ namespace TileEngine.GUI
     using System.Threading.Tasks;
     public static class WidgetFactory
     {
+        private static NinePatch button9P;
+        private static NinePatch button9PH;
+        private static NinePatch button9PP;
+        private static NinePatch window9P;
+
+
+        public static NinePatch Button9P
+        {
+            get { return button9P; }
+        }
+
+        public static NinePatch Button9PHover
+        {
+            get { return button9PH; }
+        }
+
+        public static NinePatch Button9PPressed
+        {
+            get { return button9PP; }
+        }
+
+        public static NinePatch Window9P
+        {
+            get { return window9P; }
+        }
+        public static void InitDefault(Engine engine)
+        {
+            button9P = GetNinePatch(engine, "gui/buttonMid.png");
+            button9PH = GetNinePatch(engine, "gui/buttonLight.png");
+            button9PP = GetNinePatch(engine, "gui/buttonDark.png");
+            window9P = GetNinePatch(engine, "gui/window.png");
+
+        }
         public static void AddDemoButtons(Engine engine, IWidgetContainer container)
         {
-            NinePatch button9P = GetNinePatch(engine, "gui/buttonMid.png");
-            NinePatch button9PH = GetNinePatch(engine, "gui/buttonLight.png");
-            NinePatch button9PP = GetNinePatch(engine, "gui/buttonDark.png");
-            NinePatch window9P = GetNinePatch(engine, "gui/window.png");
             WidgetWindow window1 = new WidgetWindow();
             window1.SetBounds(10, 10, 3 * 64 + 10, 32 + 10);
-            window1.Patch = window9P;
-            window1.PatchHover = window9P;
-            window1.PatchPressed = window9P;
             WidgetButton button1 = new WidgetButton("Exit");
             button1.SetBounds(5, 5, 64, 32);
-            button1.Patch = button9P;
-            button1.PatchHover = button9PH;
-            button1.PatchPressed = button9PP;
             WidgetButton button2 = new WidgetButton("Load");
             button2.SetBounds(5 + 64, 5, 64, 32);
-            button2.Patch = button9P;
-            button2.PatchHover = button9PH;
-            button2.PatchPressed = button9PP;
             WidgetButton button3 = new WidgetButton("Save");
             button3.SetBounds(5 + 64 * 2, 5, 64, 32);
-            button3.Patch = button9P;
-            button3.PatchHover = button9PH;
-            button3.PatchPressed = button9PP;
             window1.AddWidget(button1);
             window1.AddWidget(button2);
             window1.AddWidget(button3);

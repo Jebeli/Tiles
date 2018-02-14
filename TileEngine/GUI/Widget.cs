@@ -41,12 +41,15 @@ namespace TileEngine.GUI
         private NinePatch patchHover;
         private NinePatch patchPressed;
 
-        public Widget()
+        public Widget(NinePatch patch, NinePatch patchHover, NinePatch patchPressed)
         {
             children = new List<Widget>();
             visible = true;
             enabled = true;
             clickable = true;
+            this.patch = patch;
+            this.patchHover = patchHover;
+            this.patchPressed = patchPressed;
         }
 
         public NinePatch Patch
@@ -266,7 +269,7 @@ namespace TileEngine.GUI
             return pressed;
         }
 
-        public  bool CheckMouseHover(int x, int y)
+        public bool CheckMouseHover(int x, int y)
         {
             if (visible && enabled)
             {
@@ -274,7 +277,7 @@ namespace TileEngine.GUI
                 {
                     if (w.CheckMouseHover(x, y))
                     {
-                        hover = true;                        
+                        hover = true;
                     }
                 }
                 if (visible && enabled && Contains(x, y))
