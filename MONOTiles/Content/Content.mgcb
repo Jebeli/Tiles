@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\packages\MonoGame.Extended.Content.Pipeline.1.0.617\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -48,4 +49,21 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:images/tilesets/tileset_grassland.png
+
+#begin fonts/Small.fnt
+/importer:BitmapFontImporter
+/processor:BitmapFontProcessor
+/build:fonts/Small.fnt
+
+#begin fonts/Small_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:fonts/Small_0.png
 

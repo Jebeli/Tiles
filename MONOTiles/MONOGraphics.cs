@@ -22,6 +22,7 @@ namespace MONOTiles
     using TileEngine.Files;
     using TileEngine.Graphics;
     using TileEngine.Logging;
+    using MonoGame.Extended.BitmapFonts;
 
     public class MONOGraphics : AbstractGraphics
     {
@@ -112,7 +113,34 @@ namespace MONOTiles
 
         public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
+            var c = Microsoft.Xna.Framework.Color.Wheat;
+            var fnt = game.smallFont;
+            var size = fnt.MeasureString(text);
+            var pos = new Microsoft.Xna.Framework.Vector2(x, y);
+            if (hAlign == HorizontalTextAlign.Center)
+            {
+                pos.X -= size.Width / 2;
+            }
+            else if (hAlign == HorizontalTextAlign.Left)
+            {
+            }
+            else if (hAlign == HorizontalTextAlign.Right)
+            {
+                pos.X -= size.Width;
+            }
+            if (vAlign == VerticalTextAlign.Center)
+            {
+                pos.Y -= size.Height / 2;
+            }
+            else if (vAlign == VerticalTextAlign.Top)
+            {
 
+            }
+            else if (vAlign == VerticalTextAlign.Bottom)
+            {
+                pos.Y -= size.Height;
+            }
+            batch.DrawString(fnt, text, pos, c);
         }
 
 

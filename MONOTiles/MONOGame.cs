@@ -20,6 +20,7 @@ namespace MONOTiles
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
+    using MonoGame.Extended.BitmapFonts;
     using TileEngine;
     using TileEngine.Graphics;
     using TileEngine.Input;
@@ -38,6 +39,9 @@ namespace MONOTiles
         private int mouseDelta;
         private bool leftMouseDown;
         private bool rightMouseDown;
+
+        internal BitmapFont smallFont;
+
 
         public MONOGame()
         {
@@ -70,6 +74,7 @@ namespace MONOTiles
         protected override void LoadContent()
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
+            smallFont = Content.Load<BitmapFont>("fonts/Small");
             //engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
             //engine.SetMap(MapFactory.MakeDummyMap(engine));
             engine.SetMap(MapFactory.MakeIniMap(engine));
