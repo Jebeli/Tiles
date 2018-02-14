@@ -39,9 +39,9 @@ namespace GDITiles
             gdiFileResolver = new GDIFileResolver("Content");
             gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, new DebugOptions()
             {
-                ShowGrid = false,
+                ShowGrid = true,
                 ShowHighlight = true,
-                ShowTileCounter = false,
+                ShowTileCounter = true,
                 ShowCoordinates = false
             });
             engine = new Engine(gdiFileResolver, gdiGraphics);
@@ -50,8 +50,8 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            //engine.SetMap(MapFactory.MakeDummyMap(engine));
-            engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
+            engine.SetMap(MapFactory.MakeDummyMap(engine));
+            //engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
             engine.SwitchToMapScreen();
             base.OnLoad(e);
         }

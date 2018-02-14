@@ -39,42 +39,15 @@ namespace TileEngine.Graphics
         public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
         public void RenderMap(Map map)
         {
-            switch (map.Orientation)
-            {
-                case MapOrientation.Isometric:
-                    RenderIsoMap(map);
-                    break;
-                case MapOrientation.Orthogonal:
-                    RenderOrthoMap(map);
-                    break;
-            }
-        }
-
-        private void RenderIsoMap(Map map)
-        {
             batch.Begin();
             foreach (Layer layer in map.Layers)
             {
-                IsoTileLoop(layer, RenderTile);
+                TileLoop(layer, RenderTile);
             }
             batch.End();
-            if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) IsoRenderGrid(map);
+            if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
             if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
         }
-
-        private void RenderOrthoMap(Map map)
-        {
-            batch.Begin();
-            foreach (Layer layer in map.Layers)
-            {
-                OrthoTileLoop(layer, RenderTile);
-            }
-            batch.End();
-            if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) OrthoRenderGrid(map);
-            if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
-        }
-
-
         private void RenderTile(Layer layer, Tile tile, int screenX, int screenY, int width, int height)
         {
             if (tile.TileId >= 0)
@@ -86,7 +59,8 @@ namespace TileEngine.Graphics
                 }
             }
         }
-        private void OrthoTileLoop(Layer layer, PerTileFunction function)
+
+        private void TileLoop(Layer layer, PerTileFunction function)
         {
             int tileWidth = engine.Camera.TileWidth;
             int tileHeight = engine.Camera.TileHeight;
@@ -104,7 +78,7 @@ namespace TileEngine.Graphics
                 {
                     int sX;
                     int sY;
-                    engine.Camera.OrthoMapToScreen(x, y, out sX, out sY);
+                    engine.Camera.MapToScreen(x, y, out sX, out sY);
                     if (sX >= maxScreenX || sY >= maxScreenY) break;
                     if (sX <= minScreenX || sY <= minScreenY) continue;
                     function(layer, layer[x, y], sX, sY, tileWidth, tileHeight);
@@ -115,71 +89,7 @@ namespace TileEngine.Graphics
             }
         }
 
-        private void IsoTileLoop(Layer layer, PerTileFunction function)
-        {
-            int tileWidth = engine.Camera.TileWidth;
-            int tileHeight = engine.Camera.TileHeight;
-            int maxOversizeX = oversizeX * tileWidth;
-            int maxOversizeY = oversizeY * tileHeight;
-            int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
-            int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
-            int minScreenX = 0 - maxOversizeX;
-            int minScreenY = 0 - maxOversizeY;
-            int tileCounter = 0;
-            for (int y = 0; y < layer.Height; y++)
-            {
-                int columnCounter = 0;
-                for (int x = 0; x < layer.Width; x++)
-                {
-                    int sX;
-                    int sY;
-                    engine.Camera.IsoMapToScreen(x, y, out sX, out sY);
-                    if (sX >= maxScreenX || sY >= maxScreenY) break;
-                    if (sX <= minScreenX || sY <= minScreenY) continue;
-                    function(layer, layer[x, y], sX, sY, tileWidth, tileHeight);
-                    tileCounter++;
-                    columnCounter++;
-                }
-                if (columnCounter == 0 && tileCounter > 0) break;
-            }
-        }
-
-        private void IsoRenderGrid(Map map)
-        {
-            const int TEXT_OFFSET_X = 18;
-            const int TEXT_OFFSET_Y = 5;
-            const int TEXT_SIZE_Y = 9;
-            int tileWidth = engine.Camera.TileWidth;
-            int tileHeight = engine.Camera.TileHeight;
-            int maxOversizeX = oversizeX * tileWidth;
-            int maxOversizeY = oversizeY * tileHeight;
-            int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
-            int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
-            int minScreenX = 0 - maxOversizeX;
-            int minScreenY = 0 - maxOversizeY;
-            int tileCounter = 0;
-            for (int y = 0; y < map.Height; y++)
-            {
-                int columnCounter = 0;
-                for (int x = 0; x < map.Width; x++)
-                {
-                    int sX;
-                    int sY;
-                    engine.Camera.MapToScreen(x, y, out sX, out sY, map.Orientation);
-                    if (sX >= maxScreenX || sY >= maxScreenY) break;
-                    if (sX <= minScreenX || sY <= minScreenY) continue;
-                    if (gfx.DebugOptions.ShowGrid) gfx.DrawTileGrid(sX, sY, tileWidth, tileHeight, map.Orientation);
-                    if (gfx.DebugOptions.ShowTileCounter) gfx.DrawText(tileCounter.ToString(), sX + TEXT_OFFSET_X, sY + TEXT_OFFSET_Y);
-                    if (gfx.DebugOptions.ShowCoordinates) gfx.DrawText($"({x}/{y})", sX + TEXT_OFFSET_X, sY + TEXT_OFFSET_Y + TEXT_SIZE_Y);
-                    tileCounter++;
-                    columnCounter++;
-
-                }
-                if (columnCounter == 0 && tileCounter > 0) break;
-            }
-        }
-
-        private void OrthoRenderGrid(Map map)
+        private void RenderGrid(Map map)
         {
             const int TEXT_OFFSET_X = 18;
             const int TEXT_OFFSET_Y = 5;

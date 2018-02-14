@@ -45,6 +45,7 @@ namespace TileEngine.Graphics
             tileHeight = map.TileHeight;
             halfTileWidth = tileWidth / 2;
             halfTileHeight = tileHeight / 2;
+            SetMapPosition(map.Width / 2, map.Height / 2);
         }
         public int TileWidth
         {
@@ -127,6 +128,24 @@ namespace TileEngine.Graphics
             cameraX = (int)posX;
             cameraY = (int)posY;
         }
+
+        public void SetMapPosition(float mapX, float mapY)
+        {
+            float screenX = 0;
+            float screenY = 0;
+            switch (orientation)
+            {
+                case MapOrientation.Orthogonal:
+                    screenX = - mapX * tileWidth;
+                    screenY = - mapY * tileHeight;
+                    break;
+                case MapOrientation.Isometric:
+                    screenX = -((mapX - mapY) * halfTileWidth);
+                    screenY = -((mapX + mapY) * halfTileHeight);
+                    break;
+            }
+            SetPosition(screenX, screenY);
+        }
         public void Shift(float dX, float dY)
         {
             SetPosition(cameraX - dX, cameraY - dY);
@@ -151,14 +170,14 @@ namespace TileEngine.Graphics
 
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            screenX = (int)(mapX * tileWidth) + cameraX;
-            screenY = (int)(mapY * tileHeight) + cameraY;
+            screenX = (int)(mapX * tileWidth) + cameraX + halfViewWidth;
+            screenY = (int)(mapY * tileHeight) + cameraY + halfViewHeight;
         }
 
         public void OrthoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            screenX -= (cameraX);
-            screenY -= (cameraY);
+            screenX -= (cameraX + halfViewWidth);
+            screenY -= (cameraY + halfViewHeight);
             mapX = (screenX / tileWidth);
             mapY = (screenY / tileHeight);
         }

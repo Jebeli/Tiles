@@ -118,7 +118,7 @@ namespace TileEngine
         {
             get
             {
-                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY})";
+                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY}) CAM: ({camera.CameraX}/{camera.CameraY})";
             }
         }
         public bool Update()
@@ -211,7 +211,7 @@ namespace TileEngine
         public Map LoadMap(string mapId)
         {
             Map map = null;
-            foreach(ILoader loader in loaders)
+            foreach (ILoader loader in loaders)
             {
                 if (loader.CanLoad(mapId))
                 {
@@ -245,7 +245,7 @@ namespace TileEngine
 
         public void SaveTileSet(TileSet tileSet, string fileId)
         {
-            foreach(ISaver saver in savers)
+            foreach (ISaver saver in savers)
             {
                 saver.Save(tileSet, fileId);
                 break;
