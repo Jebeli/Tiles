@@ -17,6 +17,8 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Graphics
 {
+    using Core;
+    using Maps;
     using System;
     public class Camera
     {
@@ -34,20 +36,16 @@ namespace TileEngine.Graphics
         private int hoverTileY;
         private int clickTileX;
         private int clickTileY;
+        private MapOrientation orientation;
 
-        public Camera()
-            : this(64, 32)
+        public Camera(Map map)
         {
-
-        }
-        public Camera(int tileWidth, int tileHeight)
-        {
-            this.tileWidth = tileWidth;
-            this.tileHeight = tileHeight;
+            orientation = map.Orientation;
+            tileWidth = map.TileWidth;
+            tileHeight = map.TileHeight;
             halfTileWidth = tileWidth / 2;
             halfTileHeight = tileHeight / 2;
         }
-
         public int TileWidth
         {
             get { return tileWidth; }
@@ -133,14 +131,34 @@ namespace TileEngine.Graphics
         {
             SetPosition(cameraX - dX, cameraY - dY);
         }
+
+        public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY)
+        {
+            MapToScreen(mapX, mapY, out screenX, out screenY, orientation);
+        }
+
+        public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY, MapOrientation orientation)
+        {
+            if (orientation == MapOrientation.Isometric)
+            {
+                IsoMapToScreen(mapX, mapY, out screenX, out screenY);
+            }
+            else
+            {
+                OrthoMapToScreen(mapX, mapY, out screenX, out screenY);
+            }
+        }
+
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            screenX = (int)(mapX * tileWidth);
-            screenY = (int)(mapY * tileHeight);
+            screenX = (int)(mapX * tileWidth) + cameraX;
+            screenY = (int)(mapY * tileHeight) + cameraY;
         }
 
         public void OrthoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
+            screenX -= (cameraX);
+            screenY -= (cameraY);
             mapX = (screenX / tileWidth);
             mapY = (screenY / tileHeight);
         }
@@ -148,6 +166,21 @@ namespace TileEngine.Graphics
         {
             screenX = (int)((mapX - mapY) * halfTileWidth) + cameraX + halfViewWidth;
             screenY = (int)((mapX + mapY) * halfTileHeight) + cameraY + halfViewHeight;
+        }
+        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
+        {
+            ScreenToMap(screenX, screenY, out mapX, out mapY, orientation);
+        }
+        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY, MapOrientation orientation)
+        {
+            if (orientation == MapOrientation.Isometric)
+            {
+                IsoScreenToMap(screenX, screenY, out mapX, out mapY);
+            }
+            else
+            {
+                OrthoScreenToMap(screenX, screenY, out mapX, out mapY);
+            }
         }
 
         public void IsoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
@@ -159,7 +192,7 @@ namespace TileEngine.Graphics
             mapY = (screenY / tileHeight) - (screenX / tileWidth);
         }
 
-        public void IsoMapToTile(float mapX, float mapY, out int tileX, out int tileY)
+        public void MapToTile(float mapX, float mapY, out int tileX, out int tileY)
         {
             tileX = (int)(Math.Floor(mapX));
             tileY = (int)(Math.Floor(mapY));

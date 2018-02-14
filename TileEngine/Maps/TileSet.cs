@@ -68,7 +68,7 @@ namespace TileEngine.Maps
             }
         }
 
-        public void AutoFill(int tileWidth, int tileHeight)
+        public void AutoFill(int tileWidth, int tileHeight, int offsetX = 0, int offsetY = 0)
         {
             this.tileWidth = tileWidth;
             this.tileHeight = tileHeight;
@@ -79,7 +79,7 @@ namespace TileEngine.Maps
                 int x = 0;
                 while (x < texture.Width)
                 {
-                    AddTile(index, x, y, tileWidth, tileHeight, 0, -tileHeight / 2);
+                    AddTile(index, x, y, tileWidth, tileHeight, offsetX, offsetY);
                     x += tileWidth;
                     index++;
                 }

@@ -24,12 +24,18 @@ namespace TileEngine.Maps
         private int width;
         private int height;
         private IList<Layer> layers;
-        public Map(string name, int width, int height)
+        private MapOrientation orientation;
+        private int tileWidth;
+        private int tileHeight;
+        public Map(string name, int width, int height, int tileWidth, int tileHeight,  MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
         {
             this.width = width;
             this.height = height;
+            this.tileWidth = tileWidth;
+            this.tileHeight = tileHeight;
             layers = new List<Layer>();
+            this.orientation = orientation;
         }
 
         public int Width
@@ -42,6 +48,23 @@ namespace TileEngine.Maps
             get { return height; }
         }
 
+        public MapOrientation Orientation
+        {
+            get { return orientation; }
+            set { orientation = value; }
+        }
+
+        public int TileWidth
+        {
+            get { return tileWidth; }
+            set { tileWidth = value; }
+        }
+
+        public int TileHeight
+        {
+            get { return tileHeight; }
+            set { tileHeight = value; }
+        }
         public Layer AddLayer(string name)
         {
             Layer layer = null;

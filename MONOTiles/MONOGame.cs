@@ -26,7 +26,7 @@ namespace MONOTiles
     using TileEngine.Logging;
     using TileEngine.Maps;
 
-    public class Game1 : Game
+    public class MONOGame : Game
     {
         private GraphicsDeviceManager graphics;
         private ExtendedSpriteBatch spriteBatch;
@@ -39,7 +39,7 @@ namespace MONOTiles
         private bool leftMouseDown;
         private bool rightMouseDown;
 
-        public Game1()
+        public MONOGame()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
@@ -70,7 +70,7 @@ namespace MONOTiles
         protected override void LoadContent()
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
-            engine.SetMap(MapFactory.MakeDummyMap(engine));
+            engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
             engine.SwitchToMapScreen();
 
         }

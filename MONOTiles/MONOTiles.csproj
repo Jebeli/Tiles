@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ExtendedSpriteBatch.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="MONOGame.cs" />
     <Compile Include="MONOExtensions.cs" />
     <Compile Include="MONOFileResolver.cs" />
     <Compile Include="MONOGraphics.cs" />
@@ -118,6 +118,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\part2_tileset.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\part4_tileset.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

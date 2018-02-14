@@ -23,4 +23,10 @@ namespace TileEngine.Core
         Map,
         TileSet
     }
+
+    public enum MapOrientation
+    {
+        Isometric,
+        Orthogonal
+    }
 }

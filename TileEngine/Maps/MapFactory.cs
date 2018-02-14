@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Maps
 {
+    using Core;
     using System;
 
     public static class MapFactory
@@ -24,8 +25,38 @@ namespace TileEngine.Maps
         private static Random rnd = new Random();
         public static Map MakeNullMap(Engine engine)
         {
-            Map map = new Map("null", 1, 1);
+            Map map = new Map("null", 1, 1, 64, 32);
             Layer layer = map.AddLayer("null");
+            return map;
+        }
+
+        public static Map MakeDummyOrthoMap(Engine engine)
+        {
+            TileSet tileSet = engine.LoadTileSet("part2_tileset.xml");
+            if (tileSet == null)
+            {
+                tileSet = engine.GetTileSet("images/part2_tileset.png");
+                tileSet.AutoFill(48, 48);
+                engine.SaveTileSet(tileSet, "part2_tileset.xml");
+            }
+            Map map = new Map("dummy", 64, 84, 48, 48, MapOrientation.Orthogonal);
+            Layer layer = map.AddLayer("ground");
+            layer.TileSet = tileSet;
+            layer.Fill(0);
+            layer = map.AddLayer("lake");
+            layer.TileSet = tileSet;
+            layer[0, 0].TileId = 9 * 12;
+            layer[0, 1].TileId = 4 * 12 + 1;
+            layer[1, 0].TileId = 9 * 12;
+            layer[1, 1].TileId = 4 * 12 + 1;
+            layer[1, 0].TileId = 4 * 12 + 3;
+            layer[1, 1].TileId = 4 * 12 + 11;
+            for (int y = 0; y < layer.Height; y++)
+            {
+                layer[29, y].TileId = 3 * 12 + 2;
+                layer[30, y].TileId = 3;
+                layer[31, y].TileId = 3 * 12 + 3;
+            }
             return map;
         }
         public static Map MakeDummyMap(Engine engine)
@@ -34,9 +65,10 @@ namespace TileEngine.Maps
             if (tileSet == null)
             {
                 tileSet = engine.GetTileSet("images/part4_tileset.png");
-                tileSet.AutoFill(64, 64);
+                tileSet.AutoFill(64, 64, 0, -32);
+                engine.SaveTileSet(tileSet, "part4_tileset.xml");
             }
-            Map map = new Map("dummy", 64, 84);
+            Map map = new Map("dummy", 64, 84, 64, 32);
             Layer layer = map.AddLayer("ground");
             layer.TileSet = tileSet;
             for (int x = 0; x < layer.Width; x++)
@@ -77,7 +109,7 @@ namespace TileEngine.Maps
             layer[12, 8].TileId = 10 * 8 + 6;
 
 
-            //engine.SaveTileSet(layer.TileSet, "part4_tileset.xml");
+            
 
             return map;
         }

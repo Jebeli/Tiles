@@ -64,6 +64,14 @@ namespace TileEngine.Maps
             get { return tiles[XYToIndex(x, y)]; }
         }
 
+        public void Fill(int tileId)
+        {
+            foreach(var tile in tiles)
+            {
+                tile.TileId = tileId;
+            }
+        }
+
         private int XYToIndex(int x, int y)
         {
             return y * width + x;

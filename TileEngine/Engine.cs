@@ -57,7 +57,7 @@ namespace TileEngine
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             map = MapFactory.MakeNullMap(this);
-            camera = new Camera();
+            camera = new Camera(map);
             frameCounter = new FrameCounter();
             loaders = new List<ILoader>();
             loaders.Add(new XmlLoader(this));
@@ -205,6 +205,7 @@ namespace TileEngine
         public void SetMap(Map map)
         {
             this.map = map;
+            camera = new Camera(map);
         }
 
         public Map LoadMap(string mapId)

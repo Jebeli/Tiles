@@ -95,8 +95,8 @@ namespace TileEngine.Screens
             float mapY;
             int tileX;
             int tileY;
-            engine.Camera.IsoScreenToMap(x, y, out mapX, out mapY);
-            engine.Camera.IsoMapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.ScreenToMap(x, y, out mapX, out mapY);
+            engine.Camera.MapToTile(mapX, mapY, out tileX, out tileY);
             engine.Camera.HoverTileX = tileX;
             engine.Camera.HoverTileY = tileY;
         }
@@ -107,8 +107,8 @@ namespace TileEngine.Screens
             float mapY;
             int tileX;
             int tileY;
-            engine.Camera.IsoScreenToMap(x, y, out mapX, out mapY);
-            engine.Camera.IsoMapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.ScreenToMap(x, y, out mapX, out mapY);
+            engine.Camera.MapToTile(mapX, mapY, out tileX, out tileY);
             engine.Camera.ClickTileX = tileX;
             engine.Camera.ClickTileY = tileY;
         }

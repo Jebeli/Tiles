@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Graphics
 {
+    using Core;
     using Files;
 
     public interface IGraphics
@@ -40,8 +41,8 @@ namespace TileEngine.Graphics
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
 
         void DrawText(string text, int x, int y);
-        void DrawTileGrid(int x, int y, int width, int height);
-        void DrawTileSelected(int x, int y, int width, int height);
+        void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
+        void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
 
         Texture CreateTexture(string textureId, int width, int height);
         Texture GetTexture(string textureId, IFileResolver fileResolver);

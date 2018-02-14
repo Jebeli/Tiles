@@ -18,16 +18,17 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace MONOTiles
 {
     using System;
+    using TileEngine.Core;
     using TileEngine.Files;
     using TileEngine.Graphics;
     using TileEngine.Logging;
 
     public class MONOGraphics : AbstractGraphics
     {
-        private Game1 game;
+        private MONOGame game;
         private Microsoft.Xna.Framework.Graphics.RenderTarget2D view;
         private ExtendedSpriteBatch batch;
-        public MONOGraphics(Game1 game, int width, int height, DebugOptions debugOptions = null)
+        public MONOGraphics(MONOGame game, int width, int height, DebugOptions debugOptions = null)
             : base(width, height, debugOptions)
         {
             this.game = game;
@@ -111,31 +112,39 @@ namespace MONOTiles
 
         public override void DrawText(string text, int x, int y)
         {
-            
+
         }
 
-        public override void DrawTileGrid(int x, int y, int width, int height)
+        public override void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
-            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Wheat * 0.48f);
+            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Wheat * 0.48f, oriention);
         }
 
-        public override void DrawTileSelected(int x, int y, int width, int height)
+        public override void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
-            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Gold * 0.48f);
+            DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Gold * 0.48f, oriention);
         }
 
-        private void DrawTile(int x, int y, int width, int height, Microsoft.Xna.Framework.Color color)
+        private void DrawTile(int x, int y, int width, int height, Microsoft.Xna.Framework.Color color, MapOrientation oriention = MapOrientation.Isometric)
         {
-            float x1 = x;
-            float x2 = x + width / 2;
-            float x3 = x + width;
-            float y1 = y;
-            float y2 = y + height / 2;
-            float y3 = y + height;
-            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x1, y2), new Microsoft.Xna.Framework.Vector2(x2, y1), color);
-            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y1), new Microsoft.Xna.Framework.Vector2(x3, y2), color);
-            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x3, y2), new Microsoft.Xna.Framework.Vector2(x2, y3), color);
-            batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y3), new Microsoft.Xna.Framework.Vector2(x1, y2), color);
+            if (oriention == MapOrientation.Orthogonal)
+            {
+                var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+                batch.DrawRectangle(rect, color);
+            }
+            else
+            {
+                float x1 = x;
+                float x2 = x + width / 2;
+                float x3 = x + width;
+                float y1 = y;
+                float y2 = y + height / 2;
+                float y3 = y + height;
+                batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x1, y2), new Microsoft.Xna.Framework.Vector2(x2, y1), color);
+                batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y1), new Microsoft.Xna.Framework.Vector2(x3, y2), color);
+                batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x3, y2), new Microsoft.Xna.Framework.Vector2(x2, y3), color);
+                batch.DrawLine(new Microsoft.Xna.Framework.Vector2(x2, y3), new Microsoft.Xna.Framework.Vector2(x1, y2), color);
+            }
         }
         public override Texture CreateTexture(string textureId, int width, int height)
         {
@@ -151,7 +160,7 @@ namespace MONOTiles
         }
 
         public override Texture GetTexture(string textureId, IFileResolver fileResolver)
-        {            
+        {
             string assetName = fileResolver.Resolve(textureId);
             var bmp = game.Content.Load<Microsoft.Xna.Framework.Graphics.Texture2D>(assetName);
             return new MONOTexture(textureId, bmp);

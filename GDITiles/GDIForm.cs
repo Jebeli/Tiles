@@ -50,7 +50,8 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            engine.SetMap(MapFactory.MakeDummyMap(engine));
+            //engine.SetMap(MapFactory.MakeDummyMap(engine));
+            engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
             engine.SwitchToMapScreen();
             base.OnLoad(e);
         }
