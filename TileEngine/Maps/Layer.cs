@@ -18,6 +18,8 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine.Maps
 {
     using Core;
+    using System.Text;
+
     public class Layer : NamedObject
     {
         private int width;
@@ -66,10 +68,43 @@ namespace TileEngine.Maps
 
         public void Fill(int tileId)
         {
-            foreach(var tile in tiles)
+            foreach (var tile in tiles)
             {
                 tile.TileId = tileId;
             }
+        }
+
+        public void SetCSV(string csv)
+        {
+            int index = 0;
+            foreach(var s in csv.Split(',', '\n', '\r'))
+            {
+                int value;
+                if (int.TryParse(s, out value))
+                {
+                    tiles[index].TileId = value;
+                    index++;
+                }
+                if (index >= tiles.Length)
+                    break;
+            }
+        }
+
+        public string GetCSV()
+        {
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    sb.Append(tiles[index].TileId);
+                    index++;
+                    if (index < tiles.Length) sb.Append(",");
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
 
         private int XYToIndex(int x, int y)

@@ -21,6 +21,7 @@ namespace TileEngine.Loaders
     using Core;
     using Graphics;
     using Maps;
+    using System;
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
@@ -117,6 +118,42 @@ namespace TileEngine.Loaders
         private Map LoadMap(XElement root, string fileId)
         {
             Map map = null;
+            string name = (string)root.Attribute("name");
+            string orientation = (string)root.Attribute("orientation");
+            int? width = (int?)root.Attribute("width");
+            int? height = (int?)root.Attribute("height");
+            int? tileWidth = (int?)root.Attribute("tileWidth");
+            int? tileHeight = (int?)root.Attribute("tileHeight");
+            if (name != null && orientation != null && width != null && height != null && tileWidth != null && tileHeight != null)
+            {
+                MapOrientation mapOrientation;
+                if (Enum.TryParse(orientation, true, out mapOrientation))
+                {
+                    map = new Map(name, (int)width, (int)height, (int)tileWidth, (int)tileHeight, mapOrientation);
+                    foreach (var node in from item in root.Descendants("layer") select item)
+                    {
+                        string layerName = (string)node.Attribute("name");
+                        int? layerWidth = (int?)node.Attribute("width");
+                        int? layerHeight = (int?)node.Attribute("height");
+                        string tileSetName = (string)node.Attribute("tileset");
+                        var data = node.Descendants().FirstOrDefault();
+                        if (layerName != null && layerWidth != null && layerHeight != null && data != null && tileSetName != null)
+                        {
+                            TileSet tileSet = engine.GetTileSet(tileSetName);
+                            string encoding = (string)data.Attribute("encoding");
+                            if (encoding != null && tileSet != null)
+                            {
+                                Layer layer = map.AddLayer(layerName);
+                                layer.TileSet = tileSet;
+                                if (encoding.Equals("csv", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    layer.SetCSV(data.Value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return map;
         }
 
@@ -129,7 +166,7 @@ namespace TileEngine.Loaders
             string image = (string)root.Attribute("image");
             if (name != null && tileWidth != null && tileHeight != null && image != null)
             {
-                Texture tex = engine.Graphics.GetTexture(image, engine.FileResolver);
+                Texture tex = engine.GetTexture(image);
                 if (tex != null)
                 {
                     ts = new TileSet(name, tex);

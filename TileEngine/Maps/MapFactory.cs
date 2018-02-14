@@ -32,6 +32,9 @@ namespace TileEngine.Maps
 
         public static Map MakeDummyOrthoMap(Engine engine)
         {
+            Map map = engine.LoadMap("part2_map.xml");
+            if (map != null) return map;
+
             TileSet tileSet = engine.LoadTileSet("part2_tileset.xml");
             if (tileSet == null)
             {
@@ -39,7 +42,7 @@ namespace TileEngine.Maps
                 tileSet.AutoFill(48, 48);
                 engine.SaveTileSet(tileSet, "part2_tileset.xml");
             }
-            Map map = new Map("dummy", 64, 84, 48, 48, MapOrientation.Orthogonal);
+            map = new Map("dummy", 64, 84, 48, 48, MapOrientation.Orthogonal);
             Layer layer = map.AddLayer("ground");
             layer.TileSet = tileSet;
             layer.Fill(0);
@@ -57,10 +60,14 @@ namespace TileEngine.Maps
                 layer[30, y].TileId = 3;
                 layer[31, y].TileId = 3 * 12 + 3;
             }
+            engine.SaveMap(map, "part2_map.xml");
             return map;
         }
         public static Map MakeDummyMap(Engine engine)
         {
+            Map map = engine.LoadMap("part4_map.xml");
+            if (map != null) return map;
+
             TileSet tileSet = engine.LoadTileSet("part4_tileset.xml");
             if (tileSet == null)
             {
@@ -68,7 +75,7 @@ namespace TileEngine.Maps
                 tileSet.AutoFill(64, 64, 0, -32);
                 engine.SaveTileSet(tileSet, "part4_tileset.xml");
             }
-            Map map = new Map("dummy", 64, 84, 64, 32);
+            map = new Map("dummy", 64, 84, 64, 32);
             Layer layer = map.AddLayer("ground");
             layer.TileSet = tileSet;
             for (int x = 0; x < layer.Width; x++)
@@ -109,8 +116,7 @@ namespace TileEngine.Maps
             layer[12, 8].TileId = 10 * 8 + 6;
 
 
-            
-
+            engine.SaveMap(map, "part4_map.xml");
             return map;
         }
     }

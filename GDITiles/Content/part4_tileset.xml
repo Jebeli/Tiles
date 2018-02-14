@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<tileset name="images/part4_tileset.png" tileWidth="64" tileHeight="64" image="images/part4_tileset.png">
+<tileset name="part4_tileset.xml" tileWidth="64" tileHeight="64" image="images/part4_tileset.png">
   <tile id="0">
     <region x="0" y="0" width="64" height="64" offsetX="0" offsetY="-32" />
   </tile>

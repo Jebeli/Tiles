@@ -173,11 +173,19 @@ namespace TileEngine
             }
             else
             {
-                Texture tex = GetTexture(tilesetId);
-                if (tex != null)
+                tileSet = LoadTileSet(tilesetId);
+                if (tileSet != null)
                 {
-                    tileSet = new TileSet(tilesetId, tex);
                     tileSetManager.Add(tileSet);
+                }
+                else
+                {
+                    Texture tex = GetTexture(tilesetId);
+                    if (tex != null)
+                    {
+                        tileSet = new TileSet(tilesetId, tex);
+                        tileSetManager.Add(tileSet);
+                    }
                 }
             }
             return tileSet;
@@ -248,6 +256,15 @@ namespace TileEngine
             foreach (ISaver saver in savers)
             {
                 saver.Save(tileSet, fileId);
+                break;
+            }
+        }
+
+        public void SaveMap(Map map, string fileId)
+        {
+            foreach (ISaver saver in savers)
+            {
+                saver.Save(map, fileId);
                 break;
             }
         }

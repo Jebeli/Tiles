@@ -23,14 +23,42 @@ namespace TileEngine.Savers
 
     public class XmlSaver : AbstractSaver
     {
-        public XmlSaver(Engine engine) 
+        public XmlSaver(Engine engine)
             : base(engine)
         {
         }
 
         public override void Save(Map map, string fileId)
         {
-            
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.CloseOutput = true;
+            settings.Indent = true;
+            using (XmlWriter writer = XmlWriter.Create(GetOutputStream(fileId), settings))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("map");
+                writer.WriteAttributeString("name", map.Name);
+                writer.WriteAttributeString("orientation", map.Orientation.ToString().ToLowerInvariant());
+                writer.WriteAttributeString("width", map.Width.ToString());
+                writer.WriteAttributeString("height", map.Height.ToString());
+                writer.WriteAttributeString("tileWidth", map.TileWidth.ToString());
+                writer.WriteAttributeString("tileHeight", map.TileHeight.ToString());
+                foreach (Layer layer in map.Layers)
+                {
+                    writer.WriteStartElement("layer");
+                    writer.WriteAttributeString("name", layer.Name);
+                    writer.WriteAttributeString("width", layer.Width.ToString());
+                    writer.WriteAttributeString("height", layer.Height.ToString());
+                    writer.WriteAttributeString("tileset", layer.TileSet.Name);
+                    writer.WriteStartElement("data");
+                    writer.WriteAttributeString("encoding", "csv");
+                    writer.WriteString(layer.GetCSV());
+                    writer.WriteEndElement();
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
         }
 
         public override void Save(TileSet tileSet, string fileId)
@@ -38,7 +66,7 @@ namespace TileEngine.Savers
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.CloseOutput = true;
             settings.Indent = true;
-            using (XmlWriter writer = XmlWriter.Create(GetOutputStream(fileId),settings))
+            using (XmlWriter writer = XmlWriter.Create(GetOutputStream(fileId), settings))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("tileset");
@@ -52,7 +80,7 @@ namespace TileEngine.Savers
                     writer.WriteAttributeString("id", tileId.ToString());
                     var region = tileSet.GetTile(tileId);
                     writer.WriteStartElement("region");
-                    writer.WriteAttributeString("x",region.X.ToString());
+                    writer.WriteAttributeString("x", region.X.ToString());
                     writer.WriteAttributeString("y", region.Y.ToString());
                     writer.WriteAttributeString("width", region.Width.ToString());
                     writer.WriteAttributeString("height", region.Height.ToString());

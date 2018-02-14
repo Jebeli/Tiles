@@ -71,6 +71,7 @@ namespace MONOTiles
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
             engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
+            //engine.SetMap(MapFactory.MakeDummyMap(engine));
             engine.SwitchToMapScreen();
 
         }
