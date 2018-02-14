@@ -113,15 +113,34 @@ namespace TileEngine.Screens
         }
         protected virtual void OnMouseDown(float x, float y, MouseButton button)
         {
-
+            foreach (var w in widgets)
+            {
+                w.CheckMouseDown((int)x, (int)y);
+            }
         }
 
         protected virtual void OnMouseUp(float x, float y, MouseButton button)
         {
-
+            Widget widget = null;
+            foreach (var w in widgets)
+            {
+                if (w.CheckMouseUp((int)x, (int)y, ref widget))
+                {
+                    OnWidgetClick(widget);
+                }
+            }
         }
         protected virtual void OnMouseMove(float x, float y, MouseButton button)
         {
+            foreach (var w in widgets)
+            {
+                w.CheckMouseHover((int)x, (int)y);
+            }
+        }
+
+        protected virtual void OnWidgetClick(Widget widget)
+        {
+            Logger.Info("Widget", $"{widget} clicked");
         }
 
         private void LinkInput()

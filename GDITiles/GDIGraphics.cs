@@ -124,6 +124,13 @@ namespace GDITiles
             gfx.DrawString(text, smallFont, textBrush, fx, fy);
         }
 
+        public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
+        {
+            var rect = new System.Drawing.Rectangle(x, y, width, height);
+            gfx.FillRectangle(System.Drawing.Brushes.Gray, rect);
+            gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+        }
+
         public override void DrawText(string text, int x, int y)
         {
             gfx.DrawString(text, smallFont, textBrush, x, y);

@@ -47,5 +47,11 @@ namespace TileEngine.GUI
         {
             
         }
+
+        public override string ToString()
+        {
+            return "Label " + Text;
+        }
+
     }
 }

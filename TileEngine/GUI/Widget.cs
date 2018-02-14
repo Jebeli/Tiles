@@ -34,6 +34,9 @@ namespace TileEngine.GUI
         private List<Widget> children;
         private bool visible;
         private bool enabled;
+        private bool pressed;
+        private bool hover;
+
 
         public Widget()
         {
@@ -139,6 +142,16 @@ namespace TileEngine.GUI
             set { enabled = value; }
         }
 
+        public bool Hover
+        {
+            get { return hover; }
+        }
+
+        public bool Pressed
+        {
+            get { return pressed; }
+        }
+
         public Widget Parent
         {
             get { return parent; }
@@ -164,6 +177,94 @@ namespace TileEngine.GUI
             children.Clear();
         }
 
+        public bool Contains(int mouseX, int mouseY)
+        {
+            int x;
+            int y;
+            int width;
+            int height;
+            CalcBounds(out x, out y, out width, out height);
+            return (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height);
+        }
+
+        public bool CheckMouseUp(int x, int y, ref Widget widget)
+        {
+            bool wasPressed = pressed;
+            if (Visible && Enabled)
+            {
+                foreach (var w in children)
+                {
+                    if (w.CheckMouseUp(x, y, ref widget))
+                    {
+                        pressed = false;
+                    }
+                }
+                if (Visible && Enabled && Contains(x, y))
+                {
+                    if (pressed)
+                    {
+                        widget = this;
+                        pressed = false;
+                    }
+                }
+            }
+            pressed = false;
+            return !pressed && wasPressed;
+        }
+
+        public bool CheckMouseDown(int x, int y)
+        {
+            if (Visible && Enabled)
+            {
+                foreach (var w in children)
+                {
+                    if (w.CheckMouseDown(x, y))
+                    {
+                        pressed = true;
+                    }
+                }
+                if (Visible && Enabled && Contains(x, y))
+                {
+                    pressed = true;
+                }
+                else
+                {
+                    pressed = false;
+                }
+            }
+            else
+            {
+                pressed = false;
+            }
+            return pressed;
+        }
+
+        public  bool CheckMouseHover(int x, int y)
+        {
+            if (Visible && Enabled)
+            {
+                foreach (var w in children)
+                {
+                    if (w.CheckMouseHover(x, y))
+                    {
+                        hover = true;                        
+                    }
+                }
+                if (Visible && Enabled && Contains(x, y))
+                {
+                    hover = true;
+                }
+                else
+                {
+                    hover = false;
+                }
+            }
+            else
+            {
+                hover = false;
+            }
+            return hover;
+        }
         public void Render(IGraphics graphics)
         {
             if (visible)

@@ -143,6 +143,31 @@ namespace MONOTiles
             batch.DrawString(fnt, text, pos, c);
         }
 
+        public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
+        {
+            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            if (pressed)
+            {
+                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.DimGray * 0.5f);
+                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+            }
+            else if (hover && enabled)
+            {
+                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.LightGray * 0.5f);
+                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+            }
+            else if (enabled)
+            {
+                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.Gray * 0.5f);
+                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+            }
+            else
+            {
+                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.DimGray * 0.5f);
+                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+
+            }
+        }
 
         public override void DrawText(string text, int x, int y)
         {

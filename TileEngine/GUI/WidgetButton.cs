@@ -41,12 +41,17 @@ namespace TileEngine.GUI
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
-            graphics.DrawTileGrid(x, y, width, height, MapOrientation.Orthogonal);
+            graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
         }
 
         protected override void BoundsChanged()
         {
             label.SetSize(Width, Height);
+        }
+
+        public override string ToString()
+        {
+            return "Button " + Text;
         }
     }
 }

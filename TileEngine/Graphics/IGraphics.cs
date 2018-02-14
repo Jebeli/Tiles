@@ -54,6 +54,7 @@ namespace TileEngine.Graphics
         void Render(TextureRegion textureRegion, int x, int y);
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
         void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
         void DrawText(string text, int x, int y);
         void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
