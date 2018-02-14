@@ -48,6 +48,14 @@ namespace TileEngine.Maps
             get { return height; }
         }
 
+        public void InvalidateRenderLists()
+        {
+            foreach(var layer in layers)
+            {
+                layer.RenderList = null;
+            }
+        }
+
         public MapOrientation Orientation
         {
             get { return orientation; }

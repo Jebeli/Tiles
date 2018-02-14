@@ -36,10 +36,12 @@ namespace TileEngine.Graphics
         private int hoverTileY;
         private int clickTileX;
         private int clickTileY;
+        private Map map;
         private MapOrientation orientation;
 
         public Camera(Map map)
         {
+            this.map = map;
             orientation = map.Orientation;
             tileWidth = map.TileWidth;
             tileHeight = map.TileHeight;
@@ -127,6 +129,7 @@ namespace TileEngine.Graphics
         {
             cameraX = (int)posX;
             cameraY = (int)posY;
+            map.InvalidateRenderLists();
         }
 
         public void SetMapPosition(float mapX, float mapY)

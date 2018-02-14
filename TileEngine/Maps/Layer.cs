@@ -18,6 +18,8 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine.Maps
 {
     using Core;
+    using Graphics;
+    using System.Collections.Generic;
     using System.Text;
 
     public class Layer : NamedObject
@@ -30,6 +32,7 @@ namespace TileEngine.Maps
         private bool visible;
         private int oversizeX;
         private int oversizeY;
+        private IList<RenderTextureRegion> renderList;
 
         internal Layer(string name, Map map, int width, int height)
             : base(name)
@@ -46,6 +49,12 @@ namespace TileEngine.Maps
         public Map Map
         {
             get { return map; }
+        }
+
+        public IList<RenderTextureRegion> RenderList
+        {
+            get { return renderList; }
+            set { renderList = value; }
         }
 
         public bool Visible

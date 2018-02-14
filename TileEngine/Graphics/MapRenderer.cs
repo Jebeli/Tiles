@@ -19,27 +19,47 @@ namespace TileEngine.Graphics
 {
     using Core;
     using Maps;
+    using System.Collections.Generic;
 
     internal class MapRenderer
     {
         private Engine engine;
         private IGraphics gfx;
         private IBatch batch;
+        private bool useRenderLists;
         internal MapRenderer(Engine engine)
         {
+            useRenderLists = true;
             this.engine = engine;
             gfx = engine.Graphics;
             batch = new TextureBatch(gfx);
+        }
+
+        public bool UseRenderLists
+        {
+            get { return useRenderLists; }
+            set { useRenderLists = value; }
         }
 
         public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
         public void RenderMap(Map map)
         {
             batch.Begin();
+            int index = 0;
             foreach (Layer layer in map.Layers)
             {
                 if (layer.Visible)
-                    TileLoop(layer, RenderTile);
+                {
+                    if (useRenderLists)
+                    {
+                        RenderList(GetRenderList(layer));
+                    }
+                    else
+                    {
+                        TileLoop(layer, RenderTile);
+                    }
+                }
+                index++;
             }
             batch.End();
             if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
@@ -55,6 +75,58 @@ namespace TileEngine.Graphics
                     batch.Draw(tex, screenX, screenY);
                 }
             }
+        }
+
+        private void RenderList(IEnumerable<RenderTextureRegion> list)
+        {
+            foreach (var r in list)
+            {
+                batch.Draw(r.TextureRegion, r.ScreenX, r.ScreenY);
+            }
+        }
+
+        private IList<RenderTextureRegion> GetRenderList(Layer layer)
+        {
+            IList<RenderTextureRegion> list = layer.RenderList;
+            if (list == null)
+            {
+                list = new List<RenderTextureRegion>();
+                int tileWidth = engine.Camera.TileWidth;
+                int tileHeight = engine.Camera.TileHeight;
+                int maxOversizeX = layer.OversizeX * tileWidth;
+                int maxOversizeY = layer.OversizeY * tileHeight;
+                int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
+                int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
+                int minScreenX = 0 - maxOversizeX;
+                int minScreenY = 0 - maxOversizeY;
+                int tileCounter = 0;
+                for (int y = 0; y < layer.Height; y++)
+                {
+                    int columnCounter = 0;
+                    for (int x = 0; x < layer.Width; x++)
+                    {
+                        int sX;
+                        int sY;
+                        engine.Camera.MapToScreen(x, y, out sX, out sY);
+                        if (sX >= maxScreenX || sY >= maxScreenY) break;
+                        if (sX <= minScreenX || sY <= minScreenY) continue;
+                        Tile tile = layer[x, y];
+                        if (tile.TileId >= 0)
+                        {
+                            TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
+                            if (tex != null)
+                            {
+                                list.Add(new RenderTextureRegion(tex, x, y, sX, sY));
+                            }
+                        }
+                        tileCounter++;
+                        columnCounter++;
+                    }
+                    if (columnCounter == 0 && tileCounter > 0) break;
+                }
+                layer.RenderList = list;
+            }
+            return list;
         }
 
         private void TileLoop(Layer layer, PerTileFunction function)

@@ -275,6 +275,7 @@ namespace TileEngine
             graphics.SetSize(width, height);
             camera.ViewWidth = graphics.ViewWidth;
             camera.ViewHeight = graphics.ViewHeight;
+            map.InvalidateRenderLists();
         }
 
         public void SetViewScale(float scale)
@@ -283,6 +284,7 @@ namespace TileEngine
             camera.ViewWidth = graphics.ViewWidth;
             camera.ViewHeight = graphics.ViewHeight;
             input.ViewScale = scale;
+            map.InvalidateRenderLists();
         }
 
         internal void SetScreen(IScreen screen)

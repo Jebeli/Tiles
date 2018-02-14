@@ -52,6 +52,7 @@
     <Compile Include="Graphics\IBatch.cs" />
     <Compile Include="Graphics\IGraphics.cs" />
     <Compile Include="Graphics\MapRenderer.cs" />
+    <Compile Include="Graphics\RenderTextureRegion.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureBatch.cs" />
     <Compile Include="Graphics\TextureRegion.cs" />
