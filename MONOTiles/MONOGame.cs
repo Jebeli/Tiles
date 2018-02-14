@@ -70,8 +70,9 @@ namespace MONOTiles
         protected override void LoadContent()
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
-            engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
+            //engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
             //engine.SetMap(MapFactory.MakeDummyMap(engine));
+            engine.SetMap(MapFactory.MakeIniMap(engine));
             engine.SwitchToMapScreen();
 
         }

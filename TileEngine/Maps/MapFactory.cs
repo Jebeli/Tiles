@@ -19,6 +19,7 @@ namespace TileEngine.Maps
 {
     using Core;
     using System;
+    using System.Linq;
 
     public static class MapFactory
     {
@@ -27,6 +28,14 @@ namespace TileEngine.Maps
         {
             Map map = new Map("null", 1, 1, 64, 32);
             Layer layer = map.AddLayer("null");
+            return map;
+        }
+
+        public static Map MakeIniMap(Engine engine)
+        {
+            Map map = engine.LoadMap("maps/frontier_outpost.xml");
+            engine.SaveTileSet(map.Layers.First().TileSet, "tilesetdefs/tileset_grassland.xml");
+            engine.SaveMap(map, "maps/frontier_outpost.xml");
             return map;
         }
 

@@ -60,6 +60,9 @@
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Loaders\AbstractLoader.cs" />
     <Compile Include="Loaders\ILoader.cs" />
+    <Compile Include="Loaders\IniFile.cs" />
+    <Compile Include="Loaders\IniLoader.cs" />
+    <Compile Include="Loaders\LoaderExtensions.cs" />
     <Compile Include="Loaders\XmlLoader.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />

@@ -61,6 +61,7 @@ namespace TileEngine
             frameCounter = new FrameCounter();
             loaders = new List<ILoader>();
             loaders.Add(new XmlLoader(this));
+            loaders.Add(new IniLoader(this));
             savers = new List<ISaver>();
             savers.Add(new XmlSaver(this));
         }

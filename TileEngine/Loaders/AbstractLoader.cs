@@ -19,14 +19,19 @@ namespace TileEngine.Loaders
 {
     using Core;
     using Maps;
+    using System;
+    using System.Collections.Generic;
     using System.IO;
 
     public abstract class AbstractLoader : ILoader
     {
         protected Engine engine;
-        public AbstractLoader(Engine engine)
+        protected List<string> extensions;
+        public AbstractLoader(Engine engine, params string[] exts)
         {
             this.engine = engine;
+            extensions = new List<string>();
+            foreach (string ext in exts) AddExtension(ext);
         }
         public abstract FileType DetectFileTpye(string fileId);
 
@@ -39,6 +44,22 @@ namespace TileEngine.Loaders
         
         public abstract TileSet LoadTileSet(string fileId);
 
+        protected void AddExtension(string ext)
+        {
+            extensions.Add(ext);
+        }
+
+        protected bool FitsExtension(string fileId)
+        {
+            foreach(string ext in extensions)
+            {
+                if (fileId.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         protected Stream GetInputStream(string fileId)
         {
             return engine.FileResolver.OpenFile(fileId);

@@ -29,64 +29,68 @@ namespace TileEngine.Loaders
     public class XmlLoader : AbstractLoader
     {
         public XmlLoader(Engine engine)
-            : base(engine)
+            : base(engine, ".xml")
         {
         }
 
         public override FileType DetectFileTpye(string fileId)
         {
-            Stream stream = engine.FileResolver.OpenFile(fileId);
-            if (stream != null)
+            FileType type = FileType.None;
+            if (FitsExtension(fileId))
             {
-                XDocument xdoc = XDocument.Load(stream);
-                if (xdoc != null)
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
                 {
-                    var root = xdoc.Root;
-                    if (root.Name.LocalName.Equals("map"))
+                    XDocument xdoc = XDocument.Load(stream);
+                    if (xdoc != null)
                     {
-                        string mapName = root.Attribute("name").Value;
-                        if (!string.IsNullOrEmpty(mapName))
+                        var root = xdoc.Root;
+                        if (root.Name.LocalName.Equals("map"))
                         {
-                            stream.Dispose();
-                            return FileType.Map;
+                            string mapName = root.Attribute("name").Value;
+                            if (!string.IsNullOrEmpty(mapName))
+                            {
+                                type = FileType.Map;
+                            }
+                        }
+                        else if (root.Name.LocalName.Equals("tileset"))
+                        {
+                            string tsName = root.Attribute("name").Value;
+                            if (!string.IsNullOrEmpty(tsName))
+                            {
+                                type = FileType.TileSet;
+                            }
                         }
                     }
-                    else if (root.Name.LocalName.Equals("tileset"))
-                    {
-                        string tsName = root.Attribute("name").Value;
-                        if (!string.IsNullOrEmpty(tsName))
-                        {
-                            stream.Dispose();
-                            return FileType.TileSet;
-                        }
-                    }
+                    stream.Dispose();
                 }
-                stream.Dispose();
             }
-            return FileType.None;
+            return type;
         }
 
         public override Map LoadMap(string fileId)
         {
             Map map = null;
-            Stream stream = engine.FileResolver.OpenFile(fileId);
-            if (stream != null)
+            if (FitsExtension(fileId))
             {
-                XDocument xdoc = XDocument.Load(stream);
-                if (xdoc != null)
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
                 {
-                    var root = xdoc.Root;
-                    if (root.Name.LocalName.Equals("map"))
+                    XDocument xdoc = XDocument.Load(stream);
+                    if (xdoc != null)
                     {
-                        string mapName = root.Attribute("name").Value;
-                        if (!string.IsNullOrEmpty(mapName))
+                        var root = xdoc.Root;
+                        if (root.Name.LocalName.Equals("map"))
                         {
-                            map = LoadMap(root, fileId);
-                            stream.Dispose();
+                            string mapName = root.Attribute("name").Value;
+                            if (!string.IsNullOrEmpty(mapName))
+                            {
+                                map = LoadMap(root, fileId);
+                            }
                         }
                     }
+                    stream.Dispose();
                 }
-                stream.Dispose();
             }
             return map;
         }
@@ -94,24 +98,26 @@ namespace TileEngine.Loaders
         public override TileSet LoadTileSet(string fileId)
         {
             TileSet tileSet = null;
-            Stream stream = engine.FileResolver.OpenFile(fileId);
-            if (stream != null)
+            if (FitsExtension(fileId))
             {
-                XDocument xdoc = XDocument.Load(stream);
-                if (xdoc != null)
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
                 {
-                    var root = xdoc.Root;
-                    if (root.Name.LocalName.Equals("tileset"))
+                    XDocument xdoc = XDocument.Load(stream);
+                    if (xdoc != null)
                     {
-                        string tsName = root.Attribute("name").Value;
-                        if (!string.IsNullOrEmpty(tsName))
+                        var root = xdoc.Root;
+                        if (root.Name.LocalName.Equals("tileset"))
                         {
-                            tileSet = LoadTileSet(root, fileId);
-                            stream.Dispose();
+                            string tsName = root.Attribute("name").Value;
+                            if (!string.IsNullOrEmpty(tsName))
+                            {
+                                tileSet = LoadTileSet(root, fileId);
+                            }
                         }
                     }
+                    stream.Dispose();
                 }
-                stream.Dispose();
             }
             return tileSet;
         }
@@ -135,6 +141,7 @@ namespace TileEngine.Loaders
                         string layerName = (string)node.Attribute("name");
                         int? layerWidth = (int?)node.Attribute("width");
                         int? layerHeight = (int?)node.Attribute("height");
+                        bool? visible = (bool?)node.Attribute("visible");
                         string tileSetName = (string)node.Attribute("tileset");
                         var data = node.Descendants().FirstOrDefault();
                         if (layerName != null && layerWidth != null && layerHeight != null && data != null && tileSetName != null)
@@ -144,6 +151,7 @@ namespace TileEngine.Loaders
                             if (encoding != null && tileSet != null)
                             {
                                 Layer layer = map.AddLayer(layerName);
+                                if (visible != null && visible == false) { layer.Visible = false; }
                                 layer.TileSet = tileSet;
                                 if (encoding.Equals("csv", StringComparison.OrdinalIgnoreCase))
                                 {

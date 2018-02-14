@@ -50,6 +50,7 @@ namespace TileEngine.Savers
                     writer.WriteAttributeString("width", layer.Width.ToString());
                     writer.WriteAttributeString("height", layer.Height.ToString());
                     writer.WriteAttributeString("tileset", layer.TileSet.Name);
+                    writer.WriteAttributeString("visible", layer.Visible.ToString().ToLowerInvariant());
                     writer.WriteStartElement("data");
                     writer.WriteAttributeString("encoding", "csv");
                     writer.WriteString(layer.GetCSV());

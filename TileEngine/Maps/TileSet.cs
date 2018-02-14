@@ -20,6 +20,7 @@ namespace TileEngine.Maps
     using System.Collections.Generic;
     using Graphics;
     using Resources;
+    using System;
 
     public class TileSet : Resource
     {
@@ -27,6 +28,8 @@ namespace TileEngine.Maps
         private List<TextureRegion> tiles;
         private int tileWidth;
         private int tileHeight;
+        private int oversizeX;
+        private int oversizeY;
         public TileSet(string name, Texture texture)
             : base(name)
         {
@@ -44,6 +47,16 @@ namespace TileEngine.Maps
         {
             get { return tileHeight; }
             set { tileHeight = value; }
+        }
+
+        public int OversizeX
+        {
+            get { return oversizeX; }
+        }
+
+        public int OversizeY
+        {
+            get { return oversizeY; }
         }
 
         public Texture Texture
@@ -91,10 +104,19 @@ namespace TileEngine.Maps
         {
             if (texture != null)
             {
+                AdjustOversizeAndTileSize(clipW, clipH, offsetX, offsetY);
                 TextureRegion region = texture.GetRegion(clipX, clipY, clipW, clipH, offsetX, offsetY);
                 EnsureIndex(index);
                 tiles[index] = region;
             }
+        }
+
+        private void AdjustOversizeAndTileSize(int clipW, int clipH, int offsetX, int offsetY)
+        {
+            if (tileWidth == 0) tileWidth = clipW;
+            if (tileHeight == 0) tileHeight = clipH;
+            oversizeX = Math.Max(oversizeX, 1 + (clipW - offsetX) / tileWidth);
+            oversizeY = Math.Max(oversizeY, 1 + (clipH - offsetY) / tileHeight);
         }
 
         public TextureRegion GetTile(int id)

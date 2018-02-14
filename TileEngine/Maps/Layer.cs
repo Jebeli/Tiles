@@ -27,6 +27,9 @@ namespace TileEngine.Maps
         private Map map;
         private Tile[] tiles;
         private TileSet tileSet;
+        private bool visible;
+        private int oversizeX;
+        private int oversizeY;
 
         internal Layer(string name, Map map, int width, int height)
             : base(name)
@@ -34,7 +37,10 @@ namespace TileEngine.Maps
             this.width = width;
             this.height = height;
             this.map = map;
+            visible = true;
             InitTiles();
+            oversizeX = 1;
+            oversizeY = 1;
         }
 
         public Map Map
@@ -42,10 +48,21 @@ namespace TileEngine.Maps
             get { return map; }
         }
 
+        public bool Visible
+        {
+            get { return visible; }
+            set { visible = value; }
+        }
+
         public TileSet TileSet
         {
             get { return tileSet; }
-            set { tileSet = value; }
+            set
+            {
+                tileSet = value;
+                oversizeX = value.OversizeX;
+                oversizeY = value.OversizeY;
+            }
         }
 
         public int Width
@@ -56,6 +73,16 @@ namespace TileEngine.Maps
         public int Height
         {
             get { return height; }
+        }
+
+        public int OversizeX
+        {
+            get { return oversizeX; }
+        }
+
+        public int OversizeY
+        {
+            get { return oversizeY; }
         }
         public Tile this[int index]
         {
@@ -77,7 +104,7 @@ namespace TileEngine.Maps
         public void SetCSV(string csv)
         {
             int index = 0;
-            foreach(var s in csv.Split(',', '\n', '\r'))
+            foreach (var s in csv.Split(',', '\n', '\r'))
             {
                 int value;
                 if (int.TryParse(s, out value))

@@ -24,16 +24,12 @@ namespace TileEngine.Graphics
     {
         private Engine engine;
         private IGraphics gfx;
-        private int oversizeX;
-        private int oversizeY;
         private IBatch batch;
         internal MapRenderer(Engine engine)
         {
             this.engine = engine;
             gfx = engine.Graphics;
             batch = new TextureBatch(gfx);
-            oversizeX = 1;
-            oversizeY = 1;
         }
 
         public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
@@ -42,7 +38,8 @@ namespace TileEngine.Graphics
             batch.Begin();
             foreach (Layer layer in map.Layers)
             {
-                TileLoop(layer, RenderTile);
+                if (layer.Visible)
+                    TileLoop(layer, RenderTile);
             }
             batch.End();
             if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
@@ -64,8 +61,8 @@ namespace TileEngine.Graphics
         {
             int tileWidth = engine.Camera.TileWidth;
             int tileHeight = engine.Camera.TileHeight;
-            int maxOversizeX = oversizeX * tileWidth;
-            int maxOversizeY = oversizeY * tileHeight;
+            int maxOversizeX = layer.OversizeX * tileWidth;
+            int maxOversizeY = layer.OversizeY * tileHeight;
             int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
             int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
             int minScreenX = 0 - maxOversizeX;
@@ -96,8 +93,8 @@ namespace TileEngine.Graphics
             const int TEXT_SIZE_Y = 9;
             int tileWidth = engine.Camera.TileWidth;
             int tileHeight = engine.Camera.TileHeight;
-            int maxOversizeX = oversizeX * tileWidth;
-            int maxOversizeY = oversizeY * tileHeight;
+            int maxOversizeX = 1 * tileWidth;
+            int maxOversizeY = 1 * tileHeight;
             int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
             int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
             int minScreenX = 0 - maxOversizeX;
