@@ -30,24 +30,31 @@ namespace TileEngine.GUI
             NinePatch button9P = GetNinePatch(engine, "gui/buttonMid.png");
             NinePatch button9PH = GetNinePatch(engine, "gui/buttonLight.png");
             NinePatch button9PP = GetNinePatch(engine, "gui/buttonDark.png");
+            NinePatch window9P = GetNinePatch(engine, "gui/window.png");
+            WidgetWindow window1 = new WidgetWindow();
+            window1.SetBounds(10, 10, 3 * 64 + 10, 32 + 10);
+            window1.Patch = window9P;
+            window1.PatchHover = window9P;
+            window1.PatchPressed = window9P;
             WidgetButton button1 = new WidgetButton("Exit");
-            button1.SetBounds(0, 0, 64, 32);
+            button1.SetBounds(5, 5, 64, 32);
             button1.Patch = button9P;
             button1.PatchHover = button9PH;
             button1.PatchPressed = button9PP;
             WidgetButton button2 = new WidgetButton("Load");
-            button2.SetBounds(64, 0, 64, 32);
+            button2.SetBounds(5 + 64, 5, 64, 32);
             button2.Patch = button9P;
             button2.PatchHover = button9PH;
             button2.PatchPressed = button9PP;
             WidgetButton button3 = new WidgetButton("Save");
-            button3.SetBounds(64 * 2, 0, 64, 32);
+            button3.SetBounds(5 + 64 * 2, 5, 64, 32);
             button3.Patch = button9P;
             button3.PatchHover = button9PH;
             button3.PatchPressed = button9PP;
-            container.AddWidget(button1);
-            container.AddWidget(button2);
-            container.AddWidget(button3);
+            window1.AddWidget(button1);
+            window1.AddWidget(button2);
+            window1.AddWidget(button3);
+            container.AddWidget(window1);
         }
 
         public static NinePatch GetNinePatch(Engine engine, string imageId)

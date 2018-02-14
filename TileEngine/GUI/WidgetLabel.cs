@@ -31,6 +31,7 @@ namespace TileEngine.GUI
         public WidgetLabel(string text = "")
         {
             this.text = text;
+            Clickable = false;
         }
         public string Text
         {

@@ -36,6 +36,7 @@ namespace TileEngine.GUI
         private bool enabled;
         private bool pressed;
         private bool hover;
+        private bool clickable;
         private NinePatch patch;
         private NinePatch patchHover;
         private NinePatch patchPressed;
@@ -45,6 +46,7 @@ namespace TileEngine.GUI
             children = new List<Widget>();
             visible = true;
             enabled = true;
+            clickable = true;
         }
 
         public NinePatch Patch
@@ -171,6 +173,12 @@ namespace TileEngine.GUI
             get { return pressed; }
         }
 
+        public bool Clickable
+        {
+            get { return clickable; }
+            set { clickable = value; }
+        }
+
         public Widget Parent
         {
             get { return parent; }
@@ -209,7 +217,7 @@ namespace TileEngine.GUI
         public bool CheckMouseUp(int x, int y, ref Widget widget)
         {
             bool wasPressed = pressed;
-            if (Visible && Enabled)
+            if (visible && enabled && clickable)
             {
                 foreach (var w in children)
                 {
@@ -218,7 +226,7 @@ namespace TileEngine.GUI
                         pressed = false;
                     }
                 }
-                if (Visible && Enabled && Contains(x, y))
+                if (visible && enabled && clickable && Contains(x, y))
                 {
                     if (pressed)
                     {
@@ -233,7 +241,7 @@ namespace TileEngine.GUI
 
         public bool CheckMouseDown(int x, int y)
         {
-            if (Visible && Enabled)
+            if (visible && enabled && clickable)
             {
                 foreach (var w in children)
                 {
@@ -242,7 +250,7 @@ namespace TileEngine.GUI
                         pressed = true;
                     }
                 }
-                if (Visible && Enabled && Contains(x, y))
+                if (visible && enabled && clickable && Contains(x, y))
                 {
                     pressed = true;
                 }
@@ -260,7 +268,7 @@ namespace TileEngine.GUI
 
         public  bool CheckMouseHover(int x, int y)
         {
-            if (Visible && Enabled)
+            if (visible && enabled)
             {
                 foreach (var w in children)
                 {
@@ -269,7 +277,7 @@ namespace TileEngine.GUI
                         hover = true;                        
                     }
                 }
-                if (Visible && Enabled && Contains(x, y))
+                if (visible && enabled && Contains(x, y))
                 {
                     hover = true;
                 }
