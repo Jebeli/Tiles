@@ -31,6 +31,7 @@ namespace TileEngine.GUI
         {
             label = new WidgetLabel(text);
             AddWidget(label);
+            
         }
 
         public string Text
@@ -41,7 +42,10 @@ namespace TileEngine.GUI
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
-            graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            if (!DrawNinePatch(graphics, x, y, width, height))
+            {
+                graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            }
         }
 
         protected override void BoundsChanged()

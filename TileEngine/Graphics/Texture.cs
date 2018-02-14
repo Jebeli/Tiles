@@ -29,7 +29,7 @@ namespace TileEngine.Graphics
         public abstract int Width { get; }
         public abstract int Height { get; }
 
-        public TextureRegion GetRegion(int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY)
+        public TextureRegion GetRegion(int clipX, int clipY, int clipW, int clipH, int offsetX = 0, int offsetY = 0)
         {
             return new TextureRegion(this, clipX, clipY, clipW, clipH, offsetX, offsetY);
         }

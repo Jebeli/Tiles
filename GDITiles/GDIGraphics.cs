@@ -127,8 +127,26 @@ namespace GDITiles
         public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
         {
             var rect = new System.Drawing.Rectangle(x, y, width, height);
-            gfx.FillRectangle(System.Drawing.Brushes.Gray, rect);
-            gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            if (pressed)
+            {
+                gfx.FillRectangle(System.Drawing.Brushes.DimGray, rect);
+                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            }
+            else if (hover && enabled)
+            {
+                gfx.FillRectangle(System.Drawing.Brushes.LightGray, rect);
+                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            }
+            else if (enabled)
+            {
+                gfx.FillRectangle(System.Drawing.Brushes.Gray, rect);
+                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            }
+            else
+            {
+                gfx.FillRectangle(System.Drawing.Brushes.DimGray, rect);
+                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            }
         }
 
         public override void DrawText(string text, int x, int y)

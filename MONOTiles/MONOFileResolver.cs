@@ -116,6 +116,10 @@ namespace MONOTiles
                 {
                     return MakeAssetId(fileId);
                 }
+                else if (fileId.StartsWith("gui/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeAssetId(fileId);
+                }
                 else if (fileId.StartsWith("music/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
                 {
                     return MakeAssetId(fileId);

@@ -117,6 +117,21 @@ namespace TileEngine.Graphics
                     textureRegion.Width,
                     textureRegion.Height);
         }
+
+        public void Render(TextureRegion textureRegion, int x, int y, int width, int height)
+        {
+            if (textureRegion != null)
+                Render(textureRegion.Texture,
+                    x + textureRegion.OffsetX,
+                    y + textureRegion.OffsetY,
+                    width,
+                    height,
+                    textureRegion.X,
+                    textureRegion.Y,
+                    textureRegion.Width,
+                    textureRegion.Height);
+        }
+
         public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
         public abstract void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         public abstract void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);

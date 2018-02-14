@@ -34,7 +34,7 @@ namespace TileEngine.Screens
         {
             renderer = new MapRenderer(engine);
             mousePanning = true;
-            WidgetFactory.AddDemoButtons(this);
+            WidgetFactory.AddDemoButtons(engine, this);
         }
 
 

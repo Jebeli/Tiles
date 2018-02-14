@@ -126,7 +126,10 @@ namespace TileEngine.Screens
             {
                 if (w.CheckMouseUp((int)x, (int)y, ref widget))
                 {
-                    OnWidgetClick(widget);
+                    if (widget != null)
+                    {
+                        OnWidgetClick(widget);
+                    }
                 }
             }
         }

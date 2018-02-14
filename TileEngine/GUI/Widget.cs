@@ -36,13 +36,32 @@ namespace TileEngine.GUI
         private bool enabled;
         private bool pressed;
         private bool hover;
-
+        private NinePatch patch;
+        private NinePatch patchHover;
+        private NinePatch patchPressed;
 
         public Widget()
         {
             children = new List<Widget>();
             visible = true;
             enabled = true;
+        }
+
+        public NinePatch Patch
+        {
+            get { return patch; }
+            set { patch = value; }
+        }
+
+        public NinePatch PatchHover
+        {
+            get { return patchHover; }
+            set { patchHover = value; }
+        }
+        public NinePatch PatchPressed
+        {
+            get { return patchPressed; }
+            set { patchPressed = value; }
         }
 
         public int Left
@@ -283,6 +302,32 @@ namespace TileEngine.GUI
                     }
                 }
             }
+        }
+
+        protected bool DrawNinePatch(IGraphics graphics, int x, int y, int width, int height)
+        {
+            if (pressed)
+            {
+                if (patchPressed != null)
+                {
+                    patchPressed.Draw(graphics, x, y, width, height);
+                    return true;
+                }
+            }
+            if (hover)
+            {
+                if (patchHover != null)
+                {
+                    patchHover.Draw(graphics, x, y, width, height);
+                    return true;
+                }
+            }
+            if (patch != null)
+            {
+                patch.Draw(graphics, x, y, width, height);
+                return true;
+            }
+            return false;
         }
 
         protected abstract void Draw(IGraphics graphics, int x, int y, int width, int height);

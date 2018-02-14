@@ -52,6 +52,7 @@ namespace TileEngine.Graphics
         void ClearScreen();
         void DrawTextures(Texture texture, int[] vertices, int offset, int count);
         void Render(TextureRegion textureRegion, int x, int y);
+        void Render(TextureRegion textureRegion, int x, int y, int width, int height);
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
         void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
