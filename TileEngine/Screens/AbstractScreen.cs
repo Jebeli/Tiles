@@ -21,6 +21,8 @@ namespace TileEngine.Screens
     using Logging;
     using Core;
     using Input;
+    using GUI;
+    using System.Collections.Generic;
 
     public abstract class AbstractScreen : NamedObject, IScreen
     {
@@ -29,13 +31,34 @@ namespace TileEngine.Screens
         protected Engine engine;
         private static readonly float[] scales = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f };
         private int scaleIndex = 9;
+        private List<Widget> widgets;
 
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
             this.engine = engine;
+            widgets = new List<Widget>();
         }
 
+        public IList<Widget> Widgets
+        {
+            get { return widgets; }
+        }
+
+        public void AddWidget(Widget w)
+        {
+            widgets.Add(w);
+        }
+
+        public void RemoveWidget(Widget w)
+        {
+            widgets.Remove(w);
+        }
+
+        public void ClearWidgets()
+        {
+            widgets.Clear();
+        }
         public virtual void Show()
         {
             Logger.Info("Screen", $"Showing Screen {Name}");
@@ -63,6 +86,18 @@ namespace TileEngine.Screens
                 Logger.Info("Screen", $"Rendering Screen {Name}");
             }
             rendered = true;
+            RenderWidgets();
+        }
+
+        protected void RenderWidgets()
+        {
+            foreach (var w in widgets)
+            {
+                if (w.Visible)
+                {
+                    w.Render(engine.Graphics);
+                }
+            }
         }
 
         protected virtual void OnMouseWheel(float x, float y, int delta)

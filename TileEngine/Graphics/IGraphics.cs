@@ -20,6 +20,20 @@ namespace TileEngine.Graphics
     using Core;
     using Files;
 
+    public enum HorizontalTextAlign
+    {
+        Center,
+        Left,
+        Right
+    }
+
+    public enum VerticalTextAlign
+    {
+        Center,
+        Top,
+        Bottom
+    }
+
     public interface IGraphics
     {
         int Width { get; }
@@ -39,7 +53,7 @@ namespace TileEngine.Graphics
         void DrawTextures(Texture texture, int[] vertices, int offset, int count);
         void Render(TextureRegion textureRegion, int x, int y);
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
-
+        void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         void DrawText(string text, int x, int y);
         void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);

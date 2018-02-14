@@ -92,6 +92,38 @@ namespace GDITiles
             }
         }
 
+        public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        {
+            var font = smallFont;
+            float fx = x;
+            float fy = y;
+            var size = gfx.MeasureString(text, font);
+            if (hAlign == HorizontalTextAlign.Center)
+            {
+                fx -= size.Width / 2;
+            }
+            else if (hAlign == HorizontalTextAlign.Left)
+            {
+            }
+            else if (hAlign == HorizontalTextAlign.Right)
+            {
+                fx -= size.Width;
+            }
+            if (vAlign == VerticalTextAlign.Center)
+            {
+                fy -= size.Height / 2;
+            }
+            else if (vAlign == VerticalTextAlign.Top)
+            {
+
+            }
+            else if (vAlign == VerticalTextAlign.Bottom)
+            {
+                fy -= size.Height;
+            }
+            gfx.DrawString(text, smallFont, textBrush, fx, fy);
+        }
+
         public override void DrawText(string text, int x, int y)
         {
             gfx.DrawString(text, smallFont, textBrush, x, y);

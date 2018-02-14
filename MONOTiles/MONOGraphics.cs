@@ -110,6 +110,12 @@ namespace MONOTiles
             }
         }
 
+        public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        {
+
+        }
+
+
         public override void DrawText(string text, int x, int y)
         {
 

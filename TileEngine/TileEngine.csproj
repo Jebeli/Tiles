@@ -56,6 +56,11 @@
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureBatch.cs" />
     <Compile Include="Graphics\TextureRegion.cs" />
+    <Compile Include="GUI\IWidgetContainer.cs" />
+    <Compile Include="GUI\Widget.cs" />
+    <Compile Include="GUI\WidgetButton.cs" />
+    <Compile Include="GUI\WidgetFactory.cs" />
+    <Compile Include="GUI\WidgetLabel.cs" />
     <Compile Include="Input\BasicInput.cs" />
     <Compile Include="Input\IInput.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />

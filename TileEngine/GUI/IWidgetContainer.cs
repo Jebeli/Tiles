@@ -15,17 +15,21 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Screens
+namespace TileEngine.GUI
 {
-    using Core;
-    using GUI;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-    public interface IScreen : IWidgetContainer
+    public interface IWidgetContainer
     {
-        string Name { get; }
-        void Show();
-        void Hide();
-        void Update(TimeInfo time);
-        void Render(TimeInfo time);
+        IList<Widget> Widgets { get; }
+        void AddWidget(Widget w);
+
+        void RemoveWidget(Widget w);
+
+        void ClearWidgets();
     }
 }

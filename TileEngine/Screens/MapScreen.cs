@@ -19,6 +19,7 @@ namespace TileEngine.Screens
 {
     using Core;
     using Graphics;
+    using GUI;
     using Input;
 
     public class MapScreen : AbstractScreen
@@ -33,13 +34,14 @@ namespace TileEngine.Screens
         {
             renderer = new MapRenderer(engine);
             mousePanning = true;
+            WidgetFactory.AddDemoButtons(this);
         }
 
 
         public override void Render(TimeInfo time)
         {
-            base.Render(time);
             renderer.RenderMap(engine.Map);
+            base.Render(time);
         }
 
         protected override void OnMouseDown(float x, float y, MouseButton button)

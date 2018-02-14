@@ -118,7 +118,7 @@ namespace TileEngine.Graphics
                     textureRegion.Height);
         }
         public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
-
+        public abstract void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         public abstract void DrawText(string text, int x, int y);
         public abstract void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         public abstract void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
