@@ -56,7 +56,7 @@ namespace TileEngine.GUI
             labelTile.SetBounds(0, 30, 256, 30);
             AddWidget(labelTile);
             tileImage = new WidgetImage();
-            tileImage.SetBounds(64, 256 -128, 256 - 64, 200);
+            tileImage.SetBounds(64, 256 - 128, 256 - 64, 200);
             AddWidget(tileImage);
             buttonPrev = new WidgetButton("<");
             buttonPrev.SetBounds(0, 256 - 30, 64, 30);
@@ -89,7 +89,7 @@ namespace TileEngine.GUI
                     {
                         SwitchLayer(layer);
                     }
-                    index++;                    
+                    index++;
                 }
             }
         }
@@ -105,6 +105,7 @@ namespace TileEngine.GUI
                     index++;
                 }
             }
+            map.InvalidateRenderLists();
             Visible = false;
 
         }
@@ -115,30 +116,40 @@ namespace TileEngine.GUI
             {
                 int id = tile.TileId;
 
-                if (id >= -1)
+                id--;
+                while (layer.TileSet.GetTile(id) == null && id >= -1)
                 {
                     id--;
-                    while (layer.TileSet.GetTile(id) == null && id >= -1)
-                    {
-                        id--;
-                    }
-                    tile.TileId = id;
-                    SwitchLayer(layer);
                 }
+                if (id < -1)
+                {
+                    id = layer.TileSet.TileCount - 1;
+                }
+                while (layer.TileSet.GetTile(id) == null && id >= -1)
+                {
+                    id--;
+                }
+                tile.TileId = id;
+                SwitchLayer(layer);
             }
             else if (buttonNext == widget)
             {
                 int id = tile.TileId;
-                if (id < layer.TileSet.TileCount)
+                id++;
+                while (layer.TileSet.GetTile(id) == null && id < layer.TileSet.TileCount)
                 {
                     id++;
-                    while (layer.TileSet.GetTile(id) == null && id < layer.TileSet.TileCount)
-                    {
-                        id++;
-                    }
-                    tile.TileId = id;
-                    SwitchLayer(layer);
                 }
+                if (id >= layer.TileSet.TileCount)
+                {
+                    id = 0;
+                }
+                while (layer.TileSet.GetTile(id) == null && id < layer.TileSet.TileCount)
+                {
+                    id++;
+                }
+                tile.TileId = id;
+                SwitchLayer(layer);
             }
             else if (buttonCancel == widget)
             {
@@ -168,8 +179,8 @@ namespace TileEngine.GUI
                 this.layer = layer;
                 tile = layer[x, y];
                 labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId}";
-
                 tileImage.Image = layer.TileSet.GetTile(tile.TileId);
+                map.InvalidateRenderLists();
             }
         }
 

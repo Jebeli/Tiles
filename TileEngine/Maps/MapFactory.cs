@@ -49,7 +49,7 @@ namespace TileEngine.Maps
         public static TileSet MakeMediTileSet(Engine engine)
         {
             TileSet tileSet = engine.GetTileSet("images/tilesets/tileset_building.png");
-            tileSet.AutoFill(64, 192);
+            tileSet.AutoFill(64, 192, 0, -160);
             tileSet.Name = "tilesetdefs/tileset_building.xml";
             engine.SaveTileSet(tileSet, "tilesetdefs/tileset_building.xml");
             return tileSet;

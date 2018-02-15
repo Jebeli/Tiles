@@ -27,7 +27,7 @@ namespace TileEngine.Maps
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
-        public Map(string name, int width, int height, int tileWidth, int tileHeight,  MapOrientation orientation = MapOrientation.Isometric)
+        public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
         {
             this.width = width;
@@ -50,7 +50,7 @@ namespace TileEngine.Maps
 
         public void InvalidateRenderLists()
         {
-            foreach(var layer in layers)
+            foreach (var layer in layers)
             {
                 layer.RenderList = null;
             }
@@ -82,6 +82,11 @@ namespace TileEngine.Maps
                 layers.Add(layer);
             }
             return layer;
+        }
+
+        public bool HasLayer(string name)
+        {
+            return Contains(layers, name);
         }
 
         public Layer GetLayer(string name)

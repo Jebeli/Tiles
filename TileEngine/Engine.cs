@@ -278,6 +278,11 @@ namespace TileEngine
                     map = loader.LoadMap(mapId);
                     if (map != null)
                     {
+                        if (!map.HasLayer("buildings"))
+                        {
+                            Layer layer = map.AddLayer("buildings");
+                            layer.TileSet = MapFactory.MakeMediTileSet(this);
+                        }
                         SetMap(map, posX, posY);
                         OnMapLoaded(map);
                         break;
