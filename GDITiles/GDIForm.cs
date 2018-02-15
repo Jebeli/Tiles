@@ -26,7 +26,9 @@ namespace GDITiles
 
     public partial class GDIForm : Form
     {
-        private const string MAPNAME = "maps/frontier_outpost.xml";
+        private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        private const string MAPNAME2 = "maps/part2_map.xml";
+        private const string MAPNAME3 = "maps/part4_map.xml";
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
         private Engine engine;
@@ -35,6 +37,7 @@ namespace GDITiles
             InitializeComponent();
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             UpdateStyles();
+            ClientSize = new System.Drawing.Size(800, 600);
             KeyPreview = true;
             Logger.AddLogger(new ConsoleLogger());
             gdiFileResolver = new GDIFileResolver("Content");
@@ -51,7 +54,7 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            engine.SetNextMap(MAPNAME, 25, 25);
+            engine.SetNextMap(MAPNAME3, 25, 25);
             engine.Start();
             base.OnLoad(e);
         }

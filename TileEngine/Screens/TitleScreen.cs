@@ -66,6 +66,7 @@ namespace TileEngine.Screens
 
         protected override void OnWidgetClick(Widget widget)
         {
+            base.OnWidgetClick(widget);
             if (widget == exitButton)
             {
                 engine.SwitchToExitScreen();

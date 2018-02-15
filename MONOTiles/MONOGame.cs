@@ -29,7 +29,9 @@ namespace MONOTiles
 
     public class MONOGame : Game
     {
-        private const string MAPNAME = "maps/frontier_outpost.xml";
+        private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        private const string MAPNAME2 = "maps/part2_map.xml";
+        private const string MAPNAME3 = "maps/part4_map.xml";
         private GraphicsDeviceManager graphics;
         private ExtendedSpriteBatch spriteBatch;
         private Engine engine;
@@ -76,7 +78,7 @@ namespace MONOTiles
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
             smallFont = Content.Load<BitmapFont>("fonts/Small");
-            engine.SetNextMap(MAPNAME, 25, 25);
+            engine.SetNextMap(MAPNAME3, 25, 25);
             engine.Start();
 
         }
