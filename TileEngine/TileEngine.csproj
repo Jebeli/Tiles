@@ -37,6 +37,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\EngineEvents.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\ITimeInfoProvider.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Maps\Layer.cs" />
     <Compile Include="Maps\Map.cs" />
     <Compile Include="Maps\MapFactory.cs" />
+    <Compile Include="Maps\MapLoadInfo.cs" />
     <Compile Include="Maps\Tile.cs" />
     <Compile Include="Maps\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,9 +88,14 @@
     <Compile Include="Savers\ISaver.cs" />
     <Compile Include="Savers\XmlSaver.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
+    <Compile Include="Screens\ExitScreen.cs" />
     <Compile Include="Screens\IScreen.cs" />
+    <Compile Include="Screens\LoadScreen.cs" />
     <Compile Include="Screens\MapScreen.cs" />
     <Compile Include="Screens\NullScreen.cs" />
+    <Compile Include="Screens\SplashScreen.cs" />
+    <Compile Include="Screens\TextTitleScreen.cs" />
+    <Compile Include="Screens\TitleScreen.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

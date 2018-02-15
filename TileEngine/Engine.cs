@@ -40,7 +40,12 @@ namespace TileEngine
         private ResourceManager<Texture> textureManager;
         private ResourceManager<TileSet> tileSetManager;
         private IScreen currentScreen;
+        private SplashScreen splashScreen;
+        private TitleScreen titleScreen;
+        private LoadScreen loadScreen;
         private MapScreen mapScreen;
+        private ExitScreen exitScreen;
+        private MapLoadInfo nextMap;
         private Map map;
         private Camera camera;
         private FrameCounter frameCounter;
@@ -58,6 +63,10 @@ namespace TileEngine
             WidgetFactory.InitDefault(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
+            loadScreen = new LoadScreen(this);
+            splashScreen = new SplashScreen(this);
+            titleScreen = new TitleScreen(this);
+            exitScreen = new ExitScreen(this);
             map = MapFactory.MakeNullMap(this);
             camera = new Camera(map);
             frameCounter = new FrameCounter();
@@ -67,6 +76,10 @@ namespace TileEngine
             savers = new List<ISaver>();
             savers.Add(new XmlSaver(this));
         }
+
+        public event EventHandler<MapEventArgs> MapLoaded;
+        public event EventHandler<ScreenEventArgs> ScreenHidden;
+        public event EventHandler<ScreenEventArgs> ScreenShown;
         public IFileResolver FileResolver
         {
             get { return fileResolver; }
@@ -209,17 +222,53 @@ namespace TileEngine
             return tex;
         }
 
+        public void Start()
+        {
+            SwitchToSplashScreen();
+        }
+
+        public void Exit()
+        {
+            graphics.ExitRequested();
+        }
+
         public void SwitchToMapScreen()
         {
             SetScreen(mapScreen);
         }
-        public void SetMap(Map map)
+
+        public void SwitchToSplashScreen()
         {
-            this.map = map;
-            camera = new Camera(map);
+            SetScreen(splashScreen);
         }
 
-        public Map LoadMap(string mapId)
+        public void SwitchToExitScreen()
+        {
+            SetScreen(exitScreen);
+        }
+
+        public void SwitchToTitleScreen()
+        {
+            SetScreen(titleScreen);
+        }
+
+        public void SwitchToLoadScreen()
+        {
+            loadScreen.MapLoadInfo = nextMap;
+            SetScreen(loadScreen);
+        }
+
+        public void SetNextMap(string name, int posX, int posY)
+        {
+            nextMap = new MapLoadInfo(name, posX, posY);
+        }
+        public void SetMap(Map map, int posX = -1, int posY = -1)
+        {
+            this.map = map;
+            camera = new Camera(map, posX, posY);
+        }
+
+        public Map LoadMap(string mapId, int posX = -1, int posY = -1)
         {
             Map map = null;
             foreach (ILoader loader in loaders)
@@ -229,7 +278,8 @@ namespace TileEngine
                     map = loader.LoadMap(mapId);
                     if (map != null)
                     {
-                        SetMap(map);
+                        SetMap(map, posX, posY);
+                        OnMapLoaded(map);
                         break;
                     }
                 }
@@ -292,10 +342,27 @@ namespace TileEngine
         internal void SetScreen(IScreen screen)
         {
             currentScreen.Hide();
+            OnScreenHidden(currentScreen);
             currentScreen = screen;
             currentScreen.Show();
+            OnScreenShown(currentScreen);
         }
 
+        private void OnMapLoaded(Map map)
+        {
+            if (map != null)
+                MapLoaded?.Invoke(this, new MapEventArgs(map));
+        }
 
+        private void OnScreenHidden(IScreen screen)
+        {
+            if (screen != null)
+                ScreenHidden?.Invoke(null, new ScreenEventArgs(screen));
+        }
+        private void OnScreenShown(IScreen screen)
+        {
+            if (screen != null)
+                ScreenShown?.Invoke(null, new ScreenEventArgs(screen));
+        }
     }
 }

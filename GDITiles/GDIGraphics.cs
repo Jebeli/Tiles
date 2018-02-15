@@ -188,6 +188,11 @@ namespace GDITiles
             return null;
         }
 
+        public override void ExitRequested()
+        {
+            System.Windows.Forms.Application.Exit();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && gfx != null)

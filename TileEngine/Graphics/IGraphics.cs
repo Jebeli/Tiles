@@ -62,5 +62,6 @@ namespace TileEngine.Graphics
 
         Texture CreateTexture(string textureId, int width, int height);
         Texture GetTexture(string textureId, IFileResolver fileResolver);
+        void ExitRequested();
     }
 }

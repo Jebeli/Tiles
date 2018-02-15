@@ -225,6 +225,11 @@ namespace MONOTiles
             return new MONOTexture(textureId, bmp);
         }
 
+        public override void ExitRequested()
+        {
+            game.Exit();
+        }
+
         protected override bool NeedsInitGraphics
         {
             get { return view == null || view.Width != viewWidth || view.Height != viewHeight; }

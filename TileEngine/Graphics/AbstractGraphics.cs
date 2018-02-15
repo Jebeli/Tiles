@@ -142,7 +142,7 @@ namespace TileEngine.Graphics
         public abstract Texture CreateTexture(string textureId, int width, int height);
 
         public abstract Texture GetTexture(string textureId, IFileResolver fileResolver);
-
+        public abstract void ExitRequested();
         public void Dispose()
         {
             Dispose(true);

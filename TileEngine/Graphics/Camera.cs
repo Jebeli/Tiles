@@ -39,7 +39,7 @@ namespace TileEngine.Graphics
         private Map map;
         private MapOrientation orientation;
 
-        public Camera(Map map)
+        public Camera(Map map, int posX = -1, int posY = -1)
         {
             this.map = map;
             orientation = map.Orientation;
@@ -47,7 +47,14 @@ namespace TileEngine.Graphics
             tileHeight = map.TileHeight;
             halfTileWidth = tileWidth / 2;
             halfTileHeight = tileHeight / 2;
-            SetMapPosition(map.Width / 2, map.Height / 2);
+            if (posX >= 0 && posY >= 0)
+            {
+                SetMapPosition(posX, posY);
+            }
+            else
+            {
+                SetMapPosition(map.Width / 2, map.Height / 2);
+            }
         }
         public int TileWidth
         {
@@ -139,8 +146,8 @@ namespace TileEngine.Graphics
             switch (orientation)
             {
                 case MapOrientation.Orthogonal:
-                    screenX = - mapX * tileWidth;
-                    screenY = - mapY * tileHeight;
+                    screenX = -mapX * tileWidth;
+                    screenY = -mapY * tileHeight;
                     break;
                 case MapOrientation.Isometric:
                     screenX = -((mapX - mapY) * halfTileWidth);

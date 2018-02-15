@@ -26,6 +26,7 @@ namespace GDITiles
 
     public partial class GDIForm : Form
     {
+        private const string MAPNAME = "maps/frontier_outpost.xml";
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
         private Engine engine;
@@ -50,10 +51,8 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            //engine.SetMap(MapFactory.MakeDummyMap(engine));
-            //engine.SetMap(MapFactory.MakeDummyOrthoMap(engine));
-            engine.SetMap(MapFactory.MakeIniMap(engine));
-            engine.SwitchToMapScreen();
+            engine.SetNextMap(MAPNAME, 25, 25);
+            engine.Start();
             base.OnLoad(e);
         }
 
