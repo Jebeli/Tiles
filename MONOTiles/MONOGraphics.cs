@@ -113,7 +113,7 @@ namespace MONOTiles
 
         public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var c = Microsoft.Xna.Framework.Color.Wheat;
+            var c = Microsoft.Xna.Framework.Color.Black;
             var fnt = game.smallFont;
             var size = fnt.MeasureString(text);
             var pos = new Microsoft.Xna.Framework.Vector2(x, y);

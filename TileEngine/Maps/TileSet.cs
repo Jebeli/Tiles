@@ -64,6 +64,11 @@ namespace TileEngine.Maps
             get { return texture; }
         }
 
+        public int TileCount
+        {
+            get { return tiles.Count; }
+        }
+
         public IEnumerable<int> Tiles
         {
             get
@@ -104,6 +109,8 @@ namespace TileEngine.Maps
         {
             if (texture != null)
             {
+                //offsetX += 32;
+                //offsetY += 16;
                 AdjustOversizeAndTileSize(clipW, clipH, offsetX, offsetY);
                 TextureRegion region = texture.GetRegion(clipX, clipY, clipW, clipH, offsetX, offsetY);
                 EnsureIndex(index);

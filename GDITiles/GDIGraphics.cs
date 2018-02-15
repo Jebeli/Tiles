@@ -240,7 +240,7 @@ namespace GDITiles
         {
             gridPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
             selectPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Gold));
-            textBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(250, System.Drawing.Color.Wheat));
+            textBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
             smallFont = new System.Drawing.Font("Segoe UI", 8);
         }
         private void DrawTile(int x, int y, int width, int height, System.Drawing.Pen pen, MapOrientation oriention = MapOrientation.Isometric)

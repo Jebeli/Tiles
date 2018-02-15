@@ -31,12 +31,28 @@ namespace TileEngine.Maps
             return map;
         }
 
+        public static void MakeTest(Engine engine)
+        {
+            Map map = engine.LoadMap("maps/frontier_outpost.xml");
+            Layer layer = map.Layers.First();
+            TileSet tileSet = layer.TileSet;
+            engine.SaveTileSet(tileSet);
+        }
         public static Map MakeIniMap(Engine engine)
         {
             Map map = engine.LoadMap("maps/frontier_outpost.xml");
             //engine.SaveTileSet(map.Layers.First().TileSet, "tilesetdefs/tileset_grassland.xml");
             //engine.SaveMap(map, "maps/frontier_outpost.xml");
             return map;
+        }
+
+        public static TileSet MakeMediTileSet(Engine engine)
+        {
+            TileSet tileSet = engine.GetTileSet("images/tilesets/tileset_building.png");
+            tileSet.AutoFill(64, 192);
+            tileSet.Name = "tilesetdefs/tileset_building.xml";
+            engine.SaveTileSet(tileSet, "tilesetdefs/tileset_building.xml");
+            return tileSet;
         }
 
         public static Map MakeDummyOrthoMap(Engine engine)

@@ -178,9 +178,10 @@ namespace TileEngine.Loaders
                                     int clipY = values[2];
                                     int clipW = values[3];
                                     int clipH = values[4];
-                                    int offsetX = values[5];
-                                    int offsetY = values[6];
-                                    ts.AddTile(index, clipX, clipY, clipW, clipH, -offsetX, -offsetY);
+                                    int offsetX = 32 - values[5];
+                                    int offsetY = 16 - values[6];
+
+                                    ts.AddTile(index, clipX, clipY, clipW, clipH, offsetX, offsetY);
                                 }
                             }
                         }

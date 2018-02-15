@@ -53,8 +53,8 @@ namespace GDITiles
         }
 
         protected override void OnLoad(EventArgs e)
-        {
-            engine.SetNextMap(MAPNAME3, 25, 25);
+        {            
+            engine.SetNextMap(MAPNAME1, 25, 25);
             engine.Start();
             base.OnLoad(e);
         }

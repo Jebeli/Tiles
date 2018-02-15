@@ -119,7 +119,7 @@ namespace TileEngine.Screens
             }
         }
 
-        protected virtual void OnMouseUp(float x, float y, MouseButton button)
+        protected virtual bool OnMouseUp(float x, float y, MouseButton button)
         {
             Widget widget = null;
             foreach (var w in widgets)
@@ -129,9 +129,11 @@ namespace TileEngine.Screens
                     if (widget != null)
                     {
                         OnWidgetClick(widget);
+                        return false;
                     }
                 }
             }
+            return true;
         }
         protected virtual void OnMouseMove(float x, float y, MouseButton button)
         {

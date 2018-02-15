@@ -40,6 +40,7 @@ namespace TileEngine.GUI
         private NinePatch patch;
         private NinePatch patchHover;
         private NinePatch patchPressed;
+        private object tag;
 
         public Widget(NinePatch patch, NinePatch patchHover, NinePatch patchPressed)
         {
@@ -50,6 +51,12 @@ namespace TileEngine.GUI
             this.patch = patch;
             this.patchHover = patchHover;
             this.patchPressed = patchPressed;
+        }
+
+        public object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
         }
 
         public NinePatch Patch

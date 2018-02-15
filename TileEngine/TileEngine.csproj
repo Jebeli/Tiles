@@ -62,7 +62,9 @@
     <Compile Include="GUI\Widget.cs" />
     <Compile Include="GUI\WidgetButton.cs" />
     <Compile Include="GUI\WidgetFactory.cs" />
+    <Compile Include="GUI\WidgetImage.cs" />
     <Compile Include="GUI\WidgetLabel.cs" />
+    <Compile Include="GUI\WidgetTileEditor.cs" />
     <Compile Include="GUI\WidgetWindow.cs" />
     <Compile Include="Input\BasicInput.cs" />
     <Compile Include="Input\IInput.cs" />

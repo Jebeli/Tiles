@@ -304,8 +304,10 @@ namespace TileEngine
             return tileSet;
         }
 
-        public void SaveTileSet(TileSet tileSet, string fileId)
+        public void SaveTileSet(TileSet tileSet, string fileId = null)
         {
+            if (fileId == null) fileId = tileSet.Name;
+            fileId = fileId.Replace(".txt", ".xml");
             foreach (ISaver saver in savers)
             {
                 saver.Save(tileSet, fileId);
@@ -313,8 +315,10 @@ namespace TileEngine
             }
         }
 
-        public void SaveMap(Map map, string fileId)
+        public void SaveMap(Map map, string fileId = null)
         {
+            if (fileId == null) fileId = map.Name;
+            fileId = fileId.Replace(".txt", ".xml");
             foreach (ISaver saver in savers)
             {
                 saver.Save(map, fileId);
