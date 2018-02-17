@@ -93,8 +93,8 @@ namespace TileEngine.Graphics
                 list = new List<RenderTextureRegion>();
                 int tileWidth = engine.Camera.TileWidth;
                 int tileHeight = engine.Camera.TileHeight;
-                int maxOversizeX = layer.OversizeX * tileWidth;
-                int maxOversizeY = layer.OversizeY * tileHeight;
+                int maxOversizeX = layer.OversizeX * layer.TileSet.TileWidth;
+                int maxOversizeY = layer.OversizeY * layer.TileSet.TileHeight;
                 int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
                 int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
                 int minScreenX = 0 - maxOversizeX;
@@ -133,8 +133,8 @@ namespace TileEngine.Graphics
         {
             int tileWidth = engine.Camera.TileWidth;
             int tileHeight = engine.Camera.TileHeight;
-            int maxOversizeX = layer.OversizeX * tileWidth;
-            int maxOversizeY = layer.OversizeY * tileHeight;
+            int maxOversizeX = layer.OversizeX * layer.TileSet.TileWidth;
+            int maxOversizeY = layer.OversizeY * layer.TileSet.TileHeight;
             int maxScreenX = (engine.Camera.ViewWidth - tileWidth) + maxOversizeX;
             int maxScreenY = (engine.Camera.ViewHeight - tileHeight) + maxOversizeY;
             int minScreenX = 0 - maxOversizeX;

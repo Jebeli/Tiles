@@ -183,7 +183,7 @@ namespace TileEngine.Screens
         }
         private void MakeEditor(int x, int y)
         {
-            if (editor != null) RemoveWidget(editor);
+            HideEditor();
             editor = new WidgetTileEditor(engine.Map, x, y);
             int sX;
             int sY;

@@ -107,6 +107,21 @@ namespace TileEngine.GUI
             }
             map.InvalidateRenderLists();
             Visible = false;
+        }
+
+        private void Apply()
+        {
+            int index = 0;
+            foreach (var layer in map.Layers)
+            {
+                if (layer.Visible)
+                {
+                    originalIds[index] = layer[x, y].TileId;
+                    index++;
+                }
+            }
+            map.InvalidateRenderLists();
+            Visible = false;
 
         }
 
@@ -157,7 +172,7 @@ namespace TileEngine.GUI
             }
             else if (buttonApply == widget)
             {
-                Visible = false;
+                Apply();
             }
             else
             {
@@ -178,8 +193,16 @@ namespace TileEngine.GUI
             {
                 this.layer = layer;
                 tile = layer[x, y];
-                labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId}";
                 tileImage.Image = layer.TileSet.GetTile(tile.TileId);
+                if (tileImage.Image != null)
+                {
+                    tileImage.SetPosition(64 - tileImage.Image.OffsetX, 256 - 30 - tileImage.Image.Height - tileImage.Image.OffsetY);
+                    labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId} {tileImage.Image.OffsetX}/{tileImage.Image.OffsetY}";
+                }
+                else
+                {
+                    labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId}";
+                }
                 map.InvalidateRenderLists();
             }
         }
