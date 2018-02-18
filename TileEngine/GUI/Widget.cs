@@ -37,6 +37,8 @@ namespace TileEngine.GUI
         private bool pressed;
         private bool hover;
         private bool clickable;
+        private bool toggleSelect;
+        private bool selected;
         private NinePatch patch;
         private NinePatch patchHover;
         private NinePatch patchPressed;
@@ -173,6 +175,12 @@ namespace TileEngine.GUI
             set { enabled = value; }
         }
 
+        public bool ToggleSelect
+        {
+            get { return toggleSelect; }
+            set { toggleSelect = value; }
+        }
+
         public bool Hover
         {
             get { return hover; }
@@ -187,6 +195,12 @@ namespace TileEngine.GUI
         {
             get { return clickable; }
             set { clickable = value; }
+        }
+
+        public bool Selected
+        {
+            get { return selected; }
+            set { selected = value; }
         }
 
         public Widget Parent
@@ -242,6 +256,7 @@ namespace TileEngine.GUI
                     {
                         widget = this;
                         pressed = false;
+                        OnClicked();
                     }
                 }
             }
@@ -324,7 +339,7 @@ namespace TileEngine.GUI
 
         protected bool DrawNinePatch(IGraphics graphics, int x, int y, int width, int height)
         {
-            if (pressed)
+            if (pressed || selected)
             {
                 if (patchPressed != null)
                 {
@@ -352,6 +367,13 @@ namespace TileEngine.GUI
 
         protected abstract void BoundsChanged();
 
+        protected virtual void OnClicked()
+        {
+            if (toggleSelect)
+            {
+                selected = !selected;
+            }
+        }
         private void CalcBounds(out int x, out int y, out int width, out int height)
         {
             x = left;

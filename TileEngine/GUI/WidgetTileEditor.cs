@@ -47,28 +47,28 @@ namespace TileEngine.GUI
             this.y = y;
             Visible = false;
 
-            SetSize(256, 256);
+            SetSize(320, 320);
 
             labelLayers = new WidgetLabel("Layers:");
             labelLayers.SetBounds(0, 0, 64, 30);
             AddWidget(labelLayers);
             labelTile = new WidgetLabel($"Tile ({x}/{y})");
-            labelTile.SetBounds(0, 30, 256, 30);
+            labelTile.SetBounds(0, 30, 320, 30);
             AddWidget(labelTile);
             tileImage = new WidgetImage();
-            tileImage.SetBounds(64, 256 - 128, 256 - 64, 200);
+            tileImage.SetBounds(64, 320 - 128, 320 - 64, 200);
             AddWidget(tileImage);
             buttonPrev = new WidgetButton("<");
-            buttonPrev.SetBounds(0, 256 - 30, 64, 30);
+            buttonPrev.SetBounds(0, 320 - 30, 64, 30);
             AddWidget(buttonPrev);
             buttonNext = new WidgetButton(">");
-            buttonNext.SetBounds(64, 256 - 30, 64, 30);
+            buttonNext.SetBounds(64, 320 - 30, 64, 30);
             AddWidget(buttonNext);
             buttonApply = new WidgetButton("Apply");
-            buttonApply.SetBounds(64 * 2, 256 - 30, 64, 30);
+            buttonApply.SetBounds(64 * 2, 320 - 30, 64, 30);
             AddWidget(buttonApply);
             buttonCancel = new WidgetButton("Cancel");
-            buttonCancel.SetBounds(64 * 3, 256 - 30, 64, 30);
+            buttonCancel.SetBounds(64 * 3, 320 - 30, 64, 30);
             AddWidget(buttonCancel);
 
             int index = 0;
@@ -79,8 +79,9 @@ namespace TileEngine.GUI
                 if (layer.Visible)
                 {
                     WidgetButton buttonLayer = new WidgetButton(layer.Name);
-                    buttonLayer.SetBounds(64 + index * 64, 0, 64, 30);
+                    buttonLayer.SetBounds(64 + index * 72, 0, 72, 30);
                     buttonLayer.Tag = layer;
+                    buttonLayer.ToggleSelect = true;
                     layerButtons.Add(buttonLayer);
                     AddWidget(buttonLayer);
                     int id = layer[x, y].TileId;
@@ -202,6 +203,17 @@ namespace TileEngine.GUI
                 else
                 {
                     labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId}";
+                }
+                foreach (WidgetButton button in layerButtons)
+                {
+                    if (button.Tag == layer)
+                    {
+                        button.Selected = true;
+                    }
+                    else
+                    {
+                        button.Selected = false;
+                    }
                 }
                 map.InvalidateRenderLists();
             }
