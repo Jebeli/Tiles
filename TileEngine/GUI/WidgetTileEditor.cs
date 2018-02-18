@@ -39,6 +39,7 @@ namespace TileEngine.GUI
         private WidgetButton buttonNext;
         private WidgetButton buttonApply;
         private WidgetButton buttonCancel;
+        private WidgetList listTiles;
         private List<int> originalIds;
         public WidgetTileEditor(Map map, int x, int y)
         {
@@ -70,6 +71,10 @@ namespace TileEngine.GUI
             buttonCancel = new WidgetButton("Cancel");
             buttonCancel.SetBounds(64 * 3, 320 - 30, 64, 30);
             AddWidget(buttonCancel);
+
+            listTiles = new WidgetList();
+            listTiles.SetBounds(320 - 64 * 2, 60, 64 * 2, 210);
+            AddWidget(listTiles);
 
             int index = 0;
             layerButtons = new List<WidgetButton>();
@@ -188,21 +193,40 @@ namespace TileEngine.GUI
             return false;
         }
 
+        private void SetTileSet(TileSet tileSet, int selectedTile = -1)
+        {
+            listTiles.Clear();
+            if (tileSet != null)
+            {
+                foreach (var tile in tileSet.Tiles)
+                {
+                    var item = listTiles.Add(tile);
+                    item.Image = tileSet.GetTile(tile);
+                    if (tile == selectedTile)
+                    {
+                        listTiles.SelectedIndex = item.Index;
+                    }
+                }
+            }
+        }
+
         private void SwitchLayer(Layer layer)
         {
             if (layer != null)
             {
                 this.layer = layer;
                 tile = layer[x, y];
+                SetTileSet(layer.TileSet, tile.TileId);
                 tileImage.Image = layer.TileSet.GetTile(tile.TileId);
                 if (tileImage.Image != null)
                 {
                     tileImage.SetPosition(64 - tileImage.Image.OffsetX, 256 - 30 - tileImage.Image.Height - tileImage.Image.OffsetY);
-                    labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId} {tileImage.Image.OffsetX}/{tileImage.Image.OffsetY}";
+                    labelTile.Text = $"Tile: ({x}/{y}) Layer: {layer.Name} Id: {tile.TileId} Offset: ({tileImage.Image.OffsetX}/{tileImage.Image.OffsetY})";
+
                 }
                 else
                 {
-                    labelTile.Text = $"Tile ({x}/{y}) Layer {layer.Name} Id: {tile.TileId}";
+                    labelTile.Text = $"Tile: ({x}/{y}) Layer: {layer.Name} Id: {tile.TileId}";
                 }
                 foreach (WidgetButton button in layerButtons)
                 {

@@ -51,5 +51,10 @@ namespace TileEngine.Maps
             get { return tileId; }
             set { tileId = value; }
         }
+
+        public override string ToString()
+        {
+            return $"{tileId}";
+        }
     }
 }

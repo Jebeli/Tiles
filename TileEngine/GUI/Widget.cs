@@ -55,6 +55,8 @@ namespace TileEngine.GUI
             this.patchPressed = patchPressed;
         }
 
+        public event EventHandler<EventArgs> Click;
+
         public object Tag
         {
             get { return tag; }
@@ -373,6 +375,7 @@ namespace TileEngine.GUI
             {
                 selected = !selected;
             }
+            Click?.Invoke(this, EventArgs.Empty);
         }
         private void CalcBounds(out int x, out int y, out int width, out int height)
         {
