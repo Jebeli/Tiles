@@ -44,6 +44,16 @@ namespace TileEngine.GUI
         private NinePatch patchPressed;
         private object tag;
 
+        public Widget()
+            : this(null)
+        {
+
+        }
+        public Widget(NinePatch patch)
+            : this(patch, patch, patch)
+        {
+
+        }
         public Widget(NinePatch patch, NinePatch patchHover, NinePatch patchPressed)
         {
             children = new List<Widget>();
@@ -240,7 +250,7 @@ namespace TileEngine.GUI
             return (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height);
         }
 
-        public bool CheckMouseUp(int x, int y, ref Widget widget)
+        public virtual bool CheckMouseUp(int x, int y, ref Widget widget)
         {
             bool wasPressed = pressed;
             if (visible && enabled && clickable)
@@ -377,7 +387,7 @@ namespace TileEngine.GUI
             }
             Click?.Invoke(this, EventArgs.Empty);
         }
-        private void CalcBounds(out int x, out int y, out int width, out int height)
+        protected void CalcBounds(out int x, out int y, out int width, out int height)
         {
             x = left;
             y = top;

@@ -32,7 +32,7 @@ namespace TileEngine.GUI
         private int maxValue;
         private int value;
         public WidgetScrollBar()
-            : base(null, null, null)
+            : base(WidgetFactory.Window9P)
         {
             maxValue = 100;
             buttonUp = new WidgetButton("^");
@@ -77,12 +77,15 @@ namespace TileEngine.GUI
 
         private void ButtonUp_Click(object sender, EventArgs e)
         {
-            Value = Math.Max(value - 1, minValue);            
+            Value = Math.Max(value - 1, minValue);
         }
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
-            
+            if (!DrawNinePatch(graphics, x, y, width, height))
+            {
+                graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            }
         }
 
         protected override void BoundsChanged()

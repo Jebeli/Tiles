@@ -15,7 +15,7 @@ namespace TileEngine.GUI
 
         }
         public WidgetWindow(NinePatch patch)
-            : base(patch, patch, patch)
+            : base(patch)
         {
 
         }

@@ -192,9 +192,10 @@ namespace TileEngine.Loaders
                             int? height = (int?)img.Attribute("height");
                             int? offsetX = (int?)img.Attribute("offsetX");
                             int? offsetY = (int?)img.Attribute("offsetY");
+                            string tileName = (string)img.Attribute("name");
                             if (x != null && y != null && width != null && height != null && offsetX != null && offsetY != null)
                             {
-                                ts.AddTile((int)id, (int)x, (int)y, (int)width, (int)height, (int)offsetX, (int)offsetY);
+                                ts.AddTile((int)id, (int)x, (int)y, (int)width, (int)height, (int)offsetX, (int)offsetY, tileName);
                             }
                         }
                     }

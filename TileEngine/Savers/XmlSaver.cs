@@ -80,6 +80,7 @@ namespace TileEngine.Savers
                     writer.WriteStartElement("tile");
                     writer.WriteAttributeString("id", tileId.ToString());
                     var region = tileSet.GetTile(tileId);
+                    var name = tileSet.GetTileName(tileId);
                     writer.WriteStartElement("region");
                     writer.WriteAttributeString("x", region.X.ToString());
                     writer.WriteAttributeString("y", region.Y.ToString());
@@ -87,6 +88,10 @@ namespace TileEngine.Savers
                     writer.WriteAttributeString("height", region.Height.ToString());
                     writer.WriteAttributeString("offsetX", region.OffsetX.ToString());
                     writer.WriteAttributeString("offsetY", region.OffsetY.ToString());
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        writer.WriteAttributeString("name", name);
+                    }
                     writer.WriteEndElement();
                     writer.WriteEndElement();
                 }

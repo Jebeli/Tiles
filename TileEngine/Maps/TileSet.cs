@@ -26,6 +26,7 @@ namespace TileEngine.Maps
     {
         private Texture texture;
         private List<TextureRegion> tiles;
+        private List<string> tileNames;
         private int tileWidth;
         private int tileHeight;
         private int oversizeX;
@@ -35,6 +36,7 @@ namespace TileEngine.Maps
         {
             this.texture = texture;
             tiles = new List<TextureRegion>();
+            tileNames = new List<string>();
         }
 
         public int TileWidth
@@ -105,16 +107,15 @@ namespace TileEngine.Maps
             }
         }
 
-        public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY)
+        public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY, string name="")
         {
             if (texture != null)
             {
-                //offsetX += 32;
-                //offsetY += 16;
                 AdjustOversizeAndTileSize(clipW, clipH, offsetX, offsetY);
                 TextureRegion region = texture.GetRegion(clipX, clipY, clipW, clipH, offsetX, offsetY);
                 EnsureIndex(index);
                 tiles[index] = region;
+                tileNames[index] = name;
             }
         }
 
@@ -134,6 +135,15 @@ namespace TileEngine.Maps
             }
             return null;
         }
+
+        public string GetTileName(int id)
+        {
+            if (id >= 0 && id < tileNames.Count)
+            {
+                return tileNames[id];
+            }
+            return null;
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -148,6 +158,7 @@ namespace TileEngine.Maps
             if (diff > 0)
             {
                 tiles.AddRange(new TextureRegion[diff]);
+                tileNames.AddRange(new string[diff]);
             }
         }
     }

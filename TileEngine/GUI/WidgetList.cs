@@ -33,7 +33,7 @@ namespace TileEngine.GUI
         private int selectedIndex;
         private WidgetListItem selectedItem;
         public WidgetList()
-            : base(null, null, null)
+            : base(WidgetFactory.Window9P)
         {
             items = new List<WidgetListItem>();
             itemHeight = 30;
@@ -42,9 +42,11 @@ namespace TileEngine.GUI
             AddWidget(scrollBar);
         }
 
+        public event EventHandler<EventArgs> SelectedIndexChanged;
+
         private void ScrollBar_ValueChanged(object sender, EventArgs e)
         {
-            SelectedIndex = scrollBar.Value;
+            TopItemIndex = scrollBar.Value;
         }
 
         public int ItemHeight
@@ -70,16 +72,47 @@ namespace TileEngine.GUI
                     if (value >= 0 && value < items.Count)
                     {
                         selectedIndex = value;
+                        if (selectedItem != null)
+                        {
+                            selectedItem.Selected = false;
+                        }
                         selectedItem = items[value];
-                        topItemIndex = value;
-                        scrollBar.Value = value;
+                        selectedItem.Selected = true;
+                        EnsureVisible(value);
                     }
                     else
                     {
                         selectedIndex = -1;
                         selectedItem = null;
-                        scrollBar.Value = 0;
+                        TopItemIndex = 0;
                     }
+                    SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        public void EnsureVisible(int index)
+        {
+            if (index < topItemIndex)
+            {
+                TopItemIndex = index;
+            }
+            int numItems = Height / itemHeight;
+            if (index > topItemIndex + numItems)
+            {
+                TopItemIndex = index - (numItems - 1);
+            }
+        }
+
+        public int TopItemIndex
+        {
+            get { return topItemIndex; }
+            set
+            {
+                if (topItemIndex != value)
+                {
+                    topItemIndex = value;
+                    scrollBar.Value = value;
                 }
             }
         }
@@ -107,6 +140,10 @@ namespace TileEngine.GUI
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
+            if (!DrawNinePatch(graphics, x, y, width, height))
+            {
+                graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            }
             int numItems = height / itemHeight;
             int index = topItemIndex;
             int itemCount = items.Count;
@@ -121,9 +158,16 @@ namespace TileEngine.GUI
 
         private void DrawItem(WidgetListItem item, IGraphics graphics, int x, int y, int width, int height)
         {
+            if (item.Selected)
+            {
+                if (PatchPressed != null)
+                {
+                    PatchPressed.Draw(graphics, x, y, width, height);
+                }
+            }
             if (item.Image != null)
-            {                
-                graphics.Render(item.Image.Texture, x, y, Math.Min(itemHeight, item.Image.Width), Math.Min(itemHeight, item.Image.Height),item.Image.X,item.Image.Y,item.Image.Width,item.Image.Height);
+            {
+                graphics.Render(item.Image.Texture, x, y, Math.Min(itemHeight, item.Image.Width), Math.Min(itemHeight, item.Image.Height), item.Image.X, item.Image.Y, item.Image.Width, item.Image.Height);
             }
             graphics.RenderText(item.Text, x + 2 + itemHeight, y + height / 2, HorizontalTextAlign.Left);
         }
@@ -133,12 +177,32 @@ namespace TileEngine.GUI
             scrollBar.SetBounds(Width - 30, 0, 30, Height);
         }
 
+        public override bool CheckMouseUp(int x, int y, ref Widget widget)
+        {
+            bool ok = base.CheckMouseUp(x, y, ref widget);
+            if (ok && widget == this)
+            {
+                int left;
+                int top;
+                int width;
+                int height;
+                CalcBounds(out left, out top, out width, out height);
+
+                y -= top;
+                int index = y / itemHeight;
+                index += topItemIndex;
+                SelectedIndex = index;
+            }
+            return ok;
+        }
+
         public class WidgetListItem
         {
             private string text;
             private object value;
             private int index;
             private TextureRegion image;
+            private bool selected;
 
             public int Index
             {
@@ -161,6 +225,12 @@ namespace TileEngine.GUI
             {
                 get { return value; }
                 set { this.value = value; }
+            }
+
+            public bool Selected
+            {
+                get { return selected; }
+                set { selected = value; }
             }
         }
     }

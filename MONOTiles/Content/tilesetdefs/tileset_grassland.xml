@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<tileset name="tilesetdefs/tileset_grassland.txt" tileWidth="64" tileHeight="32" image="images/tilesets/tileset_grassland.png">
+<tileset name="tilesetdefs/tileset_grassland.xml" tileWidth="64" tileHeight="32" image="images/tilesets/tileset_grassland.png">
   <tile id="16">
-    <region x="353" y="1136" width="64" height="32" offsetX="0" offsetY="0" />
+    <region x="353" y="1136" width="64" height="32" offsetX="0" offsetY="0" name="Grass1" />
   </tile>
   <tile id="17">
-    <region x="455" y="1150" width="64" height="32" offsetX="0" offsetY="0" />
+    <region x="455" y="1150" width="64" height="32" offsetX="0" offsetY="0" name="Grass2"/>
   </tile>
   <tile id="18">
-    <region x="353" y="1168" width="64" height="32" offsetX="0" offsetY="0" />
+    <region x="353" y="1168" width="64" height="32" offsetX="0" offsetY="0" name="Grass3"/>
   </tile>
   <tile id="19">
-    <region x="289" y="1181" width="64" height="32" offsetX="0" offsetY="0" />
+    <region x="289" y="1181" width="64" height="32" offsetX="0" offsetY="0" name="Grass4"/>
   </tile>
   <tile id="20">
-    <region x="453" y="1182" width="64" height="32" offsetX="0" offsetY="0" />
+    <region x="453" y="1182" width="64" height="32" offsetX="0" offsetY="0" name="Grass5"/>
   </tile>
   <tile id="21">
     <region x="353" y="1200" width="64" height="32" offsetX="0" offsetY="0" />
@@ -169,19 +169,19 @@
     <region x="64" y="1141" width="41" height="82" offsetX="0" offsetY="-53" />
   </tile>
   <tile id="72">
-    <region x="581" y="1232" width="63" height="74" offsetX="1" offsetY="-46" />
+    <region x="581" y="1232" width="63" height="74" offsetX="1" offsetY="-46" name="Tent S"/>
   </tile>
   <tile id="73">
-    <region x="523" y="1560" width="30" height="67" offsetX="32" offsetY="-35" />
+    <region x="523" y="1560" width="30" height="67" offsetX="32" offsetY="-35" name="Tent N" />
   </tile>
   <tile id="74">
-    <region x="553" y="1560" width="29" height="66" offsetX="3" offsetY="-35" />
+    <region x="553" y="1560" width="29" height="66" offsetX="3" offsetY="-35" name="Tent W"/>
   </tile>
   <tile id="75">
-    <region x="0" y="1500" width="63" height="74" offsetX="0" offsetY="-46" />
+    <region x="0" y="1500" width="63" height="74" offsetX="0" offsetY="-46" name="Tent E"/>
   </tile>
   <tile id="76">
-    <region x="160" y="1569" width="59" height="49" offsetX="5" offsetY="-20" />
+    <region x="160" y="1569" width="59" height="49" offsetX="5" offsetY="-20" name="Stash"/>
   </tile>
   <tile id="77">
     <region x="341" y="1424" width="59" height="49" offsetX="5" offsetY="-20" />
@@ -658,13 +658,13 @@
     <region x="294" y="192" width="122" height="148" offsetX="-26" offsetY="-118" />
   </tile>
   <tile id="253">
-    <region x="0" y="351" width="118" height="140" offsetX="-24" offsetY="-112" />
+    <region x="0" y="351" width="118" height="140" offsetX="-24" offsetY="-112" name="Tree1"/>
   </tile>
   <tile id="254">
-    <region x="422" y="128" width="123" height="130" offsetX="-27" offsetY="-114" />
+    <region x="422" y="128" width="123" height="130" offsetX="-27" offsetY="-114" name="Tree2"/>
   </tile>
   <tile id="255">
-    <region x="115" y="637" width="112" height="140" offsetX="-16" offsetY="-113" />
+    <region x="115" y="637" width="112" height="140" offsetX="-16" offsetY="-113" name="Tree3"/>
   </tile>
   <tile id="264">
     <region x="294" y="0" width="128" height="64" offsetX="0" offsetY="-16" />

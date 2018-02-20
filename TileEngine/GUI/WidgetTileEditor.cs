@@ -73,7 +73,8 @@ namespace TileEngine.GUI
             AddWidget(buttonCancel);
 
             listTiles = new WidgetList();
-            listTiles.SetBounds(320 - 64 * 2, 60, 64 * 2, 210);
+            listTiles.SetBounds(320 - 64 * 3, 60, 64 * 3, 210);
+            listTiles.SelectedIndexChanged += ListTiles_SelectedIndexChanged;
             AddWidget(listTiles);
 
             int index = 0;
@@ -99,6 +100,7 @@ namespace TileEngine.GUI
                 }
             }
         }
+
 
         public void Cancel()
         {
@@ -129,6 +131,19 @@ namespace TileEngine.GUI
             map.InvalidateRenderLists();
             Visible = false;
 
+        }
+        private void ListTiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var item =listTiles.SelectedItem;
+            if (item != null)
+            {
+                int tileId = (int)item.Value;
+                if (tileId != tile.TileId)
+                {
+                    tile.TileId = tileId;
+                    SwitchLayer(layer);
+                }
+            }
         }
 
         public bool HandleWidgetClick(Widget widget)
@@ -202,6 +217,11 @@ namespace TileEngine.GUI
                 {
                     var item = listTiles.Add(tile);
                     item.Image = tileSet.GetTile(tile);
+                    string name = tileSet.GetTileName(tile);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        item.Text = $"{tile}: {name}";
+                    }
                     if (tile == selectedTile)
                     {
                         listTiles.SelectedIndex = item.Index;

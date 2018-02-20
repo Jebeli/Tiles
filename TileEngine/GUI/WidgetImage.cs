@@ -27,8 +27,7 @@ namespace TileEngine.GUI
     public class WidgetImage : Widget
     {
         private TextureRegion image;
-        public WidgetImage() :
-            base(null, null, null)
+        public WidgetImage() 
         {
         }
 

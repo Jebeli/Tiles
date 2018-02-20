@@ -29,7 +29,7 @@ namespace TileEngine.GUI
         private string text;
 
         public WidgetLabel(string text = "")
-            : base(null, null, null)
+            : base(null)
         {
             this.text = text;
             Clickable = false;
