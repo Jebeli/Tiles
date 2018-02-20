@@ -41,6 +41,7 @@ namespace TileEngine.GUI
         private WidgetButton buttonCancel;
         private WidgetList listTiles;
         private List<int> originalIds;
+        private TileSet tileSet;
         public WidgetTileEditor(Map map, int x, int y)
         {
             this.map = map;
@@ -134,7 +135,7 @@ namespace TileEngine.GUI
         }
         private void ListTiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var item =listTiles.SelectedItem;
+            var item = listTiles.SelectedItem;
             if (item != null)
             {
                 int tileId = (int)item.Value;
@@ -210,21 +211,38 @@ namespace TileEngine.GUI
 
         private void SetTileSet(TileSet tileSet, int selectedTile = -1)
         {
-            listTiles.Clear();
-            if (tileSet != null)
+            if (this.tileSet != tileSet)
             {
-                foreach (var tile in tileSet.Tiles)
+                listTiles.Clear();
+                if (tileSet != null)
                 {
-                    var item = listTiles.Add(tile);
-                    item.Image = tileSet.GetTile(tile);
-                    string name = tileSet.GetTileName(tile);
-                    if (!string.IsNullOrEmpty(name))
+                    foreach (var tile in tileSet.Tiles)
                     {
-                        item.Text = $"{tile}: {name}";
+                        var item = listTiles.Add(tile);
+                        item.Image = tileSet.GetTile(tile);
+                        string name = tileSet.GetTileName(tile);
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            item.Text = $"{tile}: {name}";
+                        }
+                        if (tile == selectedTile)
+                        {
+                            listTiles.SelectedIndex = item.Index;
+                        }
                     }
-                    if (tile == selectedTile)
+                }
+            }
+            else
+            {
+                if (tileSet != null)
+                {
+                    foreach(var item in listTiles.Items)
                     {
-                        listTiles.SelectedIndex = item.Index;
+                        if (selectedTile == (int)item.Value)
+                        {
+                            listTiles.SelectedIndex = item.Index;
+                            break;
+                        }
                     }
                 }
             }
