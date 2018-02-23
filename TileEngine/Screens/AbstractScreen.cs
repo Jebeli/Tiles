@@ -76,7 +76,7 @@ namespace TileEngine.Screens
 
         public virtual void Update(TimeInfo time)
         {
-
+            Widget.CheckRepeatWidget(time.TotalGameTime);
         }
 
         public virtual void Render(TimeInfo time)
@@ -113,34 +113,27 @@ namespace TileEngine.Screens
         }
         protected virtual void OnMouseDown(float x, float y, MouseButton button)
         {
-            foreach (var w in widgets)
-            {
-                w.CheckMouseDown((int)x, (int)y);
-            }
+            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
+            Widget.PressedWidget = widget;
         }
 
         protected virtual bool OnMouseUp(float x, float y, MouseButton button)
         {
-            Widget widget = null;
-            foreach (var w in widgets)
+            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
+            if (Widget.CheckClickWidget(widget, (int)x, (int)y, button))
             {
-                if (w.CheckMouseUp((int)x, (int)y, ref widget))
-                {
-                    if (widget != null)
-                    {
-                        OnWidgetClick(widget);
-                        return false;
-                    }
-                }
+                Widget.PressedWidget = null;
+                OnWidgetClick(widget);
+                return false;
+
             }
+            Widget.PressedWidget = null;
             return true;
         }
         protected virtual void OnMouseMove(float x, float y, MouseButton button)
         {
-            foreach (var w in widgets)
-            {
-                w.CheckMouseHover((int)x, (int)y);
-            }
+            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
+            Widget.HoverWidget = widget;
         }
 
         protected virtual void OnWidgetClick(Widget widget)

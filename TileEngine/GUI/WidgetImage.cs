@@ -27,7 +27,8 @@ namespace TileEngine.GUI
     public class WidgetImage : Widget
     {
         private TextureRegion image;
-        public WidgetImage() 
+        public WidgetImage()
+            : base(WidgetFactory.Window9P)
         {
         }
 
@@ -39,15 +40,22 @@ namespace TileEngine.GUI
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
+            if (!DrawNinePatch(graphics, x, y, width, height))
+            {
+                graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            }
             if (image != null)
             {
+                //tileImage.SetPosition(64 - tileImage.Image.OffsetX, 256 - 30 - tileImage.Image.Height - tileImage.Image.OffsetY);
+                x -= image.OffsetX;
+                y -= image.OffsetY;
                 graphics.Render(image, x, y);
             }
         }
 
         protected override void BoundsChanged()
         {
-            
+
         }
     }
 }

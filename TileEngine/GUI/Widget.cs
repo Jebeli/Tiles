@@ -17,12 +17,13 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.GUI
 {
+    using Input;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using TileEngine.Graphics;
+    using Graphics;
 
     public abstract class Widget : IWidgetContainer
     {
@@ -39,10 +40,15 @@ namespace TileEngine.GUI
         private bool clickable;
         private bool toggleSelect;
         private bool selected;
+        private bool repeat;
         private NinePatch patch;
         private NinePatch patchHover;
         private NinePatch patchPressed;
+        private double repeatMillis = 500;
         private object tag;
+        private static Widget hoverWidget;
+        private static Widget pressedWidget;
+        private static TimeSpan widgetStartTime;
 
         public Widget()
             : this(null)
@@ -215,6 +221,12 @@ namespace TileEngine.GUI
             set { selected = value; }
         }
 
+        public bool Repeat
+        {
+            get { return repeat; }
+            set { repeat = value; }
+        }
+
         public Widget Parent
         {
             get { return parent; }
@@ -250,85 +262,107 @@ namespace TileEngine.GUI
             return (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height);
         }
 
-        public virtual bool CheckMouseUp(int x, int y, ref Widget widget)
+        public static Widget HoverWidget
         {
-            bool wasPressed = pressed;
-            if (visible && enabled && clickable)
+            get { return hoverWidget; }
+            set
             {
-                foreach (var w in children)
+                if (hoverWidget != value)
                 {
-                    if (w.CheckMouseUp(x, y, ref widget))
+                    if (hoverWidget != null)
                     {
-                        pressed = false;
+                        hoverWidget.hover = false;
                     }
-                }
-                if (visible && enabled && clickable && Contains(x, y))
-                {
-                    if (pressed)
+                    hoverWidget = value;
+                    if (hoverWidget != null)
                     {
-                        widget = this;
-                        pressed = false;
-                        OnClicked();
+                        hoverWidget.hover = true;
                     }
                 }
             }
-            pressed = false;
-            return !pressed && wasPressed;
         }
 
-        public bool CheckMouseDown(int x, int y)
+        public static Widget PressedWidget
         {
-            if (visible && enabled && clickable)
+            get { return pressedWidget; }
+            set
             {
-                foreach (var w in children)
+                if (pressedWidget != value)
                 {
-                    if (w.CheckMouseDown(x, y))
+                    if (pressedWidget != null)
                     {
-                        pressed = true;
+                        pressedWidget.pressed = false;
+                    }
+                    pressedWidget = value;
+                    if (pressedWidget != null)
+                    {
+                        widgetStartTime = TimeSpan.MaxValue;
+                        pressedWidget.pressed = true;
                     }
                 }
-                if (visible && enabled && clickable && Contains(x, y))
+            }
+        }
+
+        public static bool CheckClickWidget(Widget widget, int x, int y, MouseButton button)
+        {
+            if (widget != null)
+            {
+                if (widget == pressedWidget)
                 {
-                    pressed = true;
+                    widget.OnMouseUp(x, y, button);
+                    widget.OnClicked();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool CheckRepeatWidget(TimeSpan time, double repeatMillis=250)
+        {
+            if (pressedWidget != null && pressedWidget.repeat)
+            {
+                if (widgetStartTime.Equals(TimeSpan.MaxValue))
+                {
+                    widgetStartTime = time;
                 }
                 else
                 {
-                    pressed = false;
-                }
-            }
-            else
-            {
-                pressed = false;
-            }
-            return pressed;
-        }
-
-        public bool CheckMouseHover(int x, int y)
-        {
-            if (visible && enabled)
-            {
-                foreach (var w in children)
-                {
-                    if (w.CheckMouseHover(x, y))
+                    var diff = time - widgetStartTime;
+                    double millis = diff.TotalMilliseconds;
+                    if (millis > repeatMillis)
                     {
-                        hover = true;
+                        widgetStartTime = time;
+                        pressedWidget.OnClicked();
+                        return true;
                     }
                 }
-                if (visible && enabled && Contains(x, y))
-                {
-                    hover = true;
-                }
-                else
-                {
-                    hover = false;
-                }
             }
-            else
-            {
-                hover = false;
-            }
-            return hover;
+            return false;
         }
+
+        public static Widget FindWidget(IWidgetContainer container, int mouseX, int mouseY)
+        {
+            if (container != null)
+            {
+                foreach (var w in container.Widgets)
+                {
+                    if (w.visible && w.enabled && w.clickable)
+                    {
+                        if (w.Contains(mouseX, mouseY))
+                        {
+                            Widget widget = FindWidget(w, mouseX, mouseY);
+                            if (widget != null)
+                            {
+                                return widget;
+                            }
+                            return w;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+      
         public void Render(IGraphics graphics)
         {
             if (visible)
@@ -386,6 +420,11 @@ namespace TileEngine.GUI
                 selected = !selected;
             }
             Click?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnMouseUp(int x, int y, MouseButton button)
+        {
+
         }
         protected void CalcBounds(out int x, out int y, out int width, out int height)
         {

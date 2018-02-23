@@ -39,6 +39,7 @@ namespace TileEngine.GUI
         private WidgetButton buttonNext;
         private WidgetButton buttonApply;
         private WidgetButton buttonCancel;
+        private WidgetButton buttonClear;
         private WidgetList listTiles;
         private List<int> originalIds;
         private TileSet tileSet;
@@ -58,19 +59,23 @@ namespace TileEngine.GUI
             labelTile.SetBounds(0, 30, 320, 30);
             AddWidget(labelTile);
             tileImage = new WidgetImage();
-            tileImage.SetBounds(64, 320 - 128, 320 - 64, 200);
+            tileImage.SetBounds(0, 60, 320 - 64 * 3, 210);
             AddWidget(tileImage);
+
+            buttonClear = new WidgetButton("Clear");
+            buttonClear.SetBounds(0, 320 - 30, 64, 30);
+            AddWidget(buttonClear);
             buttonPrev = new WidgetButton("<");
-            buttonPrev.SetBounds(0, 320 - 30, 64, 30);
+            buttonPrev.SetBounds(64, 320 - 30, 64, 30);
             AddWidget(buttonPrev);
             buttonNext = new WidgetButton(">");
-            buttonNext.SetBounds(64, 320 - 30, 64, 30);
+            buttonNext.SetBounds(64 * 2, 320 - 30, 64, 30);
             AddWidget(buttonNext);
             buttonApply = new WidgetButton("Apply");
-            buttonApply.SetBounds(64 * 2, 320 - 30, 64, 30);
+            buttonApply.SetBounds(64 * 3, 320 - 30, 64, 30);
             AddWidget(buttonApply);
             buttonCancel = new WidgetButton("Cancel");
-            buttonCancel.SetBounds(64 * 3, 320 - 30, 64, 30);
+            buttonCancel.SetBounds(64 * 4, 320 - 30, 64, 30);
             AddWidget(buttonCancel);
 
             listTiles = new WidgetList();
@@ -131,7 +136,12 @@ namespace TileEngine.GUI
             }
             map.InvalidateRenderLists();
             Visible = false;
+        }
 
+        private void Clear()
+        {
+            tile.TileId = -1;
+            SwitchLayer(layer);
         }
         private void ListTiles_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -196,6 +206,10 @@ namespace TileEngine.GUI
             {
                 Apply();
             }
+            else if (buttonClear == widget)
+            {
+                Clear();
+            }
             else
             {
                 foreach (WidgetButton button in layerButtons)
@@ -213,6 +227,7 @@ namespace TileEngine.GUI
         {
             if (this.tileSet != tileSet)
             {
+                this.tileSet = tileSet;
                 listTiles.Clear();
                 if (tileSet != null)
                 {
@@ -236,7 +251,7 @@ namespace TileEngine.GUI
             {
                 if (tileSet != null)
                 {
-                    foreach(var item in listTiles.Items)
+                    foreach (var item in listTiles.Items)
                     {
                         if (selectedTile == (int)item.Value)
                         {
@@ -258,9 +273,7 @@ namespace TileEngine.GUI
                 tileImage.Image = layer.TileSet.GetTile(tile.TileId);
                 if (tileImage.Image != null)
                 {
-                    tileImage.SetPosition(64 - tileImage.Image.OffsetX, 256 - 30 - tileImage.Image.Height - tileImage.Image.OffsetY);
                     labelTile.Text = $"Tile: ({x}/{y}) Layer: {layer.Name} Id: {tile.TileId} Offset: ({tileImage.Image.OffsetX}/{tileImage.Image.OffsetY})";
-
                 }
                 else
                 {

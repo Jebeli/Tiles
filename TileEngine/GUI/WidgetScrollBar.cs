@@ -36,8 +36,10 @@ namespace TileEngine.GUI
         {
             maxValue = 100;
             buttonUp = new WidgetButton("^");
+            buttonUp.Repeat = true;
             buttonUp.Click += ButtonUp_Click;
             buttonDown = new WidgetButton("v");
+            buttonDown.Repeat = true;
             buttonDown.Click += ButtonDown_Click;
             AddWidget(buttonUp);
             AddWidget(buttonDown);

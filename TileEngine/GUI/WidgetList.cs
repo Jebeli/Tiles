@@ -23,6 +23,7 @@ namespace TileEngine.GUI
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Graphics;
+    using Input;
 
     public class WidgetList : Widget
     {
@@ -98,7 +99,7 @@ namespace TileEngine.GUI
                 TopItemIndex = index;
             }
             int numItems = Height / itemHeight;
-            if (index > topItemIndex + numItems)
+            if (index >= topItemIndex + numItems)
             {
                 TopItemIndex = index - (numItems - 1);
             }
@@ -177,10 +178,9 @@ namespace TileEngine.GUI
             scrollBar.SetBounds(Width - 30, 0, 30, Height);
         }
 
-        public override bool CheckMouseUp(int x, int y, ref Widget widget)
+        protected override void OnMouseUp(int x, int y, MouseButton button)
         {
-            bool ok = base.CheckMouseUp(x, y, ref widget);
-            if (ok && widget == this)
+            if (button == MouseButton.Left)
             {
                 int left;
                 int top;
@@ -193,8 +193,26 @@ namespace TileEngine.GUI
                 index += topItemIndex;
                 SelectedIndex = index;
             }
-            return ok;
         }
+
+        //public override bool CheckMouseUp(int x, int y, ref Widget widget)
+        //{
+        //    bool ok = base.CheckMouseUp(x, y, ref widget);
+        //    if (ok && widget == this)
+        //    {
+        //        int left;
+        //        int top;
+        //        int width;
+        //        int height;
+        //        CalcBounds(out left, out top, out width, out height);
+
+        //        y -= top;
+        //        int index = y / itemHeight;
+        //        index += topItemIndex;
+        //        SelectedIndex = index;
+        //    }
+        //    return ok;
+        //}
 
         public class WidgetListItem
         {
