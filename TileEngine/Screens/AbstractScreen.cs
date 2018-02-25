@@ -111,10 +111,15 @@ namespace TileEngine.Screens
                 ZoomIn();
             }
         }
-        protected virtual void OnMouseDown(float x, float y, MouseButton button)
+        protected virtual bool OnMouseDown(float x, float y, MouseButton button)
         {
             Widget widget = Widget.FindWidget(this, (int)x, (int)y);
             Widget.PressedWidget = widget;
+            if (Widget.CheckMouseDownWidget(widget, (int)x, (int)y, button))
+            {
+                return false;
+            }
+            return true;
         }
 
         protected virtual bool OnMouseUp(float x, float y, MouseButton button)
@@ -134,6 +139,7 @@ namespace TileEngine.Screens
         {
             Widget widget = Widget.FindWidget(this, (int)x, (int)y);
             Widget.HoverWidget = widget;
+            Widget.CheckMouseMoveWidget(widget, (int)x, (int)y, button);
         }
 
         protected virtual void OnWidgetClick(Widget widget)

@@ -67,13 +67,16 @@ namespace TileEngine.Screens
             base.Render(time);
         }
 
-        protected override void OnMouseDown(float x, float y, MouseButton button)
+        protected override bool OnMouseDown(float x, float y, MouseButton button)
         {
-            base.OnMouseDown(x, y, button);
-            mouseX = x;
-            mouseY = y;
-            hasPanned = false;
-            panning = button == MouseButton.Right;
+            if (base.OnMouseDown(x, y, button))
+            {
+                mouseX = x;
+                mouseY = y;
+                hasPanned = false;
+                panning = button == MouseButton.Right;
+            }
+            return true;
         }
 
         protected override bool OnMouseUp(float x, float y, MouseButton button)

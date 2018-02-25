@@ -303,6 +303,28 @@ namespace TileEngine.GUI
             }
         }
 
+        public static bool CheckMouseMoveWidget(Widget widget, int x, int y, MouseButton button)
+        {
+            if (widget != null)
+            {
+                widget.OnMouseMove(x, y, button);
+                return true;
+            }
+            return false;
+        }
+        public static bool CheckMouseDownWidget(Widget widget, int x, int y, MouseButton button)
+        {
+            if (widget != null)
+            {
+                if (widget == pressedWidget)
+                {
+                    widget.OnMouseDown(x, y, button);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static bool CheckClickWidget(Widget widget, int x, int y, MouseButton button)
         {
             if (widget != null)
@@ -317,7 +339,7 @@ namespace TileEngine.GUI
             return false;
         }
 
-        public static bool CheckRepeatWidget(TimeSpan time, double repeatMillis=250)
+        public static bool CheckRepeatWidget(TimeSpan time, double repeatMillis = 250)
         {
             if (pressedWidget != null && pressedWidget.repeat)
             {
@@ -362,7 +384,7 @@ namespace TileEngine.GUI
             }
             return null;
         }
-      
+
         public void Render(IGraphics graphics)
         {
             if (visible)
@@ -423,6 +445,16 @@ namespace TileEngine.GUI
         }
 
         protected virtual void OnMouseUp(int x, int y, MouseButton button)
+        {
+
+        }
+
+        protected virtual void OnMouseDown(int x, int y, MouseButton button)
+        {
+
+        }
+
+        protected virtual void OnMouseMove(int x, int y, MouseButton button)
         {
 
         }

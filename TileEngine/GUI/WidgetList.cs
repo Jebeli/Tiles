@@ -128,6 +128,11 @@ namespace TileEngine.GUI
             get { return items; }
         }
 
+        public int VisibleItems
+        {
+            get { return Height / itemHeight; }
+        }
+
         public WidgetListItem Add(object item)
         {
             WidgetListItem listItem = new WidgetListItem();
@@ -135,7 +140,7 @@ namespace TileEngine.GUI
             listItem.Text = item.ToString();
             listItem.Index = items.Count;
             items.Add(listItem);
-            scrollBar.MaxValue = items.Count - 1;
+            scrollBar.MaxValue = Math.Max(0, items.Count - 1 - VisibleItems);
             return listItem;
         }
 
@@ -194,25 +199,6 @@ namespace TileEngine.GUI
                 SelectedIndex = index;
             }
         }
-
-        //public override bool CheckMouseUp(int x, int y, ref Widget widget)
-        //{
-        //    bool ok = base.CheckMouseUp(x, y, ref widget);
-        //    if (ok && widget == this)
-        //    {
-        //        int left;
-        //        int top;
-        //        int width;
-        //        int height;
-        //        CalcBounds(out left, out top, out width, out height);
-
-        //        y -= top;
-        //        int index = y / itemHeight;
-        //        index += topItemIndex;
-        //        SelectedIndex = index;
-        //    }
-        //    return ok;
-        //}
 
         public class WidgetListItem
         {

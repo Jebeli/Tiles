@@ -23,6 +23,7 @@ namespace TileEngine.GUI
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Graphics;
+    using Input;
 
     public class WidgetScrollBar : Widget
     {
@@ -31,9 +32,17 @@ namespace TileEngine.GUI
         private int minValue;
         private int maxValue;
         private int value;
+        private double knobSize = 1.0;
+        private double knobPosition = 0.0;
+        private NinePatch knobPatch;
+        private NinePatch knobPatchPressed;
+        private bool knobPressed;
+        private int knobStartY;
         public WidgetScrollBar()
             : base(WidgetFactory.Window9P)
         {
+            knobPatch = WidgetFactory.Button9P;
+            knobPatchPressed = WidgetFactory.Button9PPressed;
             maxValue = 100;
             buttonUp = new WidgetButton("^");
             buttonUp.Repeat = true;
@@ -47,16 +56,86 @@ namespace TileEngine.GUI
 
         public event EventHandler<EventArgs> ValueChanged;
 
+        public double KnobSize
+        {
+            get { return knobSize; }
+            set { knobSize = value; }
+        }
+
+        public double KnobPosition
+        {
+            get { return knobPosition; }
+            set { knobPosition = value; }
+        }
+
+        public NinePatch KnobPatch
+        {
+            get { return knobPatch; }
+            set { knobPatch = value; }
+        }
         public int MinValue
         {
             get { return minValue; }
-            set { minValue = value; }
+            set
+            {
+                minValue = value;
+                AdjustKnobSize();
+                AdjustKnobPosition();
+            }
         }
 
         public int MaxValue
         {
             get { return maxValue; }
-            set { maxValue = value; }
+            set
+            {
+                maxValue = value;
+                AdjustKnobSize();
+                AdjustKnobPosition();
+            }
+        }
+
+        private void AdjustKnobSize()
+        {
+            int range = maxValue - minValue;
+            knobSize = 1.0 / range;
+        }
+
+        private void AdjustKnobPosition()
+        {
+            int range = maxValue - minValue;
+            int pos = value - minValue;
+            knobPosition = pos;
+            knobPosition /= range;
+        }
+
+        private void AdjustValue()
+        {
+            int range = maxValue - minValue;
+            int pos = (int)(knobPosition * range);
+            Value = pos - minValue;
+        }
+
+        private void MoveKnob(int mouseX, int mouseY)
+        {
+            int x;
+            int y;
+            int width;
+            int height;
+            CalcBounds(out x, out y, out width, out height);
+            int range = maxValue - minValue;
+            int kx;
+            int ky;
+            int kw;
+            int kh;
+            GetKnobRect(out kx, out ky, out kw, out kh);
+            int innerHeight = height - buttonDown.Height - buttonUp.Height - kh;
+            double kPos = mouseY - y - buttonDown.Height - knobStartY;
+            kPos /= innerHeight;
+            if (kPos > 1.0) kPos = 1.0;
+            if (kPos < 0.0) kPos = 0.0;
+            knobPosition = kPos;
+            AdjustValue();
         }
 
         public int Value
@@ -64,9 +143,13 @@ namespace TileEngine.GUI
             get { return value; }
             set
             {
+                if (value > maxValue) value = maxValue;
+                if (value < minValue) value = minValue;
                 if (this.value != value)
                 {
                     this.value = value;
+                    AdjustKnobSize();
+                    AdjustKnobPosition();
                     OnValueChanged();
                 }
             }
@@ -82,11 +165,75 @@ namespace TileEngine.GUI
             Value = Math.Max(value - 1, minValue);
         }
 
+        protected override void OnMouseDown(int x, int y, MouseButton button)
+        {
+            knobPressed = false;
+            if (KnobContains(x, y))
+            {
+                int kx;
+                int ky;
+                int kw;
+                int kh;
+                GetKnobRect(out kx, out ky, out kw, out kh);
+                knobStartY = y - ky;
+                knobPressed = true;
+            }
+        }
+
+        protected override void OnMouseUp(int x, int y, MouseButton button)
+        {
+            if (knobPressed)
+            {
+                MoveKnob(x, y);
+            }
+            knobPressed = false;
+        }
+
+        protected override void OnMouseMove(int x, int y, MouseButton button)
+        {
+            if (knobPressed)
+            {
+                MoveKnob(x, y);
+            }
+        }
+
+        private bool KnobContains(int mouseX, int mouseY)
+        {
+            int x;
+            int y;
+            int width;
+            int height;
+            GetKnobRect(out x, out y, out width, out height);
+            return (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height);
+        }
+
+        protected void GetKnobRect(out int x, out int y, out int width, out int height)
+        {
+            CalcBounds(out x, out y, out width, out height);
+            int innerHeight = Height - buttonDown.Height - buttonUp.Height;
+            int kh = (int)(innerHeight * knobSize);
+            if (kh < 30) kh = 30;
+            int ky = y + buttonUp.Height + (int)((innerHeight - kh) * KnobPosition);
+            y = ky;
+            height = kh;
+        }
+
+
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
             if (!DrawNinePatch(graphics, x, y, width, height))
             {
                 graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
+            }
+            if (knobPressed && knobPatchPressed != null)
+            {
+                GetKnobRect(out x, out y, out width, out height);
+                knobPatchPressed.Draw(graphics, x, y, width, height);
+            }
+            else if (knobPatch != null)
+            {
+                GetKnobRect(out x, out y, out width, out height);
+                knobPatch.Draw(graphics, x, y, width, height);
             }
         }
 
