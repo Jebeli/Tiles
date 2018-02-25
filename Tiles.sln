@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDITiles", "GDITiles\GDITil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MONOTiles", "MONOTiles\MONOTiles.csproj", "{59E07112-AA06-4B74-8DE8-EEBFD3042C58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileContent", "TileContent\TileContent.csproj", "{5AD4412A-F16A-4F59-BF73-C5746F071545}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{59E07112-AA06-4B74-8DE8-EEBFD3042C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59E07112-AA06-4B74-8DE8-EEBFD3042C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59E07112-AA06-4B74-8DE8-EEBFD3042C58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
