@@ -46,10 +46,11 @@ namespace TileEngine.GUI
         private NinePatch patchPressed;
         private double repeatMillis = 500;
         private object tag;
+        private Color customColor;
+        private bool useCustomColor;
         private static Widget hoverWidget;
         private static Widget pressedWidget;
         private static TimeSpan widgetStartTime;
-
         public Widget()
             : this(null)
         {
@@ -79,6 +80,20 @@ namespace TileEngine.GUI
             set { tag = value; }
         }
 
+        public Color CustomColor
+        {
+            get { return customColor; }
+            set
+            {
+                customColor = value;
+                useCustomColor = true;
+            }
+        }
+        protected Color GetTextColor()
+        {
+            if (useCustomColor) return customColor;
+            return Enabled ? WidgetFactory.TextColor : WidgetFactory.DisabledColor;
+        }
         public NinePatch Patch
         {
             get { return patch; }

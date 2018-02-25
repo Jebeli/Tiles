@@ -29,8 +29,20 @@ namespace TileEngine.GUI
         private static NinePatch button9PH;
         private static NinePatch button9PP;
         private static NinePatch window9P;
+        private static Color textColor = Color.Black;
+        private static Color disabledColor = Color.Gray;
 
+        public static Color TextColor
+        {
+            get { return textColor; }
+            set { textColor = value; }
+        }
 
+        public static Color DisabledColor
+        {
+            get { return disabledColor; }
+            set { disabledColor = value; }
+        }
         public static NinePatch Button9P
         {
             get { return button9P; }

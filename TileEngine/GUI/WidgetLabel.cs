@@ -42,7 +42,7 @@ namespace TileEngine.GUI
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
-            graphics.RenderText(text, x + width / 2, y + height / 2);
+            graphics.RenderText(text, x + width / 2, y + height / 2, GetTextColor());
         }
 
         protected override void BoundsChanged()

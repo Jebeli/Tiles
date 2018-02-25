@@ -53,6 +53,14 @@ namespace GDITiles
             }
         }
 
+        public override void ClearScreen(Color color)
+        {
+            if (CheckInFrame())
+            {
+                gfx.Clear(color.GetColor());
+            }
+        }
+
         public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)
         {
             var bmp = texture.GetBitmap();
@@ -92,7 +100,7 @@ namespace GDITiles
             }
         }
 
-        public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        public override void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
             var font = smallFont;
             float fx = x;
@@ -121,7 +129,10 @@ namespace GDITiles
             {
                 fy -= size.Height;
             }
-            gfx.DrawString(text, smallFont, textBrush, fx, fy);
+            using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
+            {
+                gfx.DrawString(text, smallFont, brush, fx, fy);
+            }
         }
 
         public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)

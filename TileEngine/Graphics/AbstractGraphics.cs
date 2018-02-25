@@ -103,6 +103,7 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void ClearScreen();
+        public abstract void ClearScreen(Color color);
         public abstract void DrawTextures(Texture texture, int[] vertices, int offset, int count);
         public void Render(TextureRegion textureRegion, int x, int y)
         {
@@ -133,7 +134,7 @@ namespace TileEngine.Graphics
         }
 
         public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
-        public abstract void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        public abstract void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         public abstract void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
 
         public abstract void DrawText(string text, int x, int y);

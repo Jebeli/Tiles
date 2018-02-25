@@ -140,7 +140,7 @@ namespace TileEngine.GUI
             listItem.Text = item.ToString();
             listItem.Index = items.Count;
             items.Add(listItem);
-            scrollBar.MaxValue = Math.Max(0, items.Count - 1 - VisibleItems);
+            scrollBar.MaxValue = Math.Max(0, items.Count - VisibleItems);
             return listItem;
         }
 
@@ -175,7 +175,7 @@ namespace TileEngine.GUI
             {
                 graphics.Render(item.Image.Texture, x, y, Math.Min(itemHeight, item.Image.Width), Math.Min(itemHeight, item.Image.Height), item.Image.X, item.Image.Y, item.Image.Width, item.Image.Height);
             }
-            graphics.RenderText(item.Text, x + 2 + itemHeight, y + height / 2, HorizontalTextAlign.Left);
+            graphics.RenderText(item.Text, x + 2 + itemHeight, y + height / 2, GetTextColor(), HorizontalTextAlign.Left);
         }
 
         protected override void BoundsChanged()

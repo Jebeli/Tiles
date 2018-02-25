@@ -36,5 +36,10 @@ namespace MONOTiles
         {
             return new TimeInfo(time.TotalGameTime, time.ElapsedGameTime);
         }
+
+        public static Microsoft.Xna.Framework.Color GetColor(this Color c)
+        {
+            return new Microsoft.Xna.Framework.Color(c.R, c.G, c.B, c.Alpha);
+        }
     }
 }

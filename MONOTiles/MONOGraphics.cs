@@ -63,6 +63,12 @@ namespace MONOTiles
             game.GraphicsDevice.Clear(Microsoft.Xna.Framework.Graphics.ClearOptions.Target, Microsoft.Xna.Framework.Color.Transparent, 1.0f, 0);
         }
 
+        public override void ClearScreen(Color color)
+        {
+            game.GraphicsDevice.Clear(Microsoft.Xna.Framework.Graphics.ClearOptions.Target, Microsoft.Xna.Framework.Color.Transparent, 1.0f, 0);
+            game.GraphicsDevice.Clear(color.GetColor());
+        }
+
         public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)
         {
             var bmp = texture.GetTexture();
@@ -111,9 +117,9 @@ namespace MONOTiles
             }
         }
 
-        public override void RenderText(string text, int x, int y, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        public override void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var c = Microsoft.Xna.Framework.Color.Black;
+            var c = color.GetColor();
             var fnt = game.smallFont;
             var size = fnt.MeasureString(text);
             var pos = new Microsoft.Xna.Framework.Vector2(x, y);

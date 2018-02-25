@@ -37,5 +37,10 @@ namespace GDITiles
             if ((mb & System.Windows.Forms.MouseButtons.Middle) == System.Windows.Forms.MouseButtons.Middle) return TileEngine.Input.MouseButton.Middle;
             return TileEngine.Input.MouseButton.None;
         }
+
+        public static System.Drawing.Color GetColor(this Color c)
+        {
+            return System.Drawing.Color.FromArgb(c.Alpha, c.R, c.G, c.B);
+        }
     }
 }
