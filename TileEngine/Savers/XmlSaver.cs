@@ -94,7 +94,7 @@ namespace TileEngine.Savers
                     }
                     writer.WriteEndElement();
                     writer.WriteEndElement();
-                }
+                }                
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();

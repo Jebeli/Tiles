@@ -164,25 +164,42 @@ namespace TileEngine.Loaders
                 {
                     ts = new TileSet(fileId, tex);
                     var sec = ini.Sections.FirstOrDefault(sn => sn.Name.Equals(""));
+                    int[] values = null;
                     if (sec != null)
                     {
                         foreach (var k in sec.KeyList)
                         {
-                            if (k.Ident.Equals("tile"))
+                            switch (k.Ident)
                             {
-                                var values = k.Value.ToIntValues();
-                                if (values.Length >= 6)
-                                {
-                                    int index = values[0];
-                                    int clipX = values[1];
-                                    int clipY = values[2];
-                                    int clipW = values[3];
-                                    int clipH = values[4];
-                                    int offsetX = 32 - values[5];
-                                    int offsetY = 16 - values[6];
+                                case "tile":
+                                    values = k.Value.ToIntValues();
+                                    if (values.Length >= 6)
+                                    {
+                                        int index = values[0];
+                                        int clipX = values[1];
+                                        int clipY = values[2];
+                                        int clipW = values[3];
+                                        int clipH = values[4];
+                                        int offsetX = 32 - values[5];
+                                        int offsetY = 16 - values[6];
 
-                                    ts.AddTile(index, clipX, clipY, clipW, clipH, offsetX, offsetY);
-                                }
+                                        ts.AddTile(index, clipX, clipY, clipW, clipH, offsetX, offsetY);
+                                    }
+                                    break;
+                                case "animation":
+                                    var sValues = k.Value.ToStrValues(';');
+                                    var tileId = sValues[0].ToIntValue();
+                                    for (int i = 1; i < sValues.Length; i++)
+                                    {
+                                        var subValue = sValues[i];
+                                        if (subValue.EndsWith("ms")) { subValue = subValue.Replace("ms", ""); }
+                                        values = subValue.ToIntValues();
+                                        if (values.Length >= 3)
+                                        {
+                                            ts.AddAnim(tileId, values[0], values[1], values[2]);
+                                        }
+                                    }
+                                    break;
                             }
                         }
                     }

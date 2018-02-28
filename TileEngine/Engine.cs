@@ -146,6 +146,7 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
+                map.Update(time);
                 currentScreen.Update(time);
                 return true;
             }

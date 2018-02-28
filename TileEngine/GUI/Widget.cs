@@ -92,7 +92,10 @@ namespace TileEngine.GUI
         protected Color GetTextColor()
         {
             if (useCustomColor) return customColor;
-            return Enabled ? WidgetFactory.TextColor : WidgetFactory.DisabledColor;
+            if (pressed) return WidgetFactory.PressedColor;
+            if (selected) return WidgetFactory.PressedColor;
+            if (!enabled) return WidgetFactory.DisabledColor;
+            return WidgetFactory.TextColor;
         }
         public NinePatch Patch
         {

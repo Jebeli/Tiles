@@ -26,7 +26,7 @@ namespace TileEngine.GUI
     using TileEngine.Graphics;
     public class WidgetButton : Widget
     {
-        private WidgetLabel label;
+        private string text;
 
         public WidgetButton(string text = "")
             : this(WidgetFactory.Button9P, WidgetFactory.Button9PHover, WidgetFactory.Button9PPressed, text)
@@ -35,14 +35,13 @@ namespace TileEngine.GUI
         public WidgetButton(NinePatch patch, NinePatch patchHover, NinePatch patchPressed, string text = "")
             : base(patch, patchHover, patchPressed)
         {
-            label = new WidgetLabel(text);
-            AddWidget(label);
+            this.text = text;
         }
 
         public string Text
         {
-            get { return label.Text; }
-            set { label.Text = value; }
+            get { return text; }
+            set { text = value; }
         }
 
         protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
@@ -51,16 +50,17 @@ namespace TileEngine.GUI
             {
                 graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
             }
+            graphics.RenderText(text, x + width / 2, y + height / 2, GetTextColor());
+
         }
 
         protected override void BoundsChanged()
         {
-            label.SetSize(Width, Height);
         }
 
         public override string ToString()
         {
-            return "Button " + Text;
+            return "Button " + text;
         }
     }
 }

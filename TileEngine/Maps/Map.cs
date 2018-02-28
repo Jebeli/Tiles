@@ -73,6 +73,14 @@ namespace TileEngine.Maps
             get { return tileHeight; }
             set { tileHeight = value; }
         }
+
+        public void Update(TimeInfo time)
+        {
+            foreach(var l in layers)
+            {
+                l.Update(time);
+            }
+        }
         public Layer AddLayer(string name)
         {
             Layer layer = null;

@@ -31,6 +31,7 @@ namespace TileEngine.GUI
         private static NinePatch window9P;
         private static Color textColor = Color.Black;
         private static Color disabledColor = Color.Gray;
+        private static Color pressedColor = Color.White;
 
         public static Color TextColor
         {
@@ -42,6 +43,12 @@ namespace TileEngine.GUI
         {
             get { return disabledColor; }
             set { disabledColor = value; }
+        }
+
+        public static Color PressedColor
+        {
+            get { return pressedColor; }
+            set { pressedColor = value; }
         }
         public static NinePatch Button9P
         {

@@ -59,8 +59,8 @@ namespace TileEngine.GUI
         public void Clear()
         {
             items.Clear();
-            topItemIndex = 0;
             selectedIndex = -1;
+            TopItemIndex = 0;
         }
 
         public int SelectedIndex
@@ -92,16 +92,16 @@ namespace TileEngine.GUI
             }
         }
 
-        public void EnsureVisible(int index)
+        public void EnsureVisible(int index, int pad = 1)
         {
-            if (index < topItemIndex)
+            if (index - pad < topItemIndex)
             {
-                TopItemIndex = index;
+                TopItemIndex = index - pad;
             }
-            int numItems = Height / itemHeight;
-            if (index >= topItemIndex + numItems)
+            int numItems = VisibleItems;
+            if (index + pad >= topItemIndex + numItems)
             {
-                TopItemIndex = index - (numItems - 1);
+                TopItemIndex = index + pad - (numItems - 1);
             }
         }
 
@@ -110,6 +110,8 @@ namespace TileEngine.GUI
             get { return topItemIndex; }
             set
             {
+                if (value > items.Count - VisibleItems) value = items.Count - VisibleItems;
+                if (value < 0) value = 0;
                 if (topItemIndex != value)
                 {
                     topItemIndex = value;

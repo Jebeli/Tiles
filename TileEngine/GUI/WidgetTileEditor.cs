@@ -22,7 +22,7 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using TileEngine.Maps;
+    using Maps;
 
     public class WidgetTileEditor : WidgetWindow
     {
@@ -50,36 +50,36 @@ namespace TileEngine.GUI
             this.y = y;
             Visible = false;
 
-            SetSize(320, 320);
+            SetSize(320 + 8, 320 + 8);
 
             labelLayers = new WidgetLabel("Layers:");
-            labelLayers.SetBounds(0, 0, 64, 30);
+            labelLayers.SetBounds(4, 4, 64, 30);
             AddWidget(labelLayers);
             labelTile = new WidgetLabel($"Tile ({x}/{y})");
-            labelTile.SetBounds(0, 30, 320, 30);
+            labelTile.SetBounds(4, 34, 320, 30);
             AddWidget(labelTile);
             tileImage = new WidgetImage();
-            tileImage.SetBounds(0, 60, 320 - 64 * 3, 210);
+            tileImage.SetBounds(4, 64, 320 - 64 * 3, 210);
             AddWidget(tileImage);
 
             buttonClear = new WidgetButton("Clear");
-            buttonClear.SetBounds(0, 320 - 30, 64, 30);
+            buttonClear.SetBounds(4, 4 + 320 - 30, 64, 30);
             AddWidget(buttonClear);
             buttonPrev = new WidgetButton("<");
-            buttonPrev.SetBounds(64, 320 - 30, 64, 30);
+            buttonPrev.SetBounds(4 + 64, 4 + 320 - 30, 64, 30);
             AddWidget(buttonPrev);
             buttonNext = new WidgetButton(">");
-            buttonNext.SetBounds(64 * 2, 320 - 30, 64, 30);
+            buttonNext.SetBounds(4 + 64 * 2, 4 + 320 - 30, 64, 30);
             AddWidget(buttonNext);
             buttonApply = new WidgetButton("Apply");
-            buttonApply.SetBounds(64 * 3, 320 - 30, 64, 30);
+            buttonApply.SetBounds(4 + 64 * 3, 4 + 320 - 30, 64, 30);
             AddWidget(buttonApply);
             buttonCancel = new WidgetButton("Cancel");
-            buttonCancel.SetBounds(64 * 4, 320 - 30, 64, 30);
+            buttonCancel.SetBounds(4 + 64 * 4, 4 + 320 - 30, 64, 30);
             AddWidget(buttonCancel);
 
             listTiles = new WidgetList();
-            listTiles.SetBounds(320 - 64 * 3, 60, 64 * 3, 210);
+            listTiles.SetBounds(320 - 64 * 3 - 4, 60 + 4, 64 * 3, 210);
             listTiles.SelectedIndexChanged += ListTiles_SelectedIndexChanged;
             AddWidget(listTiles);
 
@@ -91,7 +91,7 @@ namespace TileEngine.GUI
                 if (layer.Visible)
                 {
                     WidgetButton buttonLayer = new WidgetButton(layer.Name);
-                    buttonLayer.SetBounds(64 + index * 72, 0, 72, 30);
+                    buttonLayer.SetBounds(4 + 64 + index * 72, 4, 72, 30);
                     buttonLayer.Tag = layer;
                     buttonLayer.ToggleSelect = true;
                     layerButtons.Add(buttonLayer);

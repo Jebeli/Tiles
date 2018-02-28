@@ -26,6 +26,15 @@ namespace TileEngine.Loaders
 
     static class LoaderExtensions
     {
+        public static int ToIntValue(this string v)
+        {
+            int res = 0;
+            if (v != null)
+            {
+                int.TryParse(v, out res);
+            }
+            return res;
+        }
         public static int[] ToIntValues(this string v)
         {
             List<int> list = new List<int>();
@@ -37,6 +46,23 @@ namespace TileEngine.Loaders
                     if (int.TryParse(s, out i))
                     {
                         list.Add(i);
+                    }
+                }
+            }
+            return list.ToArray();
+        }
+
+        public static string[] ToStrValues(this string v, char sep = ',')
+        {
+            List<string> list = new List<string>();
+            if (v != null)
+            {
+                foreach (var s in v.Split(sep))
+                {
+                    var ss = s.Trim();
+                    if (!string.IsNullOrEmpty(ss))
+                    {
+                        list.Add(ss);
                     }
                 }
             }

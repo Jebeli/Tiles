@@ -102,6 +102,10 @@ namespace TileEngine.Maps
             get { return tiles[XYToIndex(x, y)]; }
         }
 
+        public void Update(TimeInfo time)
+        {
+            tileSet?.Update();
+        }
         public void Fill(int tileId)
         {
             foreach (var tile in tiles)

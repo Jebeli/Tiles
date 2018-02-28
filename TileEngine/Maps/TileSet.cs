@@ -27,16 +27,19 @@ namespace TileEngine.Maps
         private Texture texture;
         private List<TextureRegion> tiles;
         private List<string> tileNames;
+        private Dictionary<int, TileAnim> anims;
         private int tileWidth;
         private int tileHeight;
         private int oversizeX;
         private int oversizeY;
+        private float speed = 0.5f;
         public TileSet(string name, Texture texture)
             : base(name)
         {
             this.texture = texture;
             tiles = new List<TextureRegion>();
             tileNames = new List<string>();
+            anims = new Dictionary<int, TileAnim>();
         }
 
         public int TileWidth
@@ -88,6 +91,19 @@ namespace TileEngine.Maps
             }
         }
 
+        public bool Update()
+        {
+            bool updates = false;
+            foreach (var anim in anims.Values)
+            {
+                if (anim.Update())
+                {
+                    updates = true;
+                }
+            }
+            return updates;
+        }
+
         public void AutoFill(int tileWidth, int tileHeight, int offsetX = 0, int offsetY = 0)
         {
             this.tileWidth = tileWidth;
@@ -119,6 +135,25 @@ namespace TileEngine.Maps
             }
         }
 
+        public void AddAnim(int index, int posX, int posY, int duration)
+        {
+            if (texture != null)
+            {
+                TextureRegion tile = GetTile(index);
+                if (tile != null)
+                {
+                    TileAnim anim = null;
+                    if (!anims.TryGetValue(index, out anim))
+                    {
+                        anim = new TileAnim(index);
+                        anims[index] = anim;
+                        //anim.AddFrame(texture, (int)(duration * speed), tile.X, tile.Y, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
+                    }
+                    anim.AddFrame(texture, (int)(duration * speed), posX, posY, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
+                }
+            }
+        }
+
         private void AdjustOversizeAndTileSize(int clipW, int clipH, int offsetX, int offsetY)
         {
             if (tileWidth == 0) tileWidth = clipW;
@@ -129,6 +164,11 @@ namespace TileEngine.Maps
 
         public TextureRegion GetTile(int id)
         {
+            TileAnim anim;
+            if (anims.TryGetValue(id, out anim))
+            {
+                return anim.CurrentFrame;
+            }
             if (id >= 0 && id < tiles.Count)
             {
                 return tiles[id];
