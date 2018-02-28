@@ -80,7 +80,7 @@ namespace MONOTiles
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
             smallFont = Content.Load<BitmapFont>("fonts/Small");
-            engine.SetNextMap(MAPNAME4, 25, 25);
+            engine.SetNextMap(MAPNAME1, 25, 25);
             engine.Start();
         }
 

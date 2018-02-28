@@ -196,6 +196,17 @@ namespace TileEngine.Loaders
                             if (x != null && y != null && width != null && height != null && offsetX != null && offsetY != null)
                             {
                                 ts.AddTile((int)id, (int)x, (int)y, (int)width, (int)height, (int)offsetX, (int)offsetY, tileName);
+                                foreach (var frameNode in from item in node.Descendants("frame") select item)
+                                {
+                                    x = (int?)frameNode.Attribute("x");
+                                    y = (int?)frameNode.Attribute("y");
+                                    int? duration = (int?)frameNode.Attribute("duration");
+                                    if (duration != null)
+                                    {
+                                        ts.AddAnim((int)id, (int)x, (int)y, (int)duration);
+                                    }
+                                }
+
                             }
                         }
                     }

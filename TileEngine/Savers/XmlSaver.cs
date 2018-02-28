@@ -93,8 +93,21 @@ namespace TileEngine.Savers
                         writer.WriteAttributeString("name", name);
                     }
                     writer.WriteEndElement();
+                    var anim = tileSet.GetTileAnim(tileId);
+                    if (anim != null)
+                    {
+                        for (int i = 0; i < anim.FrameCount; i++)
+                        {
+                            region = anim.Textures[i];
+                            writer.WriteStartElement("frame");
+                            writer.WriteAttributeString("x", region.X.ToString());
+                            writer.WriteAttributeString("y", region.Y.ToString());
+                            writer.WriteAttributeString("duration", anim.FrameDurations[i].ToString());
+                            writer.WriteEndElement();
+                        }
+                    }
                     writer.WriteEndElement();
-                }                
+                }
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();

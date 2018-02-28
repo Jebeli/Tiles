@@ -91,6 +91,19 @@ namespace TileEngine.Maps
             }
         }
 
+        public IEnumerable<int> AnimTiles
+        {
+            get
+            {
+                List<int> list = new List<int>();
+                foreach(int i in anims.Keys)
+                {
+                    list.Add(i);
+                }
+                return list;
+            }
+        }
+
         public bool Update()
         {
             bool updates = false;
@@ -172,6 +185,16 @@ namespace TileEngine.Maps
             if (id >= 0 && id < tiles.Count)
             {
                 return tiles[id];
+            }
+            return null;
+        }
+
+        public TileAnim GetTileAnim(int id)
+        {
+            TileAnim anim;
+            if (anims.TryGetValue(id,out anim))
+            {
+                return anim;
             }
             return null;
         }

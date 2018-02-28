@@ -49,6 +49,11 @@ namespace TileEngine.Maps
             return false;
         }
 
+        public int FrameCount
+        {
+            get { return textures.Count; }
+        }
+
         private void AdvanceFrame()
         {
             duration = 0;

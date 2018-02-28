@@ -670,7 +670,10 @@
     <region x="294" y="0" width="128" height="64" offsetX="0" offsetY="-16" />
   </tile>
   <tile id="265">
-    <region x="422" y="0" width="128" height="64" offsetX="0" offsetY="-16" />
+    <region x="422" y="64" width="128" height="64" offsetX="0" offsetY="-16" />
+    <frame x="422" y="64" duration="33" />
+    <frame x="294" y="128" duration="33" />
+    <frame x="422" y="0" duration="33" />
   </tile>
   <tile id="296">
     <region x="0" y="0" width="294" height="351" offsetX="42" offsetY="-284" />
