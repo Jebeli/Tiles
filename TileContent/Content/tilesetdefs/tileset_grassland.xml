@@ -253,184 +253,184 @@
     <region x="596" y="876" width="45" height="29" offsetX="13" offsetY="-3" name="Shrub 2"/>
   </tile>
   <tile id="114">
-    <region x="596" y="800" width="48" height="40" offsetX="8" offsetY="-15" />
+    <region x="596" y="800" width="48" height="40" offsetX="8" offsetY="-15" name="Shrub 3"/>
   </tile>
   <tile id="115">
-    <region x="597" y="627" width="47" height="44" offsetX="11" offsetY="-18" />
+    <region x="597" y="627" width="47" height="44" offsetX="11" offsetY="-18" name="Shrub 4"/>
   </tile>
   <tile id="116">
-    <region x="171" y="983" width="55" height="32" offsetX="2" offsetY="-5" />
+    <region x="171" y="983" width="55" height="32" offsetX="2" offsetY="-5" name="Shrub 5"/>
   </tile>
   <tile id="117">
-    <region x="169" y="1271" width="53" height="35" offsetX="7" offsetY="-5" />
+    <region x="169" y="1271" width="53" height="35" offsetX="7" offsetY="-5" name="Shrub 6"/>
   </tile>
   <tile id="118">
-    <region x="582" y="1615" width="27" height="34" offsetX="22" offsetY="-17" />
+    <region x="582" y="1615" width="27" height="34" offsetX="22" offsetY="-17" name="Flower 1"/>
   </tile>
   <tile id="119">
-    <region x="536" y="374" width="25" height="20" offsetX="21" offsetY="-3" />
+    <region x="536" y="374" width="25" height="20" offsetX="21" offsetY="-3" name="Flower 2"/>
   </tile>
   <tile id="120">
-    <region x="353" y="1101" width="41" height="35" offsetX="17" offsetY="-11" />
+    <region x="353" y="1101" width="41" height="35" offsetX="17" offsetY="-11" name="Shrub 7"/>
   </tile>
   <tile id="121">
-    <region x="279" y="1501" width="50" height="39" offsetX="14" offsetY="-10" />
+    <region x="279" y="1501" width="50" height="39" offsetX="14" offsetY="-10" name="Shrub 8"/>
   </tile>
   <tile id="122">
-    <region x="64" y="923" width="43" height="34" offsetX="13" offsetY="-5" />
+    <region x="64" y="923" width="43" height="34" offsetX="13" offsetY="-5" name="Shrub 9"/>
   </tile>
   <tile id="123">
-    <region x="64" y="957" width="43" height="33" offsetX="13" offsetY="-5" />
+    <region x="64" y="957" width="43" height="33" offsetX="13" offsetY="-5" name="Shrub 10"/>
   </tile>
   <tile id="124">
-    <region x="597" y="671" width="47" height="43" offsetX="12" offsetY="-14" />
+    <region x="597" y="671" width="47" height="43" offsetX="12" offsetY="-14" name="Shrub 11"/>
   </tile>
   <tile id="125">
-    <region x="609" y="200" width="35" height="31" offsetX="13" offsetY="-5" />
+    <region x="609" y="200" width="35" height="31" offsetX="13" offsetY="-5" name="Shrub 12"/>
   </tile>
   <tile id="126">
-    <region x="176" y="777" width="51" height="40" offsetX="11" offsetY="-11" />
+    <region x="176" y="777" width="51" height="40" offsetX="11" offsetY="-11" name="Shrub 13"/>
   </tile>
   <tile id="127">
-    <region x="417" y="1136" width="38" height="32" offsetX="19" offsetY="-6" />
+    <region x="417" y="1136" width="38" height="32" offsetX="19" offsetY="-6" name="Shrub 14"/>
   </tile>
   <tile id="128">
-    <region x="64" y="1022" width="43" height="30" offsetX="3" offsetY="-5" />
+    <region x="64" y="1022" width="43" height="30" offsetX="3" offsetY="-5" name="Rock 1"/>
   </tile>
   <tile id="129">
-    <region x="192" y="1618" width="24" height="24" offsetX="17" offsetY="-10" />
+    <region x="192" y="1618" width="24" height="24" offsetX="17" offsetY="-10" name="Rock 2"/>
   </tile>
   <tile id="130">
-    <region x="417" y="1168" width="36" height="31" offsetX="18" offsetY="-4" />
+    <region x="417" y="1168" width="36" height="31" offsetX="18" offsetY="-4" name="Rock 3"/>
   </tile>
   <tile id="131">
-    <region x="283" y="1625" width="31" height="25" offsetX="16" offsetY="-4" />
+    <region x="283" y="1625" width="31" height="25" offsetX="16" offsetY="-4" name="Rock 4"/>
   </tile>
   <tile id="132">
-    <region x="596" y="974" width="43" height="88" offsetX="10" offsetY="-60" />
+    <region x="596" y="974" width="43" height="88" offsetX="10" offsetY="-60" name="Rock 5"/>
   </tile>
   <tile id="133">
-    <region x="64" y="1281" width="40" height="83" offsetX="12" offsetY="-58" />
+    <region x="64" y="1281" width="40" height="83" offsetX="12" offsetY="-58" name="Rock 6"/>
   </tile>
   <tile id="134">
-    <region x="597" y="714" width="46" height="86" offsetX="10" offsetY="-59" />
+    <region x="597" y="714" width="46" height="86" offsetX="10" offsetY="-59" name="Rock 7"/>
   </tile>
   <tile id="135">
-    <region x="64" y="1052" width="41" height="89" offsetX="12" offsetY="-61" />
+    <region x="64" y="1052" width="41" height="89" offsetX="12" offsetY="-61" name="Rock 8"/>
   </tile>
   <tile id="136">
-    <region x="596" y="905" width="44" height="35" offsetX="12" offsetY="-5" />
+    <region x="596" y="905" width="44" height="35" offsetX="12" offsetY="-5" name="Stump"/>
   </tile>
   <tile id="137">
-    <region x="169" y="1177" width="56" height="43" offsetX="4" offsetY="-15" />
+    <region x="169" y="1177" width="56" height="43" offsetX="4" offsetY="-15" name="Stump with Axe" />
   </tile>
   <tile id="138">
-    <region x="171" y="1015" width="54" height="81" offsetX="10" offsetY="-61" />
+    <region x="171" y="1015" width="54" height="81" offsetX="10" offsetY="-61" name="Signpost 1"/>
   </tile>
   <tile id="139">
-    <region x="171" y="1096" width="54" height="81" offsetX="10" offsetY="-61" />
+    <region x="171" y="1096" width="54" height="81" offsetX="10" offsetY="-61" name="Signpost 2"/>
   </tile>
   <tile id="140">
-    <region x="417" y="1199" width="33" height="39" offsetX="18" offsetY="-15" />
+    <region x="417" y="1199" width="33" height="39" offsetX="18" offsetY="-15" name="Headstone 1"/>
   </tile>
   <tile id="141">
-    <region x="417" y="1238" width="33" height="39" offsetX="18" offsetY="-16" />
+    <region x="417" y="1238" width="33" height="39" offsetX="18" offsetY="-16" name="Headstone 2"/>
   </tile>
   <tile id="142">
-    <region x="354" y="1044" width="41" height="57" offsetX="15" offsetY="-32" />
+    <region x="354" y="1044" width="41" height="57" offsetX="15" offsetY="-32" name="Headstone 3"/>
   </tile>
   <tile id="143">
-    <region x="64" y="1223" width="41" height="58" offsetX="15" offsetY="-32" />
+    <region x="64" y="1223" width="41" height="58" offsetX="15" offsetY="-32" name="Headstone 4"/>
   </tile>
   <tile id="144">
-    <region x="532" y="920" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="532" y="920" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 1"/>
   </tile>
   <tile id="145">
-    <region x="291" y="819" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="291" y="819" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 2"/>
   </tile>
   <tile id="146">
-    <region x="105" y="1225" width="64" height="42" offsetX="0" offsetY="11" />
+    <region x="105" y="1225" width="64" height="42" offsetX="0" offsetY="11" name="Riverbank 3"/>
   </tile>
   <tile id="147">
-    <region x="105" y="1267" width="64" height="42" offsetX="0" offsetY="11" />
+    <region x="105" y="1267" width="64" height="42" offsetX="0" offsetY="11" name="Riverbank 4"/>
   </tile>
   <tile id="148">
-    <region x="404" y="837" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="404" y="837" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 5"/>
   </tile>
   <tile id="149">
-    <region x="226" y="864" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="226" y="864" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 6"/>
   </tile>
   <tile id="150">
-    <region x="0" y="1307" width="64" height="42" offsetX="0" offsetY="11" />
+    <region x="0" y="1307" width="64" height="42" offsetX="0" offsetY="11" name="Riverbank 7"/>
   </tile>
   <tile id="151">
-    <region x="0" y="1349" width="64" height="42" offsetX="0" offsetY="11" />
+    <region x="0" y="1349" width="64" height="42" offsetX="0" offsetY="11" name="Riverbank 8"/>
   </tile>
   <tile id="152">
-    <region x="112" y="905" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="112" y="905" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 9"/>
   </tile>
   <tile id="153">
-    <region x="289" y="1075" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="289" y="1075" width="64" height="53" offsetX="0" offsetY="0" name="Riverbank 10"/>
   </tile>
   <tile id="154">
-    <region x="0" y="1391" width="64" height="29" offsetX="0" offsetY="10" />
+    <region x="0" y="1391" width="64" height="29" offsetX="0" offsetY="10" name="Riverbank 11"/>
   </tile>
   <tile id="155">
-    <region x="225" y="1120" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="225" y="1120" width="64" height="53" offsetX="0" offsetY="0" name="Riverbank 12"/>
   </tile>
   <tile id="156">
-    <region x="0" y="987" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="0" y="987" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 13"/>
   </tile>
   <tile id="157">
-    <region x="523" y="1043" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="523" y="1043" width="64" height="53" offsetX="0" offsetY="0" name="Riverbank 14"/>
   </tile>
   <tile id="158">
-    <region x="0" y="1474" width="64" height="26" offsetX="0" offsetY="11" />
+    <region x="0" y="1474" width="64" height="26" offsetX="0" offsetY="11" name="Riverbank 15"/>
   </tile>
   <tile id="159">
-    <region x="459" y="1044" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="459" y="1044" width="64" height="53" offsetX="0" offsetY="0" name="Riverbank 16"/>
   </tile>
   <tile id="160">
-    <region x="107" y="969" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="107" y="969" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 17"/>
   </tile>
   <tile id="161">
-    <region x="523" y="1096" width="64" height="53" offsetX="0" offsetY="11" />
+    <region x="523" y="1096" width="64" height="53" offsetX="0" offsetY="11" name="Riverbank 18"/>
   </tile>
   <tile id="162">
-    <region x="0" y="1420" width="64" height="27" offsetX="0" offsetY="26" />
+    <region x="0" y="1420" width="64" height="27" offsetX="0" offsetY="26" name="Riverbank 19"/>
   </tile>
   <tile id="163">
-    <region x="395" y="1083" width="64" height="53" offsetX="0" offsetY="11" />
+    <region x="395" y="1083" width="64" height="53" offsetX="0" offsetY="11" name="Riverbank 20"/>
   </tile>
   <tile id="164">
-    <region x="0" y="1051" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="0" y="1051" width="64" height="64" offsetX="0" offsetY="0" name="Riverbank 21"/>
   </tile>
   <tile id="165">
-    <region x="459" y="1097" width="64" height="53" offsetX="0" offsetY="11" />
+    <region x="459" y="1097" width="64" height="53" offsetX="0" offsetY="11" name="Riverbank 22"/>
   </tile>
   <tile id="166">
-    <region x="0" y="1447" width="64" height="27" offsetX="0" offsetY="26" />
+    <region x="0" y="1447" width="64" height="27" offsetX="0" offsetY="26" name="Riverbank 23"/>
   </tile>
   <tile id="167">
-    <region x="523" y="1149" width="64" height="53" offsetX="0" offsetY="11" />
+    <region x="523" y="1149" width="64" height="53" offsetX="0" offsetY="11" name="Riverbank 24"/>
   </tile>
   <tile id="168">
-    <region x="480" y="1568" width="21" height="34" offsetX="11" offsetY="16" />
+    <region x="480" y="1568" width="21" height="34" offsetX="11" offsetY="16" name="Boat 1"/>
   </tile>
   <tile id="169">
-    <region x="573" y="1498" width="32" height="56" offsetX="0" offsetY="6" />
+    <region x="573" y="1498" width="32" height="56" offsetX="0" offsetY="6" name="Boat 2"/>
   </tile>
   <tile id="170">
-    <region x="219" y="1482" width="60" height="61" offsetX="0" offsetY="2" />
+    <region x="219" y="1482" width="60" height="61" offsetX="0" offsetY="2" name="Boat 3"/>
   </tile>
   <tile id="171">
-    <region x="0" y="1574" width="63" height="57" offsetX="1" offsetY="5" />
+    <region x="0" y="1574" width="63" height="57" offsetX="1" offsetY="5" name="Boat 4"/>
   </tile>
   <tile id="172">
-    <region x="582" y="1562" width="32" height="53" offsetX="32" offsetY="10" />
+    <region x="582" y="1562" width="32" height="53" offsetX="32" offsetY="10" name="Boat 5"/>
   </tile>
   <tile id="173">
-    <region x="614" y="1562" width="29" height="38" offsetX="32" offsetY="19" />
+    <region x="614" y="1562" width="29" height="38" offsetX="32" offsetY="19" name="Boat 6"/>
   </tile>
   <tile id="176">
     <region x="446" y="1310" width="64" height="32" offsetX="0" offsetY="32" name="Water 1"/>
@@ -481,201 +481,201 @@
     <region x="574" y="1466" width="64" height="32" offsetX="0" offsetY="32" name="Water 16"/>
   </tile>
   <tile id="192">
-    <region x="290" y="883" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="290" y="883" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 1"/>
   </tile>
   <tile id="193">
-    <region x="226" y="928" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="226" y="928" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 2"/>
   </tile>
   <tile id="194">
-    <region x="289" y="1128" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="289" y="1128" width="64" height="53" offsetX="0" offsetY="0" name="Wood Bridge 3"/>
   </tile>
   <tile id="195">
-    <region x="225" y="1173" width="64" height="53" offsetX="0" offsetY="0" />
+    <region x="225" y="1173" width="64" height="53" offsetX="0" offsetY="0" name="Wood Bridge 4"/>
   </tile>
   <tile id="196">
-    <region x="397" y="901" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="397" y="901" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 5"/>
   </tile>
   <tile id="197">
-    <region x="290" y="947" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="290" y="947" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 6"/>
   </tile>
   <tile id="198">
-    <region x="226" y="992" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="226" y="992" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 7"/>
   </tile>
   <tile id="199">
-    <region x="107" y="1033" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="107" y="1033" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 8"/>
   </tile>
   <tile id="200">
-    <region x="0" y="1115" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="0" y="1115" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 9"/>
   </tile>
   <tile id="201">
-    <region x="290" y="1011" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="290" y="1011" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 10"/>
   </tile>
   <tile id="202">
-    <region x="225" y="1056" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="225" y="1056" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 11"/>
   </tile>
   <tile id="203">
-    <region x="105" y="1097" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="105" y="1097" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 12"/>
   </tile>
   <tile id="204">
-    <region x="0" y="1179" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="0" y="1179" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 13"/>
   </tile>
   <tile id="205">
-    <region x="105" y="1161" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="105" y="1161" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 14"/>
   </tile>
   <tile id="206">
-    <region x="0" y="1243" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="0" y="1243" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 15"/>
   </tile>
   <tile id="207">
-    <region x="461" y="921" width="64" height="64" offsetX="0" offsetY="0" />
+    <region x="461" y="921" width="64" height="64" offsetX="0" offsetY="0" name="Wood Bridge 16"/>
   </tile>
   <tile id="208">
-    <region x="399" y="1555" width="31" height="95" offsetX="1" offsetY="-64" />
+    <region x="399" y="1555" width="31" height="95" offsetX="1" offsetY="-64" name="Lodge 1"/>
   </tile>
   <tile id="209">
-    <region x="533" y="582" width="64" height="143" offsetX="0" offsetY="-111" />
+    <region x="533" y="582" width="64" height="143" offsetX="0" offsetY="-111" name="Lodge 2"/>
   </tile>
   <tile id="210">
-    <region x="96" y="1405" width="32" height="129" offsetX="32" offsetY="-99" />
+    <region x="96" y="1405" width="32" height="129" offsetX="32" offsetY="-99" name="Lodge 3"/>
   </tile>
   <tile id="211">
-    <region x="63" y="1534" width="32" height="112" offsetX="32" offsetY="-81" />
+    <region x="63" y="1534" width="32" height="112" offsetX="32" offsetY="-81" name="Lodge 4"/>
   </tile>
   <tile id="212">
-    <region x="95" y="1534" width="32" height="110" offsetX="0" offsetY="-81" />
+    <region x="95" y="1534" width="32" height="110" offsetX="0" offsetY="-81" name="Lodge 5"/>
   </tile>
   <tile id="213">
-    <region x="128" y="1508" width="32" height="127" offsetX="0" offsetY="-100" />
+    <region x="128" y="1508" width="32" height="127" offsetX="0" offsetY="-100" name="Lodge 6"/>
   </tile>
   <tile id="214">
-    <region x="227" y="723" width="64" height="141" offsetX="0" offsetY="-113" />
+    <region x="227" y="723" width="64" height="141" offsetX="0" offsetY="-113" name="Lodge 7"/>
   </tile>
   <tile id="215">
-    <region x="340" y="1558" width="31" height="91" offsetX="32" offsetY="-66" />
+    <region x="340" y="1558" width="31" height="91" offsetX="32" offsetY="-66" name="Lodge 8"/>
   </tile>
   <tile id="216">
-    <region x="501" y="1498" width="22" height="135" offsetX="10" offsetY="-115" />
+    <region x="501" y="1498" width="22" height="135" offsetX="10" offsetY="-115" name="Broken Tower 1"/>
   </tile>
   <tile id="217">
-    <region x="64" y="1364" width="32" height="170" offsetX="0" offsetY="-151" />
+    <region x="64" y="1364" width="32" height="170" offsetX="0" offsetY="-151" name="Broken Tower 2"/>
   </tile>
   <tile id="218">
-    <region x="414" y="1277" width="32" height="189" offsetX="0" offsetY="-169" />
+    <region x="414" y="1277" width="32" height="189" offsetX="0" offsetY="-169" name="Broken Tower 3"/>
   </tile>
   <tile id="219">
-    <region x="545" y="200" width="64" height="174" offsetX="0" offsetY="-170" />
+    <region x="545" y="200" width="64" height="174" offsetX="0" offsetY="-170" name="Broken Tower 4"/>
   </tile>
   <tile id="220">
-    <region x="128" y="1373" width="32" height="135" offsetX="32" offsetY="-117" />
+    <region x="128" y="1373" width="32" height="135" offsetX="32" offsetY="-117" name="Broken Tower 5"/>
   </tile>
   <tile id="221">
-    <region x="412" y="1466" width="32" height="89" offsetX="32" offsetY="-63" />
+    <region x="412" y="1466" width="32" height="89" offsetX="32" offsetY="-63" name="Broken Tower 6"/>
   </tile>
   <tile id="222">
-    <region x="536" y="258" width="9" height="64" offsetX="32" offsetY="-43" />
+    <region x="536" y="258" width="9" height="64" offsetX="32" offsetY="-43" name="Broken Tower 7"/>
   </tile>
   <tile id="224">
-    <region x="0" y="877" width="64" height="110" offsetX="0" offsetY="-81" />
+    <region x="0" y="877" width="64" height="110" offsetX="0" offsetY="-81" name="Cave Entrance 1"/>
   </tile>
   <tile id="225">
-    <region x="444" y="1470" width="25" height="84" offsetX="32" offsetY="-65" />
+    <region x="444" y="1470" width="25" height="84" offsetX="32" offsetY="-65" name="Cave Entrance 2"/>
   </tile>
   <tile id="226">
-    <region x="455" y="1554" width="25" height="86" offsetX="7" offsetY="-65" />
+    <region x="455" y="1554" width="25" height="86" offsetX="7" offsetY="-65" name="Cave Entrance 3"/>
   </tile>
   <tile id="227">
-    <region x="404" y="632" width="64" height="110" offsetX="0" offsetY="-81" />
+    <region x="404" y="632" width="64" height="110" offsetX="0" offsetY="-81" name="Cave Entrance 4"/>
   </tile>
   <tile id="228">
-    <region x="468" y="632" width="64" height="110" offsetX="0" offsetY="-81" />
+    <region x="468" y="632" width="64" height="110" offsetX="0" offsetY="-81" name="Cave Entrance 5"/>
   </tile>
   <tile id="229">
-    <region x="371" y="1558" width="28" height="91" offsetX="32" offsetY="-65" />
+    <region x="371" y="1558" width="28" height="91" offsetX="32" offsetY="-65" name="Cave Entrance 6"/>
   </tile>
   <tile id="230">
-    <region x="430" y="1555" width="25" height="91" offsetX="7" offsetY="-65" />
+    <region x="430" y="1555" width="25" height="91" offsetX="7" offsetY="-65" name="Cave Entrance 7"/>
   </tile>
   <tile id="231">
-    <region x="532" y="725" width="64" height="110" offsetX="0" offsetY="-81" />
+    <region x="532" y="725" width="64" height="110" offsetX="0" offsetY="-81" name="Cave Entrance 8"/>
   </tile>
   <tile id="232">
-    <region x="96" y="1373" width="32" height="32" offsetX="0" offsetY="0" />
+    <region x="96" y="1373" width="32" height="32" offsetX="0" offsetY="0" name="Temple Entrance 1"/>
   </tile>
   <tile id="233">
-    <region x="469" y="1470" width="32" height="64" offsetX="0" offsetY="-32" />
+    <region x="469" y="1470" width="32" height="64" offsetX="0" offsetY="-32" name="Temple Entrance 2"/>
   </tile>
   <tile id="234">
-    <region x="219" y="1543" width="32" height="96" offsetX="0" offsetY="-64" />
+    <region x="219" y="1543" width="32" height="96" offsetX="0" offsetY="-64" name="Temple Entrance 3"/>
   </tile>
   <tile id="235">
-    <region x="112" y="777" width="64" height="128" offsetX="0" offsetY="-96" />
+    <region x="112" y="777" width="64" height="128" offsetX="0" offsetY="-96" name="Temple Entrance 4"/>
   </tile>
   <tile id="236">
-    <region x="251" y="1543" width="32" height="96" offsetX="32" offsetY="-64" />
+    <region x="251" y="1543" width="32" height="96" offsetX="32" offsetY="-64" name="Temple Entrance 5"/>
   </tile>
   <tile id="237">
-    <region x="605" y="1498" width="32" height="64" offsetX="32" offsetY="-32" />
+    <region x="605" y="1498" width="32" height="64" offsetX="32" offsetY="-32" name="Temple Entrance 6"/>
   </tile>
   <tile id="238">
-    <region x="160" y="1618" width="32" height="32" offsetX="32" offsetY="0" />
+    <region x="160" y="1618" width="32" height="32" offsetX="32" offsetY="0" name="Temple Entrance 7"/>
   </tile>
   <tile id="240">
-    <region x="118" y="351" width="118" height="110" offsetX="-22" offsetY="-92" />
+    <region x="118" y="351" width="118" height="110" offsetX="-22" offsetY="-92" name="Blue Tree 1"/>
   </tile>
   <tile id="241">
-    <region x="293" y="520" width="113" height="104" offsetX="-17" offsetY="-86" />
+    <region x="293" y="520" width="113" height="104" offsetX="-17" offsetY="-86" name="Blue Tree 2"/>
   </tile>
   <tile id="242">
-    <region x="0" y="771" width="112" height="106" offsetX="-16" offsetY="-88" />
+    <region x="0" y="771" width="112" height="106" offsetX="-16" offsetY="-88" name="Blue Tree 3"/>
   </tile>
   <tile id="243">
-    <region x="0" y="491" width="116" height="112" offsetX="-20" offsetY="-91" />
+    <region x="0" y="491" width="116" height="112" offsetX="-20" offsetY="-91" name="Blue Tree 4"/>
   </tile>
   <tile id="244">
-    <region x="0" y="603" width="115" height="168" offsetX="-19" offsetY="-136" />
+    <region x="0" y="603" width="115" height="168" offsetX="-19" offsetY="-136" name="Dead Tree 1"/>
   </tile>
   <tile id="245">
-    <region x="292" y="624" width="112" height="195" offsetX="-16" offsetY="-183" />
+    <region x="292" y="624" width="112" height="195" offsetX="-16" offsetY="-183" name="Dead Tree 2"/>
   </tile>
   <tile id="246">
-    <region x="536" y="395" width="102" height="187" offsetX="-6" offsetY="-173" />
+    <region x="536" y="395" width="102" height="187" offsetX="-6" offsetY="-173" name="Dead Tree 3"/>
   </tile>
   <tile id="247">
-    <region x="550" y="0" width="93" height="200" offsetX="-9" offsetY="-184" />
+    <region x="550" y="0" width="93" height="200" offsetX="-9" offsetY="-184" name="Dead Tree 4"/>
   </tile>
   <tile id="248">
-    <region x="294" y="340" width="120" height="180" offsetX="-28" offsetY="-148" />
+    <region x="294" y="340" width="120" height="180" offsetX="-28" offsetY="-148" name="Tall Tree 1"/>
   </tile>
   <tile id="249">
-    <region x="416" y="258" width="120" height="190" offsetX="-27" offsetY="-162" />
+    <region x="416" y="258" width="120" height="190" offsetX="-27" offsetY="-162" name="Tall Tree 2" />
   </tile>
   <tile id="250">
-    <region x="414" y="448" width="119" height="184" offsetX="-23" offsetY="-160" />
+    <region x="414" y="448" width="119" height="184" offsetX="-23" offsetY="-160" name="Tall Tree 3"/>
   </tile>
   <tile id="251">
-    <region x="118" y="461" width="117" height="176" offsetX="-21" offsetY="-148" />
+    <region x="118" y="461" width="117" height="176" offsetX="-21" offsetY="-148" name="Tall Tree 4"/>
   </tile>
   <tile id="252">
-    <region x="294" y="192" width="122" height="148" offsetX="-26" offsetY="-118" />
+    <region x="294" y="192" width="122" height="148" offsetX="-26" offsetY="-118" name="Fluffy Tree 1"/>
   </tile>
   <tile id="253">
-    <region x="0" y="351" width="118" height="140" offsetX="-24" offsetY="-112" name="Tree1"/>
+    <region x="0" y="351" width="118" height="140" offsetX="-24" offsetY="-112" name="Fluffy Tree 2"/>
   </tile>
   <tile id="254">
-    <region x="422" y="128" width="123" height="130" offsetX="-27" offsetY="-114" name="Tree2"/>
+    <region x="422" y="128" width="123" height="130" offsetX="-27" offsetY="-114" name="Fluffy Tree 3"/>
   </tile>
   <tile id="255">
-    <region x="115" y="637" width="112" height="140" offsetX="-16" offsetY="-113" name="Tree3"/>
+    <region x="115" y="637" width="112" height="140" offsetX="-16" offsetY="-113" name="Fluffy Tree 4"/>
   </tile>
   <tile id="264">
-    <region x="294" y="0" width="128" height="64" offsetX="0" offsetY="-16" />
+    <region x="294" y="0" width="128" height="64" offsetX="0" offsetY="-16" name="Teleporter Inactive"/>
   </tile>
   <tile id="265">
-    <region x="422" y="64" width="128" height="64" offsetX="0" offsetY="-16" />
+    <region x="422" y="64" width="128" height="64" offsetX="0" offsetY="-16" name="Teleporter Active"/>
     <frame x="422" y="64" duration="33" />
     <frame x="294" y="128" duration="33" />
     <frame x="422" y="0" duration="33" />
   </tile>
   <tile id="296">
-    <region x="0" y="0" width="294" height="351" offsetX="42" offsetY="-284" />
+    <region x="0" y="0" width="294" height="351" offsetX="42" offsetY="-284" name="Rotten Tower"/>
   </tile>
 </tileset>

@@ -20,6 +20,7 @@ namespace TileEngine.Savers
     using Maps;
     using System.Xml;
     using System.Xml.Linq;
+    using System;
 
     public class XmlSaver : AbstractSaver
     {
@@ -37,7 +38,7 @@ namespace TileEngine.Savers
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("map");
-                writer.WriteAttributeString("name", map.Name);
+                writer.WriteAttributeString("name", AdjustName(map.Name));
                 writer.WriteAttributeString("orientation", map.Orientation.ToString().ToLowerInvariant());
                 writer.WriteAttributeString("width", map.Width.ToString());
                 writer.WriteAttributeString("height", map.Height.ToString());
@@ -49,7 +50,7 @@ namespace TileEngine.Savers
                     writer.WriteAttributeString("name", layer.Name);
                     writer.WriteAttributeString("width", layer.Width.ToString());
                     writer.WriteAttributeString("height", layer.Height.ToString());
-                    writer.WriteAttributeString("tileset", layer.TileSet.Name);
+                    writer.WriteAttributeString("tileset", AdjustName(layer.TileSet.Name));
                     writer.WriteAttributeString("visible", layer.Visible.ToString().ToLowerInvariant());
                     writer.WriteStartElement("data");
                     writer.WriteAttributeString("encoding", "csv");
@@ -71,7 +72,7 @@ namespace TileEngine.Savers
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("tileset");
-                writer.WriteAttributeString("name", tileSet.Name);
+                writer.WriteAttributeString("name", AdjustName(tileSet.Name));
                 writer.WriteAttributeString("tileWidth", tileSet.TileWidth.ToString());
                 writer.WriteAttributeString("tileHeight", tileSet.TileHeight.ToString());
                 writer.WriteAttributeString("image", tileSet.Texture.Name.ToString());
@@ -112,6 +113,11 @@ namespace TileEngine.Savers
                 writer.WriteEndDocument();
                 writer.Flush();
             }
+        }
+
+        protected override string AdjustName(string fileId)
+        {
+            return fileId.Replace(".txt", ".xml");
         }
     }
 }

@@ -35,5 +35,7 @@ namespace TileEngine.Savers
         {
             return engine.FileResolver.CreateFile(fileId);
         }
+
+        protected abstract string AdjustName(string fileId);
     }
 }
