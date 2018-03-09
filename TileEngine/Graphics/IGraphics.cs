@@ -45,6 +45,9 @@ namespace TileEngine.Graphics
         bool InFrame { get; }
         DebugOptions DebugOptions { get; set; }
 
+        void SetTarget(Texture tex);
+        void ClearTarget();
+
         void BeginFrame();
         void EndFrame();
         void SetSize(int width, int height);
@@ -52,11 +55,16 @@ namespace TileEngine.Graphics
         void ClearScreen();
         void ClearScreen(Color color);
         void DrawTextures(Texture texture, int[] vertices, int offset, int count);
+        void Render(Texture texture, int x, int y, int trans=0);
         void Render(TextureRegion textureRegion, int x, int y);
         void Render(TextureRegion textureRegion, int x, int y, int width, int height);
-        void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
+        void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans=0);
         void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        int MeasureTextWidth(string text);
         void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
+        void DrawRectangle(int x, int y, int width, int height, Color color);
+        void FillRectangle(int x, int y, int width, int height, Color color);
+        void DrawLine(int x1, int y1, int x2, int y2, Color color);
         void DrawText(string text, int x, int y);
         void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);

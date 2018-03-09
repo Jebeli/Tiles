@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Screens
 {
+    using System;
     using Core;
     using Graphics;
     using GUI;
@@ -30,29 +31,43 @@ namespace TileEngine.Screens
         private bool mousePanning;
         private bool panning;
         private bool hasPanned;
-        private WidgetTileEditor editor;
-        WidgetWindow window1;
-        WidgetButton button1;
-        WidgetButton button2;
-        WidgetButton button3;
+
+        private Window win1;
+        private Gadget button1;
+        private Gadget button2;
+        private Gadget button3;
+
         public MapScreen(Engine engine)
             : base(engine, "MapScreen")
         {
             renderer = new MapRenderer(engine);
             mousePanning = true;
+            MakeWindows();
+        }
 
-            window1 = new WidgetWindow();
-            window1.SetBounds(10, 10, 3 * 64 + 10, 32 + 10);
-            button1 = new WidgetButton("Exit");
-            button1.SetBounds(5, 5, 64, 32);
-            button2 = new WidgetButton("Load");
-            button2.SetBounds(5 + 64, 5, 64, 32);
-            button3 = new WidgetButton("Save");
-            button3.SetBounds(5 + 64 * 2, 5, 64, 32);
-            window1.AddWidget(button1);
-            window1.AddWidget(button2);
-            window1.AddWidget(button3);
-            AddWidget(window1);
+        private void MakeWindows()
+        {
+            button1 = Gadget.MakeBoolGadget("Exit", 64, 32);
+            button1.SetPosition(5, 5);
+            button2 = Gadget.MakeBoolGadget("Load", 64, 32);
+            button2.SetPosition(5 + 64, 5);
+            button3 = Gadget.MakeBoolGadget("Save", 64, 32);
+            button3.SetPosition(5 + 64 * 2, 5);
+            win1 = Intuition.OpenWindowTags(null,
+                Tag(WATags.WA_Left, 10),
+                Tag(WATags.WA_Top, 10),
+                Tag(WATags.WA_Width, 3 * 64 + 10),
+                Tag(WATags.WA_Height, 32 + 10),
+                Tag(WATags.WA_Flags, WindowFlags.WFLG_BORDERLESS),
+                Tag(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                Tag(WATags.WA_Gadgets, new[] { button1, button2, button3 }),
+                Tag(WATags.WA_Opacity, 170),
+                Tag(WATags.WA_Screen, this));
+        }
+
+        private void CloseWindows()
+        {
+            Intuition.CloseWindow(win1);
         }
 
         public override void Update(TimeInfo time)
@@ -113,28 +128,63 @@ namespace TileEngine.Screens
             }
         }
 
-        protected override void OnWidgetClick(Widget widget)
+        //protected override void OnWidgetClick(Widget widget)
+        //{
+        //    base.OnWidgetClick(widget);
+        //    if (button1 == widget)
+        //    {
+        //        engine.SwitchToTitleScreen();
+        //        //engine.Exit();
+        //    }
+        //    else if (button2 == widget)
+        //    {
+
+        //    }
+        //    else if (button3 == widget)
+        //    {
+        //        engine.SaveMap(engine.Map);
+        //        foreach (var layer in engine.Map.Layers)
+        //        {
+        //            engine.SaveTileSet(layer.TileSet);
+        //        }
+        //    }
+        //    else if (editor != null)
+        //    {
+        //        editor.HandleWidgetClick(widget);
+        //    }
+        //}
+
+        protected override void OnGadgetClick(Gadget gadget)
         {
-            base.OnWidgetClick(widget);
-            if (button1 == widget)
+            base.OnGadgetClick(gadget);
+            if (button1 == gadget)
             {
-                engine.Exit();
+                Intuition.AutoRequestPositionMode = AutoRequestPositionMode.CenterScreen;
+                IntuiText body = new IntuiText("Return to the");
+                body.NextText = new IntuiText("Title Screen?");
+                Intuition.AutoRequest(win1, body, "Yes", "No", IDCMPFlags.GADGETUP, IDCMPFlags.GADGETUP, 200, 100);
+                //
             }
-            else if (button2 == widget)
+            else if (button2 == gadget)
             {
 
             }
-            else if (button3 == widget)
+            else if (button3 == gadget)
             {
                 engine.SaveMap(engine.Map);
-                foreach(var layer in engine.Map.Layers)
+                foreach (var layer in engine.Map.Layers)
                 {
                     engine.SaveTileSet(layer.TileSet);
                 }
             }
-            else if (editor != null)
+        }
+
+        protected override void OnAutoRequest(int gadNum)
+        {
+            base.OnAutoRequest(gadNum);
+            if (gadNum == 1)
             {
-                editor.HandleWidgetClick(widget);
+                engine.SwitchToTitleScreen();
             }
         }
 
@@ -178,26 +228,26 @@ namespace TileEngine.Screens
 
         private void HideEditor()
         {
-            if (editor != null)
-            {
-                editor.Cancel();
-                RemoveWidget(editor);
-            }
+            //if (editor != null)
+            //{
+            //    editor.Cancel();
+            //    RemoveWidget(editor);
+            //}
         }
         private void MakeEditor(int x, int y)
         {
             HideEditor();
-            editor = new WidgetTileEditor(engine.Map, x, y);
-            int sX;
-            int sY;
-            engine.Camera.MapToScreen(x, y, out sX, out sY);
-            sX += engine.Camera.TileWidth;
-            sY += engine.Camera.TileHeight;
-            if (sX + editor.Width > engine.Camera.ViewWidth) { sX = engine.Camera.ViewWidth - editor.Width; }
-            if (sY + editor.Height > engine.Camera.ViewHeight) { sY = engine.Camera.ViewHeight - editor.Height; }
-            editor.SetPosition(sX, sY);
-            AddWidget(editor);
-            editor.Visible = true;
+            //editor = new WidgetTileEditor(engine.Map, x, y);
+            //int sX;
+            //int sY;
+            //engine.Camera.MapToScreen(x, y, out sX, out sY);
+            //sX += engine.Camera.TileWidth;
+            //sY += engine.Camera.TileHeight;
+            //if (sX + editor.Width > engine.Camera.ViewWidth) { sX = engine.Camera.ViewWidth - editor.Width; }
+            //if (sY + editor.Height > engine.Camera.ViewHeight) { sY = engine.Camera.ViewHeight - editor.Height; }
+            //editor.SetPosition(sX, sY);
+            //AddWidget(editor);
+            //editor.Visible = true;
         }
     }
 }

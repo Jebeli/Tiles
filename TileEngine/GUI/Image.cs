@@ -15,20 +15,29 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-namespace TileEngine.Screens
+namespace TileEngine.GUI
 {
-    using Core;
+    using System;
     using System.Collections.Generic;
-    using TileEngine.GUI;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using TileEngine.Graphics;
 
-    public interface IScreen 
+    public class Image
     {
-        string Name { get; }
-        void Show();
-        void Hide();
-        void Update(TimeInfo time);
-        void Render(TimeInfo time);
-        IList<Window> Windows { get; }
-        Window ActiveWindow { get; set; }
+        public Image(TextureRegion region)
+        {
+            ImageData = region;
+            Width = region.Width;
+            Height = region.Height;
+        }
+
+        public int LeftEdge { get; set; }
+        public int TopEdge { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public TextureRegion ImageData { get; set; }
+        public Image NextImage { get; set; }
     }
 }

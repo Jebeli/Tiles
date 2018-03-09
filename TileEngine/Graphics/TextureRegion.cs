@@ -47,6 +47,16 @@ namespace TileEngine.Graphics
             this.offsetY = offsetY;
         }
 
+        public virtual void Draw(IGraphics graphics, int x, int y, int width, int height)
+        {
+            graphics.Render(this, x, y, width, height);
+        }
+
+        public void Draw(IGraphics graphics, int x, int y)
+        {
+            Draw(graphics, x, y, width, height);
+        }
+
         public Texture Texture
         {
             get { return texture; }

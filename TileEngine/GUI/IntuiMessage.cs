@@ -22,38 +22,33 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using TileEngine.Graphics;
 
-    public class WidgetLabel : Widget
+    public class IntuiMessage : EventArgs
     {
-        private string text;
+        private readonly IDCMPFlags message;
+        private readonly Gadget gadget;
+        private readonly int code;
 
-        public WidgetLabel(string text = "")
-            : base(null)
+        public IntuiMessage(IDCMPFlags msg, Gadget gad, int code)
         {
-            this.text = text;
-            Clickable = false;
-        }
-        public string Text
-        {
-            get { return text; }
-            set { text = value; }
+            message = msg;
+            gadget = gad;
+            this.code = code;
         }
 
-        protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
+        public IDCMPFlags Message
         {
-            graphics.RenderText(text, x + width / 2, y + height / 2, GetTextColor());
+            get { return message; }
         }
 
-        protected override void BoundsChanged()
+        public Gadget Gadget
         {
-
+            get { return gadget; }
         }
 
-        public override string ToString()
+        public int Code
         {
-            return "Label " + Text;
+            get { return code; }
         }
-
     }
 }

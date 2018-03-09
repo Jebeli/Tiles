@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TileEngine.Graphics
 {
-    public class NinePatch
+    public class NinePatch : TextureRegion
     {
         public const int TOP_LEFT = 0;
         public const int TOP_CENTER = 1;
@@ -17,8 +17,7 @@ namespace TileEngine.Graphics
         public const int BOTTOM_LEFT = 6;
         public const int BOTTOM_CENTER = 7;
         public const int BOTTOM_RIGHT = 8;
-
-        private Texture texture;
+        
         private TextureRegion[] patches;
         private int left;
         private int right;
@@ -26,8 +25,9 @@ namespace TileEngine.Graphics
         private int bottom;
 
         public NinePatch(Texture texture, int left, int right, int top, int bottom)
+            :base(texture)
         {
-            this.texture = texture;
+            //this.texture = texture;
             patches = new TextureRegion[9];
             this.left = left;
             this.right = right;
@@ -73,7 +73,7 @@ namespace TileEngine.Graphics
             }
         }
 
-        public void Draw(IGraphics graphics, int x, int y, int width, int height)
+        public override void Draw(IGraphics graphics, int x, int y, int width, int height)
         {
             graphics.Render(patches[TOP_LEFT], x, y);
             graphics.Render(patches[TOP_CENTER], x + left, y, width - left - right, top);

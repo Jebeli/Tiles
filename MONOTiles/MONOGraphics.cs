@@ -34,6 +34,32 @@ namespace MONOTiles
         {
             this.game = game;
         }
+
+        public override void SetTarget(Texture tex)
+        {
+            var tx = tex.GetTexture();
+            Microsoft.Xna.Framework.Graphics.RenderTarget2D currentView = tx as Microsoft.Xna.Framework.Graphics.RenderTarget2D;
+            batch = game.SpriteBatch;
+            batch.End();
+            game.GraphicsDevice.SetRenderTarget(currentView);
+            batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
+                Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
+                Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
+                Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
+                Microsoft.Xna.Framework.Graphics.RasterizerState.CullCounterClockwise);
+        }
+
+        public override void ClearTarget()
+        {
+            batch.End();
+            game.GraphicsDevice.SetRenderTarget(view);
+            batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
+                Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
+                Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
+                Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
+                Microsoft.Xna.Framework.Graphics.RasterizerState.CullCounterClockwise);
+        }
+
         public void BeginFrame(ExtendedSpriteBatch batch)
         {
             BeginFrame();
@@ -105,7 +131,7 @@ namespace MONOTiles
             }
         }
 
-        public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)
+        public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans)
         {
             var bmp = texture.GetTexture();
             if (bmp != null)
@@ -113,6 +139,10 @@ namespace MONOTiles
                 var dstRect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
                 var srcRect = new Microsoft.Xna.Framework.Rectangle(srcX, srcY, srcWidth, srcHeight);
                 var col = Microsoft.Xna.Framework.Color.White;
+                if (trans > 0)
+                {
+                    col *= (float)((255 - trans) / 256.0);
+                }
                 batch.Draw(bmp, dstRect, srcRect, col, 0.0f, Microsoft.Xna.Framework.Vector2.Zero, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 1.0f);
             }
         }
@@ -149,6 +179,13 @@ namespace MONOTiles
             batch.DrawString(fnt, text, pos, c);
         }
 
+        public override int MeasureTextWidth(string text)
+        {
+            var fnt = game.smallFont;
+            var size = fnt.MeasureString(text);
+            return (int)size.Width;
+        }
+
         public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
         {
             var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
@@ -175,6 +212,24 @@ namespace MONOTiles
             }
         }
 
+        public override void DrawRectangle(int x, int y, int width, int height, Color color)
+        {
+            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            batch.DrawRectangle(rect, color.GetColor());
+        }
+
+        public override void FillRectangle(int x, int y, int width, int height, Color color)
+        {
+            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            batch.FillRectangle(rect, color.GetColor());
+        }
+
+        public override void DrawLine(int x1, int y1, int x2, int y2, Color color)
+        {
+            var start = new Microsoft.Xna.Framework.Vector2(x1, y1);
+            var end = new Microsoft.Xna.Framework.Vector2(x2, y2);
+            batch.DrawLine(start, end, color.GetColor());
+        }
         public override void DrawText(string text, int x, int y)
         {
 

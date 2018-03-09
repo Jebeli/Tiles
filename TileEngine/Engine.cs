@@ -45,6 +45,7 @@ namespace TileEngine
         private LoadScreen loadScreen;
         private MapScreen mapScreen;
         private ExitScreen exitScreen;
+        private IntuiTestScreen testScreen;
         private MapLoadInfo nextMap;
         private Map map;
         private Camera camera;
@@ -60,13 +61,14 @@ namespace TileEngine
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
-            WidgetFactory.InitDefault(this);
+            Intuition.Init(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
             splashScreen = new SplashScreen(this);
             titleScreen = new TitleScreen(this);
             exitScreen = new ExitScreen(this);
+            testScreen = new IntuiTestScreen(this);
             map = MapFactory.MakeNullMap(this);
             camera = new Camera(map);
             frameCounter = new FrameCounter();
@@ -146,6 +148,7 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
+                Intuition.Update(time);
                 map.Update(time);
                 currentScreen.Update(time);
                 return true;
@@ -164,6 +167,7 @@ namespace TileEngine
             graphics.BeginFrame();
             graphics.ClearScreen();
             currentScreen.Render(time);
+            Intuition.Render(graphics, time);
             graphics.EndFrame();
         }
 
@@ -257,6 +261,11 @@ namespace TileEngine
         {
             loadScreen.MapLoadInfo = nextMap;
             SetScreen(loadScreen);
+        }
+
+        public void SwitchToTestScreen()
+        {
+            SetScreen(testScreen);
         }
 
         public void SetNextMap(string name, int posX, int posY)

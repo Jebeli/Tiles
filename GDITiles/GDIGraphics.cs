@@ -28,6 +28,7 @@ namespace GDITiles
         private System.Drawing.Imaging.PixelFormat pixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
         private System.Drawing.Bitmap view;
         private System.Drawing.Graphics gfx;
+        private System.Drawing.Graphics oldGfx;
         private System.Drawing.Pen gridPen;
         private System.Drawing.Pen selectPen;
         private System.Drawing.Font smallFont;
@@ -44,6 +45,20 @@ namespace GDITiles
             System.Drawing.Rectangle src = new System.Drawing.Rectangle(0, 0, view.Width, view.Height);
             graphics.DrawImage(view, dst, src, System.Drawing.GraphicsUnit.Pixel);
         }
+
+        public override void SetTarget(Texture tex)
+        {
+            var currentView = tex.GetBitmap();
+            oldGfx = gfx;
+            gfx = System.Drawing.Graphics.FromImage(currentView);
+        }
+
+        public override void ClearTarget()
+        {
+            gfx.Dispose();
+            gfx = oldGfx;
+        }
+
 
         public override void ClearScreen()
         {
@@ -89,7 +104,7 @@ namespace GDITiles
         }
 
 
-        public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)
+        public override void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans)
         {
             var bmp = texture.GetBitmap();
             if (bmp != null)
@@ -135,6 +150,13 @@ namespace GDITiles
             }
         }
 
+        public override int MeasureTextWidth(string text)
+        {
+            var font = smallFont;
+            var size = gfx.MeasureString(text, font);
+            return (int)size.Width;
+        }
+
         public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
         {
             var rect = new System.Drawing.Rectangle(x, y, width, height);
@@ -157,6 +179,32 @@ namespace GDITiles
             {
                 gfx.FillRectangle(System.Drawing.Brushes.DimGray, rect);
                 gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+            }
+        }
+
+        public override void DrawRectangle(int x, int y, int width, int height, Color color)
+        {
+            using (var pen = new System.Drawing.Pen(color.GetColor()))
+            {
+                var rect = new System.Drawing.Rectangle(x, y, width, height);
+                gfx.DrawRectangle(pen, rect);
+            }
+        }
+
+        public override void FillRectangle(int x, int y, int width, int height, Color color)
+        {
+            using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
+            {
+                var rect = new System.Drawing.Rectangle(x, y, width, height);
+                gfx.FillRectangle(brush, rect);
+            }
+        }
+
+        public override void DrawLine(int x1, int y1, int x2, int y2, Color color)
+        {
+            using (var pen = new System.Drawing.Pen(color.GetColor()))
+            {
+                gfx.DrawLine(pen, x1, y1, x2, y2);
             }
         }
 

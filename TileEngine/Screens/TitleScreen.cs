@@ -17,46 +17,73 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Screens
 {
+    using Graphics;
+    using GUI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Core;
-    using TileEngine.GUI;
 
     public class TitleScreen : TextTitleScreen
     {
-        private WidgetButton newButton;
-        private WidgetButton contButton;
-        private WidgetButton loadButton;
-        private WidgetButton exitButton;
+        private Window window;
+
+        private Gadget newButton;
+        private Gadget contButton;
+        private Gadget loadButton;
+        private Gadget exitButton;
+        private Gadget testButton;
         public TitleScreen(Engine engine)
             : base(engine, "TitleScreen", "TILES")
         {
-            newButton = new WidgetButton("New Game");
-            contButton = new WidgetButton("Continue Game");
-            loadButton = new WidgetButton("Load Game");
-            exitButton = new WidgetButton("Quit Game");
-            newButton.SetBounds(100, 100, 128, 30);
-            contButton.SetBounds(100, 130, 128, 30);
-            loadButton.SetBounds(100, 160, 128, 30);
-            exitButton.SetBounds(100, 190, 128, 30);
-            AddWidget(newButton);
-            AddWidget(contButton);
-            AddWidget(loadButton);
-            AddWidget(exitButton);
+            MakeWindow();
+        }
+
+        private void MakeWindow()
+        {
+            newButton = Gadget.MakeBoolGadget("New Game", 128, 30);
+            contButton = Gadget.MakeBoolGadget("Continue Game", 128, 30);
+            loadButton = Gadget.MakeBoolGadget("Load Game", 128, 30);
+            exitButton = Gadget.MakeBoolGadget("Quit Game", 128, 30);
+            testButton = Gadget.MakeBoolGadget("Intui Test", 128, 30);
+            newButton.SetPosition(100, 100);
+            contButton.SetPosition(100, 130);
+            loadButton.SetPosition(100, 160);
+            exitButton.SetPosition(100, 190);
+            testButton.SetPosition(100, 220);
+
+            window = Intuition.OpenWindowTags(null,
+                Tag(WATags.WA_Left, 0),
+                Tag(WATags.WA_Top, 0),
+                Tag(WATags.WA_Width, engine.Graphics.ViewWidth),
+                Tag(WATags.WA_Height, engine.Graphics.ViewHeight),
+                Tag(WATags.WA_Flags, WindowFlags.WFLG_BORDERLESS | WindowFlags.WFLG_BACKDROP),
+                Tag(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                Tag(WATags.WA_Gadgets, new[] { newButton, contButton, loadButton, exitButton, testButton }),
+                Tag(WATags.WA_BackgroundColor, Color.Black),
+                Tag(WATags.WA_Screen, this));
+
+            Intuition.OffGadget(loadButton, window);
+        }
+
+        private void CloseWindow()
+        {
+            Intuition.CloseWindow(window);
         }
 
         public override void Update(TimeInfo time)
         {
             base.Update(time);
-            int y = engine.Graphics.ViewHeight / 2 + 75;
+            window.SetWindowBox(0, engine.Graphics.ViewHeight / 2 + 75, engine.Graphics.ViewWidth, engine.Graphics.ViewHeight / 2 - 75);
+            int y = 0;
             int x = engine.Graphics.ViewWidth / 2 - newButton.Width / 2;
             newButton.SetPosition(x, y);
             contButton.SetPosition(x, y + 40);
             loadButton.SetPosition(x, y + 80);
             exitButton.SetPosition(x, y + 120);
+            testButton.SetPosition(x, y + 160);
         }
 
         public override void Render(TimeInfo time)
@@ -64,25 +91,30 @@ namespace TileEngine.Screens
             base.Render(time);
         }
 
-        protected override void OnWidgetClick(Widget widget)
+        protected override void OnGadgetClick(Gadget gadget)
         {
-            base.OnWidgetClick(widget);
-            if (widget == exitButton)
+            base.OnGadgetClick(gadget);
+            if (gadget == exitButton)
             {
                 engine.SwitchToExitScreen();
             }
-            else if (widget == loadButton)
+            else if (gadget == loadButton)
             {
                 engine.SwitchToLoadScreen();
             }
-            else if (widget == contButton)
+            else if (gadget == contButton)
             {
                 engine.SwitchToLoadScreen();
             }
-            else if (widget == newButton)
+            else if (gadget == newButton)
             {
                 engine.SwitchToLoadScreen();
+            }
+            else if (gadget == testButton)
+            {
+                engine.SwitchToTestScreen();
             }
         }
+
     }
 }

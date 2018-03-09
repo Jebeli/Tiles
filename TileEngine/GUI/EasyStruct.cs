@@ -23,13 +23,11 @@ namespace TileEngine.GUI
     using System.Text;
     using System.Threading.Tasks;
 
-    public interface IWidgetContainer
+    public class EasyStruct
     {
-        IList<Widget> Widgets { get; }
-        void AddWidget(Widget w);
-
-        void RemoveWidget(Widget w);
-
-        void ClearWidgets();
+        public int Flags { get; set; }
+        public string Title { get; set; }
+        public string TextFormat { get; set; }
+        public string GadgetFormat { get; set; }
     }
 }

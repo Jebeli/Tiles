@@ -38,9 +38,24 @@ namespace MONOTiles
         /// <param name="color">The draw color.</param>
         public void DrawLine(Vector2 start, Vector2 end, Color color)
         {
-            float length = (end - start).Length();
-            float rotation = (float)Math.Atan2(end.Y - start.Y, end.X - start.X);
-            Draw(WhiteTexture, start, null, color, rotation, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
+            if ((int)start.X == (int)end.X)
+            {
+                int minY = (int)Math.Min(start.Y, end.Y);
+                int maxY = (int)Math.Max(start.Y, end.Y);
+                Draw(WhiteTexture, new Rectangle((int)start.X, minY, 1, 1 + maxY - minY), color);
+            }
+            else if ((int)start.Y == (int)end.Y)
+            {
+                int minX = (int)Math.Min(start.X, end.X);
+                int maxX = (int)Math.Max(start.X, end.X);
+                Draw(WhiteTexture, new Rectangle(minX, (int)start.Y, 1 + maxX - minX, 1), color);
+            }
+            else
+            {
+                float length = (end - start).Length();
+                float rotation = (float)Math.Atan2(end.Y - start.Y, end.X - start.X);
+                Draw(WhiteTexture, start, null, color, rotation, Vector2.Zero, new Vector2(length, 1), SpriteEffects.None, 0);
+            }
         }
 
         /// <summary>
@@ -65,5 +80,6 @@ namespace MONOTiles
         {
             Draw(WhiteTexture, rectangle, color);
         }
+
     }
 }

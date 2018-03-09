@@ -22,40 +22,41 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using TileEngine.Graphics;
 
-    public class WidgetImage : Widget
+    public class StringInfo
     {
-        private TextureRegion image;
-        public WidgetImage()
-            : base(WidgetFactory.Window9P)
+        private int bufferPos;
+        public StringInfo(string buffer = "")
         {
+            Buffer = buffer;
+            UndoBuffer = "";
+            MaxChars = short.MaxValue;
+            BufferPos = buffer.Length;
         }
 
-        public TextureRegion Image
+        public string Buffer { get; set; }
+        public string UndoBuffer { get; set; }
+        public int BufferPos
         {
-            get { return image; }
-            set { image = value; }
-        }
-
-        protected override void Draw(IGraphics graphics, int x, int y, int width, int height)
-        {
-            if (!DrawNinePatch(graphics, x, y, width, height))
+            get { return bufferPos; }
+            set
             {
-                graphics.RenderWidget(x, y, width, height, Enabled, Hover, Pressed);
-            }
-            if (image != null)
-            {
-                //tileImage.SetPosition(64 - tileImage.Image.OffsetX, 256 - 30 - tileImage.Image.Height - tileImage.Image.OffsetY);
-                x -= image.OffsetX;
-                y -= image.OffsetY;
-                graphics.Render(image, x, y);
+                if (value < 0) value = 0;
+                if (value >= NumChars) value = NumChars;
+                bufferPos = value;
             }
         }
-
-        protected override void BoundsChanged()
+        public int MaxChars { get; set; }
+        public int DispPos { get; set; }
+        public int UndoPos { get; set; }
+        public int NumChars
         {
-
+            get { return Buffer.Length; }
         }
+
+        public int DispCount { get; set; }
+        public int CLeft { get; set; }
+        public int CTop { get; set; }
+        public int LongInt { get; set; }
     }
 }

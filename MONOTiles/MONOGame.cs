@@ -21,6 +21,7 @@ namespace MONOTiles
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
     using MonoGame.Extended.BitmapFonts;
+    using System.Collections.Generic;
     using TileEngine;
     using TileEngine.Graphics;
     using TileEngine.Input;
@@ -44,9 +45,13 @@ namespace MONOTiles
         private int mouseDelta;
         private bool leftMouseDown;
         private bool rightMouseDown;
+        private List<Keys> downKeys = new List<Keys>();
 
         internal BitmapFont smallFont;
-
+        internal ExtendedSpriteBatch SpriteBatch
+        {
+            get { return spriteBatch; }
+        }
 
         public MONOGame()
         {
@@ -96,6 +101,7 @@ namespace MONOTiles
                 Window.Title = engine.DebugInfoText;
             }
             HandleMouse(Mouse.GetState());
+            HandleKeys(Keyboard.GetState());
             base.Update(gameTime);
         }
 
@@ -107,6 +113,27 @@ namespace MONOTiles
             base.Draw(gameTime);
         }
 
+        private void HandleKeys(KeyboardState ks)
+        {
+            List<Keys> pressedKeys = new List<Keys>(ks.GetPressedKeys());
+            List<Keys> copyDownKeys = new List<Keys>(downKeys);
+            foreach (Keys k in copyDownKeys)
+            {
+                if (!pressedKeys.Contains(k))
+                {
+                    downKeys.Remove(k);
+                    engine.Input.KeyUp((Key)k);
+                }
+            }
+            foreach (Keys k in pressedKeys)
+            {
+                if (!downKeys.Contains(k))
+                {
+                    downKeys.Add(k);
+                    engine.Input.KeyDown((Key)k);
+                }
+            }
+        }
         private void HandleMouse(MouseState ms)
         {
             if (mouseX != ms.X || mouseY != ms.Y)

@@ -34,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Core\EngineEvents.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Core\FrameCounter.cs" />
@@ -59,18 +56,22 @@
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\TextureBatch.cs" />
     <Compile Include="Graphics\TextureRegion.cs" />
-    <Compile Include="GUI\IWidgetContainer.cs" />
-    <Compile Include="GUI\Widget.cs" />
-    <Compile Include="GUI\WidgetButton.cs" />
-    <Compile Include="GUI\WidgetFactory.cs" />
-    <Compile Include="GUI\WidgetImage.cs" />
-    <Compile Include="GUI\WidgetLabel.cs" />
-    <Compile Include="GUI\WidgetList.cs" />
-    <Compile Include="GUI\WidgetScrollBar.cs" />
-    <Compile Include="GUI\WidgetTileEditor.cs" />
-    <Compile Include="GUI\WidgetWindow.cs" />
+    <Compile Include="GUI\Border.cs" />
+    <Compile Include="GUI\EasyStruct.cs" />
+    <Compile Include="GUI\Enums.cs" />
+    <Compile Include="GUI\Gadget.cs" />
+    <Compile Include="GUI\Image.cs" />
+    <Compile Include="GUI\IntuiMessage.cs" />
+    <Compile Include="GUI\IntuiText.cs" />
+    <Compile Include="GUI\Intuition.cs" />
+    <Compile Include="GUI\NewWindow.cs" />
+    <Compile Include="GUI\PropInfo.cs" />
+    <Compile Include="GUI\Requester.cs" />
+    <Compile Include="GUI\StringInfo.cs" />
+    <Compile Include="GUI\Window.cs" />
     <Compile Include="Input\BasicInput.cs" />
     <Compile Include="Input\IInput.cs" />
+    <Compile Include="Input\KeyEventArgs.cs" />
     <Compile Include="Input\MouseEventArgs.cs" />
     <Compile Include="Loaders\AbstractLoader.cs" />
     <Compile Include="Loaders\ILoader.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Savers\XmlSaver.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
     <Compile Include="Screens\ExitScreen.cs" />
+    <Compile Include="Screens\IntuiTestScreen.cs" />
     <Compile Include="Screens\IScreen.cs" />
     <Compile Include="Screens\LoadScreen.cs" />
     <Compile Include="Screens\MapScreen.cs" />
@@ -102,6 +104,15 @@
     <Compile Include="Screens\SplashScreen.cs" />
     <Compile Include="Screens\TextTitleScreen.cs" />
     <Compile Include="Screens\TitleScreen.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

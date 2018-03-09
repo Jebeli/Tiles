@@ -43,6 +43,10 @@ namespace TileEngine.Input
 
         public event EventHandler<MouseEventArgs> OnMouseMove;
 
+        public event EventHandler<KeyEventArgs> OnKeyDown;
+
+        public event EventHandler<KeyEventArgs> OnKeyUp;
+
         public void MouseDown(int screenX, int screenY, MouseButton button)
         {
             OnMouseDown?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
@@ -62,6 +66,21 @@ namespace TileEngine.Input
         {
             OnMouseWheel?.Invoke(this, CreateMouseEventArgs(screenX, screenY, delta));
         }
+
+        public void KeyDown(Key key)
+        {
+            OnKeyDown?.Invoke(this, CreateKeyEventArgs(key, (char)0));
+        }
+        public void KeyUp(Key key)
+        {
+            OnKeyUp?.Invoke(this, CreateKeyEventArgs(key, (char)0));
+        }
+
+        private KeyEventArgs CreateKeyEventArgs(Key data, char code)
+        {
+            return new KeyEventArgs(data, code);
+        }
+
 
         private MouseEventArgs CreateMouseEventArgs(int screenX, int screenY, MouseButton button)
         {

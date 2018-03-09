@@ -78,6 +78,9 @@ namespace TileEngine.Graphics
             set { debugOptions = value; }
         }
 
+        public abstract void SetTarget(Texture tex);
+        public abstract void ClearTarget();
+
         public void BeginFrame()
         {
             frameId++;
@@ -119,6 +122,21 @@ namespace TileEngine.Graphics
                     textureRegion.Height);
         }
 
+        public void Render(Texture texture, int x, int y, int trans)
+        {
+            if (texture != null)
+                Render(texture,
+                    x,
+                    y,
+                    texture.Width,
+                    texture.Height,
+                    0,
+                    0,
+                    texture.Width,
+                    texture.Height,
+                    trans);
+        }
+
         public void Render(TextureRegion textureRegion, int x, int y, int width, int height)
         {
             if (textureRegion != null)
@@ -133,10 +151,13 @@ namespace TileEngine.Graphics
                     textureRegion.Height);
         }
 
-        public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight);
+        public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans=0);
         public abstract void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        public abstract int MeasureTextWidth(string text);
         public abstract void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
-
+        public abstract void DrawRectangle(int x, int y, int width, int height, Color color);
+        public abstract void FillRectangle(int x, int y, int width, int height, Color color);
+        public abstract void DrawLine(int x1, int y1, int x2, int y2, Color color);
         public abstract void DrawText(string text, int x, int y);
         public abstract void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         public abstract void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);

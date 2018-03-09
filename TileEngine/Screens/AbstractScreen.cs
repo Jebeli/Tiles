@@ -21,8 +21,8 @@ namespace TileEngine.Screens
     using Logging;
     using Core;
     using Input;
-    using GUI;
     using System.Collections.Generic;
+    using GUI;
 
     public abstract class AbstractScreen : NamedObject, IScreen
     {
@@ -31,40 +31,33 @@ namespace TileEngine.Screens
         protected Engine engine;
         private static readonly float[] scales = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f };
         private int scaleIndex = 9;
-        private List<Widget> widgets;
+        private List<Window> windows;
+        private Window activeWindow;
 
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
             this.engine = engine;
-            widgets = new List<Widget>();
+            windows = new List<Window>();
+        }
+        public IList<Window> Windows
+        {
+            get { return windows; }
         }
 
-        public IList<Widget> Widgets
+        public Window ActiveWindow
         {
-            get { return widgets; }
+            get { return activeWindow; }
+            set { activeWindow = value; }
         }
 
-        public void AddWidget(Widget w)
-        {
-            widgets.Add(w);
-        }
-
-        public void RemoveWidget(Widget w)
-        {
-            widgets.Remove(w);
-        }
-
-        public void ClearWidgets()
-        {
-            widgets.Clear();
-        }
         public virtual void Show()
         {
             Logger.Info("Screen", $"Showing Screen {Name}");
             startTime = engine.GetCurrentTime();
             rendered = false;
             LinkInput();
+            Intuition.ActivateWindow(activeWindow);
         }
 
         public virtual void Hide()
@@ -76,7 +69,6 @@ namespace TileEngine.Screens
 
         public virtual void Update(TimeInfo time)
         {
-            Widget.CheckRepeatWidget(time.TotalGameTime);
         }
 
         public virtual void Render(TimeInfo time)
@@ -86,18 +78,15 @@ namespace TileEngine.Screens
                 Logger.Info("Screen", $"Rendering Screen {Name}");
             }
             rendered = true;
-            RenderWidgets();
         }
 
-        protected void RenderWidgets()
+        protected virtual void OnKeyDown(Key keyData, Key keyCode, char code)
         {
-            foreach (var w in widgets)
-            {
-                if (w.Visible)
-                {
-                    w.Render(engine.Graphics);
-                }
-            }
+            Intuition.KeyDown(keyData, code);
+        }
+        protected virtual void OnKeyUp(Key keyData, Key keyCode, char code)
+        {
+            Intuition.KeyUp(keyData, code);
         }
 
         protected virtual void OnMouseWheel(float x, float y, int delta)
@@ -113,54 +102,83 @@ namespace TileEngine.Screens
         }
         protected virtual bool OnMouseDown(float x, float y, MouseButton button)
         {
-            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
-            Widget.PressedWidget = widget;
-            if (Widget.CheckMouseDownWidget(widget, (int)x, (int)y, button))
-            {
-                return false;
-            }
+            Intuition.MouseDown((int)x, (int)y, button);
             return true;
         }
 
         protected virtual bool OnMouseUp(float x, float y, MouseButton button)
         {
-            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
-            if (Widget.CheckClickWidget(widget, (int)x, (int)y, button))
-            {
-                Widget.PressedWidget = null;
-                OnWidgetClick(widget);
-                return false;
-
-            }
-            Widget.PressedWidget = null;
+            Intuition.MouseUp((int)x, (int)y, button);
             return true;
         }
         protected virtual void OnMouseMove(float x, float y, MouseButton button)
         {
-            Widget widget = Widget.FindWidget(this, (int)x, (int)y);
-            Widget.HoverWidget = widget;
-            Widget.CheckMouseMoveWidget(widget, (int)x, (int)y, button);
+            Intuition.MouseMove((int)x, (int)y, button);
         }
 
-        protected virtual void OnWidgetClick(Widget widget)
+        protected virtual void OnIntuitionMessage(IntuiMessage message)
         {
-            Logger.Info("Widget", $"{widget} clicked");
+            switch (message.Message)
+            {
+                case IDCMPFlags.GADGETUP:
+                    OnGadgetClick(message.Gadget);
+                    break;
+                case IDCMPFlags.AUTOREQUEST:
+                    OnAutoRequest(message.Code);
+                    break;
+            }
+        }
+
+        protected virtual void OnGadgetClick(Gadget gadget)
+        {
+            Logger.Info("Screen", $"Gadget {gadget} Selected");
+        }
+
+        protected virtual void OnAutoRequest(int gadNum)
+        {
+            Logger.Info("Screen", $"Requester Gadget {gadNum} Selected");
+        }
+
+        protected static ValueTuple<WATags, object> Tag(WATags tag, object value)
+        {
+            return tag.T(value);
         }
 
         private void LinkInput()
         {
+            Intuition.Message += Intuition_Message;
             engine.Input.OnMouseDown += Input_OnMouseDown;
             engine.Input.OnMouseUp += Input_OnMouseUp;
             engine.Input.OnMouseMove += Input_OnMouseMove;
             engine.Input.OnMouseWheel += Input_OnMouseWheel;
+            engine.Input.OnKeyDown += Input_OnKeyDown;
+            engine.Input.OnKeyUp += Input_OnKeyUp;
         }
 
         private void UnlinkInput()
         {
+            Intuition.Message -= Intuition_Message;
             engine.Input.OnMouseDown -= Input_OnMouseDown;
             engine.Input.OnMouseUp -= Input_OnMouseUp;
             engine.Input.OnMouseMove -= Input_OnMouseMove;
             engine.Input.OnMouseWheel -= Input_OnMouseWheel;
+            engine.Input.OnKeyDown -= Input_OnKeyDown;
+            engine.Input.OnKeyUp -= Input_OnKeyUp;
+        }
+
+        private void Intuition_Message(object sender, IntuiMessage e)
+        {
+            OnIntuitionMessage(e);
+        }
+
+        private void Input_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            OnKeyUp(e.KeyData, e.KeyCode, e.Code);
+        }
+
+        private void Input_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            OnKeyDown(e.KeyData, e.KeyCode, e.Code);
         }
 
         private void Input_OnMouseMove(object sender, MouseEventArgs e)
