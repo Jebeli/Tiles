@@ -62,6 +62,7 @@ namespace TileEngine
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
             Intuition.Init(this);
+            GadTools.Init(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);

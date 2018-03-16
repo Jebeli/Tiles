@@ -28,7 +28,7 @@ namespace TileEngine.GUI
         private int bufferPos;
         public StringInfo(string buffer = "")
         {
-            Buffer = buffer;
+            Buffer = buffer ?? "";
             UndoBuffer = "";
             MaxChars = short.MaxValue;
             BufferPos = buffer.Length;

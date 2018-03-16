@@ -54,15 +54,15 @@ namespace TileEngine.Screens
             button3 = Gadget.MakeBoolGadget("Save", 64, 32);
             button3.SetPosition(5 + 64 * 2, 5);
             win1 = Intuition.OpenWindowTags(null,
-                Tag(WATags.WA_Left, 10),
-                Tag(WATags.WA_Top, 10),
-                Tag(WATags.WA_Width, 3 * 64 + 10),
-                Tag(WATags.WA_Height, 32 + 10),
-                Tag(WATags.WA_Flags, WindowFlags.WFLG_BORDERLESS),
-                Tag(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
-                Tag(WATags.WA_Gadgets, new[] { button1, button2, button3 }),
-                Tag(WATags.WA_Opacity, 170),
-                Tag(WATags.WA_Screen, this));
+                (Tags.WA_Left, 10),
+                (Tags.WA_Top, 10),
+                (Tags.WA_Width, 3 * 64 + 10),
+                (Tags.WA_Height, 32 + 10),
+                (Tags.WA_Flags, WindowFlags.WFLG_BORDERLESS),
+                (Tags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                (Tags.WA_Gadgets, new[] { button1, button2, button3 }),
+                (Tags.WA_Opacity, 170),
+                (Tags.WA_Screen, this));
         }
 
         private void CloseWindows()
@@ -128,32 +128,6 @@ namespace TileEngine.Screens
             }
         }
 
-        //protected override void OnWidgetClick(Widget widget)
-        //{
-        //    base.OnWidgetClick(widget);
-        //    if (button1 == widget)
-        //    {
-        //        engine.SwitchToTitleScreen();
-        //        //engine.Exit();
-        //    }
-        //    else if (button2 == widget)
-        //    {
-
-        //    }
-        //    else if (button3 == widget)
-        //    {
-        //        engine.SaveMap(engine.Map);
-        //        foreach (var layer in engine.Map.Layers)
-        //        {
-        //            engine.SaveTileSet(layer.TileSet);
-        //        }
-        //    }
-        //    else if (editor != null)
-        //    {
-        //        editor.HandleWidgetClick(widget);
-        //    }
-        //}
-
         protected override void OnGadgetClick(Gadget gadget)
         {
             base.OnGadgetClick(gadget);
@@ -163,7 +137,6 @@ namespace TileEngine.Screens
                 IntuiText body = new IntuiText("Return to the");
                 body.NextText = new IntuiText("Title Screen?");
                 Intuition.AutoRequest(win1, body, "Yes", "No", IDCMPFlags.GADGETUP, IDCMPFlags.GADGETUP, 200, 100);
-                //
             }
             else if (button2 == gadget)
             {

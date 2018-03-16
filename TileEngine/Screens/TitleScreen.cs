@@ -28,13 +28,16 @@ namespace TileEngine.Screens
 
     public class TitleScreen : TextTitleScreen
     {
+        private const int GADID_NEW = 100;
+        private const int GADID_CONT = 101;
+        private const int GADID_LOAD = 102;
+        private const int GADID_QUIT = 103;
+        private const int GADID_TEST = 104;
+        private const int buttonWidth = 128;
+        private const int buttonHeight = 30;
+        private List<Gadget> glist;
         private Window window;
 
-        private Gadget newButton;
-        private Gadget contButton;
-        private Gadget loadButton;
-        private Gadget exitButton;
-        private Gadget testButton;
         public TitleScreen(Engine engine)
             : base(engine, "TitleScreen", "TILES")
         {
@@ -43,29 +46,82 @@ namespace TileEngine.Screens
 
         private void MakeWindow()
         {
-            newButton = Gadget.MakeBoolGadget("New Game", 128, 30);
-            contButton = Gadget.MakeBoolGadget("Continue Game", 128, 30);
-            loadButton = Gadget.MakeBoolGadget("Load Game", 128, 30);
-            exitButton = Gadget.MakeBoolGadget("Quit Game", 128, 30);
-            testButton = Gadget.MakeBoolGadget("Intui Test", 128, 30);
-            newButton.SetPosition(100, 100);
-            contButton.SetPosition(100, 130);
-            loadButton.SetPosition(100, 160);
-            exitButton.SetPosition(100, 190);
-            testButton.SetPosition(100, 220);
+            int buttonLeft = 100;
+            int buttonTop = 100;
+            glist = new List<Gadget>();
+            var btnImage = Intuition.NewObject(Intuition.FRAMEICLASS,
+                (Tags.IA_Width, buttonWidth),
+                (Tags.IA_Height, buttonHeight),
+                (Tags.IA_EdgesOnly, false),
+                (Tags.IA_FrameType, FrameType.Button)
+                );
+            Intuition.NewObject(Intuition.FRBUTTONCLASS,
+                (Tags.GA_List, glist),
+                (Tags.GA_Left, buttonLeft),
+                (Tags.GA_Top, buttonTop),
+                (Tags.GA_Width, buttonWidth),
+                (Tags.GA_Height, buttonHeight),
+                (Tags.GA_Text, "New Game"),
+                (Tags.GA_ID,GADID_NEW),
+                (Tags.GA_Image, btnImage)
+                );
+            buttonTop += 40;
+            Intuition.NewObject(Intuition.FRBUTTONCLASS,
+                (Tags.GA_List, glist),
+                (Tags.GA_Left, buttonLeft),
+                (Tags.GA_Top, buttonTop),
+                (Tags.GA_Width, buttonWidth),
+                (Tags.GA_Height, buttonHeight),
+                (Tags.GA_Text, "Continue Game"),
+                (Tags.GA_ID, GADID_CONT),
+                (Tags.GA_Image, btnImage)
+                );
+            buttonTop += 40;
+            Intuition.NewObject(Intuition.FRBUTTONCLASS,
+                (Tags.GA_List, glist),
+                (Tags.GA_Left, buttonLeft),
+                (Tags.GA_Top, buttonTop),
+                (Tags.GA_Width, buttonWidth),
+                (Tags.GA_Height, buttonHeight),
+                (Tags.GA_Disabled,true),
+                (Tags.GA_Text, "Load Game"),
+                (Tags.GA_ID, GADID_LOAD),
+                (Tags.GA_Image, btnImage)
+                );
+            buttonTop += 40;
+            Intuition.NewObject(Intuition.FRBUTTONCLASS,
+                (Tags.GA_List, glist),
+                (Tags.GA_Left, buttonLeft),
+                (Tags.GA_Top, buttonTop),
+                (Tags.GA_Width, buttonWidth),
+                (Tags.GA_Height, buttonHeight),
+                (Tags.GA_Text, "Quit Game"),
+                (Tags.GA_ID, GADID_QUIT),
+                (Tags.GA_Image, btnImage)
+                );
+            buttonTop += 40;
+            Intuition.NewObject(Intuition.FRBUTTONCLASS,
+                (Tags.GA_List, glist),
+                (Tags.GA_Left, buttonLeft),
+                (Tags.GA_Top, buttonTop),
+                (Tags.GA_Width, buttonWidth),
+                (Tags.GA_Height, buttonHeight),
+                (Tags.GA_Text, "Intui Test"),
+                (Tags.GA_ID, GADID_TEST),
+                (Tags.GA_Image, btnImage)
+                );
 
             window = Intuition.OpenWindowTags(null,
-                Tag(WATags.WA_Left, 0),
-                Tag(WATags.WA_Top, 0),
-                Tag(WATags.WA_Width, engine.Graphics.ViewWidth),
-                Tag(WATags.WA_Height, engine.Graphics.ViewHeight),
-                Tag(WATags.WA_Flags, WindowFlags.WFLG_BORDERLESS | WindowFlags.WFLG_BACKDROP),
-                Tag(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
-                Tag(WATags.WA_Gadgets, new[] { newButton, contButton, loadButton, exitButton, testButton }),
-                Tag(WATags.WA_BackgroundColor, Color.Black),
-                Tag(WATags.WA_Screen, this));
+                (Tags.WA_Left, 0),
+                (Tags.WA_Top, 0),
+                (Tags.WA_Width, engine.Graphics.ViewWidth),
+                (Tags.WA_Height, engine.Graphics.ViewHeight),
+                (Tags.WA_Flags, WindowFlags.WFLG_BORDERLESS | WindowFlags.WFLG_BACKDROP),
+                (Tags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                (Tags.WA_Gadgets, glist),
+                (Tags.WA_BackgroundColor, Color.Black),
+                (Tags.WA_Screen, this));
 
-            Intuition.OffGadget(loadButton, window);
         }
 
         private void CloseWindow()
@@ -78,12 +134,12 @@ namespace TileEngine.Screens
             base.Update(time);
             window.SetWindowBox(0, engine.Graphics.ViewHeight / 2 + 75, engine.Graphics.ViewWidth, engine.Graphics.ViewHeight / 2 - 75);
             int y = 0;
-            int x = engine.Graphics.ViewWidth / 2 - newButton.Width / 2;
-            newButton.SetPosition(x, y);
-            contButton.SetPosition(x, y + 40);
-            loadButton.SetPosition(x, y + 80);
-            exitButton.SetPosition(x, y + 120);
-            testButton.SetPosition(x, y + 160);
+            int x = engine.Graphics.ViewWidth / 2 - buttonWidth / 2;
+            foreach(var gad in glist)
+            {
+                gad.Set((Tags.GA_Left,x),(Tags.GA_Top,y));
+                y += 40;
+            }
         }
 
         public override void Render(TimeInfo time)
@@ -94,25 +150,23 @@ namespace TileEngine.Screens
         protected override void OnGadgetClick(Gadget gadget)
         {
             base.OnGadgetClick(gadget);
-            if (gadget == exitButton)
+            switch (gadget.GadgetId)
             {
-                engine.SwitchToExitScreen();
-            }
-            else if (gadget == loadButton)
-            {
-                engine.SwitchToLoadScreen();
-            }
-            else if (gadget == contButton)
-            {
-                engine.SwitchToLoadScreen();
-            }
-            else if (gadget == newButton)
-            {
-                engine.SwitchToLoadScreen();
-            }
-            else if (gadget == testButton)
-            {
-                engine.SwitchToTestScreen();
+                case GADID_QUIT:
+                    engine.SwitchToExitScreen();
+                    break;
+                case GADID_LOAD:
+                    engine.SwitchToLoadScreen();
+                    break;
+                case GADID_CONT:
+                    engine.SwitchToLoadScreen();
+                    break;
+                case GADID_NEW:
+                    engine.SwitchToLoadScreen();
+                    break;
+                case GADID_TEST:
+                    engine.SwitchToTestScreen();
+                    break;
             }
         }
 

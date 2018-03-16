@@ -117,20 +117,23 @@ namespace MONOTiles
         {
             List<Keys> pressedKeys = new List<Keys>(ks.GetPressedKeys());
             List<Keys> copyDownKeys = new List<Keys>(downKeys);
+            bool shift = ks.IsKeyDown(Keys.LeftShift) || ks.IsKeyDown(Keys.RightShift);
+            Key baseKey = Key.None;
+            if (shift) { baseKey = Key.Shift; }
             foreach (Keys k in copyDownKeys)
             {
                 if (!pressedKeys.Contains(k))
                 {
-                    downKeys.Remove(k);
-                    engine.Input.KeyUp((Key)k);
+                    downKeys.Remove(k);                                        
+                    engine.Input.KeyUp(baseKey | (Key)k);
                 }
             }
             foreach (Keys k in pressedKeys)
             {
                 if (!downKeys.Contains(k))
                 {
-                    downKeys.Add(k);
-                    engine.Input.KeyDown((Key)k);
+                    downKeys.Add(k);                    
+                    engine.Input.KeyDown(baseKey | (Key)k);
                 }
             }
         }

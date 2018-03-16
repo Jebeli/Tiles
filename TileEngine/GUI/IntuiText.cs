@@ -30,6 +30,8 @@ namespace TileEngine.GUI
         private Color backPen;
         private int leftEdge;
         private int topEdge;
+        private int width;
+        private int height;
         private string itext;
         private HorizontalTextAlign horizontalTextAlign;
         private VerticalTextAlign verticalTextAlign;
@@ -66,6 +68,18 @@ namespace TileEngine.GUI
         {
             get { return topEdge; }
             set { topEdge = value; }
+        }
+
+        public int Width
+        {
+            get { return width; }
+            set { width = value; }
+        }
+
+        public int Height
+        {
+            get { return height; }
+            set { height = value; }
         }
 
         public string IText

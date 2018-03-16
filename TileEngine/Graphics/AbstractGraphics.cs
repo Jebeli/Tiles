@@ -105,6 +105,8 @@ namespace TileEngine.Graphics
             viewWidth = (int)(width * viewScale);
             viewHeight = (int)(height * viewScale);
         }
+        public abstract void SetClip(int x, int y, int width, int height);
+        public abstract void ClearClip();    
         public abstract void ClearScreen();
         public abstract void ClearScreen(Color color);
         public abstract void DrawTextures(Texture texture, int[] vertices, int offset, int count);

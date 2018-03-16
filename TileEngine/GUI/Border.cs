@@ -37,24 +37,51 @@ namespace TileEngine.GUI
         {
             xy = new List<int>();
         }
-        public Border(int width, int height)
+        public Border(int width, int height, bool selected = false)
         {
             xy = new List<int>();
+            frontPen = Color.Black;
             xy.Add(0);
-            xy.Add(height - 1);
+            xy.Add(0);
+            xy.Add(width);
+            xy.Add(0);
+            xy.Add(width);
+            xy.Add(height);
+            xy.Add(0);
+            xy.Add(height);
             xy.Add(0);
             xy.Add(0);
-            xy.Add(width - 1);
-            xy.Add(0);
-            frontPen = Intuition.ColorLightEdge;
             nextBorder = new Border();
-            nextBorder.xy.Add(width - 1);
-            nextBorder.xy.Add(0);
-            nextBorder.xy.Add(width - 1);
-            nextBorder.xy.Add(height - 1);
-            nextBorder.xy.Add(0);
-            nextBorder.xy.Add(height - 1);
-            nextBorder.frontPen = Intuition.ColorDarkEdge;
+            nextBorder.xy.Add(width - 2);
+            nextBorder.xy.Add(1);
+            nextBorder.xy.Add(1);
+            nextBorder.xy.Add(1);
+            nextBorder.xy.Add(1);
+            nextBorder.xy.Add(height - 2);
+            nextBorder.frontPen = selected ? Intuition.ColorDarkEdge : Intuition.ColorLightEdge;
+            nextBorder.nextBorder = new Border();
+            nextBorder.nextBorder.xy.Add(width - 1);
+            nextBorder.nextBorder.xy.Add(2);
+            nextBorder.nextBorder.xy.Add(width - 1);
+            nextBorder.nextBorder.xy.Add(height - 1);
+            nextBorder.nextBorder.xy.Add(2);
+            nextBorder.nextBorder.xy.Add(height - 1);
+            nextBorder.nextBorder.frontPen = selected ? Intuition.ColorLightEdge : Intuition.ColorDarkEdge;
+
+            nextBorder.nextBorder.nextBorder = new Border();
+            nextBorder.nextBorder.nextBorder.xy.Add(width - 1);
+            nextBorder.nextBorder.nextBorder.xy.Add(1);
+            nextBorder.nextBorder.nextBorder.xy.Add(width - 1);
+            nextBorder.nextBorder.nextBorder.xy.Add(1);
+            nextBorder.nextBorder.nextBorder.frontPen = Intuition.ColorMidEdge;
+
+            nextBorder.nextBorder.nextBorder.nextBorder = new Border();
+            nextBorder.nextBorder.nextBorder.nextBorder.xy.Add(1);
+            nextBorder.nextBorder.nextBorder.nextBorder.xy.Add(height - 1);
+            nextBorder.nextBorder.nextBorder.nextBorder.xy.Add(1);
+            nextBorder.nextBorder.nextBorder.nextBorder.xy.Add(height - 1);
+            nextBorder.nextBorder.nextBorder.nextBorder.frontPen = Intuition.ColorMidEdge;
+
         }
 
         public Color FrontPen

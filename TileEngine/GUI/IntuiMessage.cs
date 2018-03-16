@@ -26,13 +26,15 @@ namespace TileEngine.GUI
     public class IntuiMessage : EventArgs
     {
         private readonly IDCMPFlags message;
-        private readonly Gadget gadget;
-        private readonly int code;
+        private Gadget gadget;
+        private Window window;
+        private int code;
 
         public IntuiMessage(IDCMPFlags msg, Gadget gad, int code)
         {
             message = msg;
             gadget = gad;
+            window = gad?.Window;
             this.code = code;
         }
 
@@ -44,11 +46,23 @@ namespace TileEngine.GUI
         public Gadget Gadget
         {
             get { return gadget; }
+            internal set
+            {
+                gadget = value;
+                window = gadget?.Window;
+            }
+        }
+
+        public Window Window
+        {
+            get { return window; }
+            internal set { window = value; }
         }
 
         public int Code
         {
             get { return code; }
+            internal set { code = value; }
         }
     }
 }

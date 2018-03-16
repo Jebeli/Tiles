@@ -70,50 +70,89 @@ namespace TileEngine.Input
         public char KeyCodeToChar(Key keys)
         {
             char c = (char)0;
-            Key modifier = (Key)((int)keys & (int)Key.Modifiers);
-            Key code = (Key)((int)keys & (int)Key.KeyCode);
-            switch (code)
+            Key modifier = keys & Key.Modifiers;
+            Key code = keys & Key.KeyCode;
+            if (code != Key.None)
             {
-                case Key.A:
-                case Key.B:
-                case Key.C:
-                case Key.D:
-                case Key.E:
-                case Key.F:
-                case Key.G:
-                case Key.H:
-                case Key.I:
-                case Key.J:
-                case Key.K:
-                case Key.L:
-                case Key.M:
-                case Key.N:
-                case Key.O:
-                case Key.P:
-                case Key.Q:
-                case Key.R:
-                case Key.S:
-                case Key.T:
-                case Key.U:
-                case Key.V:
-                case Key.W:
-                case Key.X:
-                case Key.Y:
-                case Key.Z:
-                    c = (char)code;
-                    if ((modifier & Key.Shift) == Key.Shift)
-                    {
-                        c = char.ToUpper(c);
-                    }
-                    else
-                    {
-                        c = char.ToLower(c);
-                    }
-                    break;
-                case Key.Escape:
-                case Key.Space:
-                    c = (char)code;
-                    break;
+                switch (code)
+                {
+                    case Key.A:
+                    case Key.B:
+                    case Key.C:
+                    case Key.D:
+                    case Key.E:
+                    case Key.F:
+                    case Key.G:
+                    case Key.H:
+                    case Key.I:
+                    case Key.J:
+                    case Key.K:
+                    case Key.L:
+                    case Key.M:
+                    case Key.N:
+                    case Key.O:
+                    case Key.P:
+                    case Key.Q:
+                    case Key.R:
+                    case Key.S:
+                    case Key.T:
+                    case Key.U:
+                    case Key.V:
+                    case Key.W:
+                    case Key.X:
+                    case Key.Y:
+                    case Key.Z:
+                        c = (char)code;
+                        if ((modifier & Key.Shift) == Key.Shift)
+                        {
+                            c = char.ToUpper(c);
+                        }
+                        else
+                        {
+                            c = char.ToLower(c);
+                        }
+                        break;
+                    case Key.Escape:
+                    case Key.Space:
+                        c = (char)code;
+                        break;
+                    case Key.D0:
+                        c = '0';
+                        break;
+                    case Key.D1:
+                        c = '1';
+                        break;
+                    case Key.D2:
+                        c = '2';
+                        break;
+                    case Key.D3:
+                        c = '3';
+                        break;
+                    case Key.D4:
+                        c = '4';
+                        break;
+                    case Key.D5:
+                        c = '5';
+                        break;
+                    case Key.D6:
+                        c = '6';
+                        break;
+                    case Key.D7:
+                        c = '7';
+                        break;
+                    case Key.D8:
+                        c = '8';
+                        break;
+                    case Key.D9:
+                        c = '9';
+                        break;
+                    case Key.OemMinus:
+                        c = '-';
+                        break;
+                    case Key.Oemplus:
+                        c = '+';
+                        break;
+                }
             }
             return c;
         }

@@ -27,6 +27,7 @@ namespace TileEngine.Input
         Middle = 4
     }
 
+    [Flags]
     public enum Key
     {
         //

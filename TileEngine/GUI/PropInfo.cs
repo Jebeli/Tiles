@@ -62,10 +62,12 @@ namespace TileEngine.GUI
         public int VertPot
         {
             get { return vertPot; }
-            set {
+            set
+            {
                 if (value > 0xFFFF) value = 0xFFFF;
                 if (value < 0) value = 0;
-                vertPot = value; }
+                vertPot = value;
+            }
         }
 
         public int HorizBody
@@ -114,6 +116,15 @@ namespace TileEngine.GUI
         {
             get { return topBorder; }
             set { topBorder = value; }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Flags);
+            sb.Append(" ");
+            sb.Append($"{HorizPot}/{HorizBody} {VertPot}/{VertBody}");
+            return sb.ToString();
         }
 
     }

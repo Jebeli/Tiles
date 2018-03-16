@@ -28,7 +28,14 @@ namespace TileEngine.Screens
         void Hide();
         void Update(TimeInfo time);
         void Render(TimeInfo time);
-        IList<Window> Windows { get; }
+        IEnumerable<Window> Windows { get; }
         Window ActiveWindow { get; set; }
+        void RemoveWindow(Window window);
+        void AddWindow(Window window);
+        void WindowToFront(Window window);
+        void WindowToBack(Window window);
+        int Width { get; }
+        int Height { get; }
+        DrawInfo GetDrawInfo();
     }
 }

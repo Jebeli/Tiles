@@ -52,6 +52,8 @@ namespace TileEngine.Graphics
         void EndFrame();
         void SetSize(int width, int height);
         void SetScale(float scale);
+        void SetClip(int x, int y, int width, int height);
+        void ClearClip();
         void ClearScreen();
         void ClearScreen(Color color);
         void DrawTextures(Texture texture, int[] vertices, int offset, int count);

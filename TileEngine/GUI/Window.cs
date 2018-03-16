@@ -44,6 +44,7 @@ namespace TileEngine.GUI
         private int borderRight;
         private int borderBottom;
         private WindowFlags flags;
+        private MoreWindowFlags moreFlags;
         private IDCMPFlags idcmpflags;
         private string title;
         private List<Gadget> gadgets = new List<Gadget>();
@@ -64,6 +65,7 @@ namespace TileEngine.GUI
         {
             this.engine = engine;
             opacity = 255;
+            HoverOpacity = 255;
             screen = nw.Screen;
             leftEdge = nw.LeftEdge;
             topEdge = nw.TopEdge;
@@ -90,11 +92,13 @@ namespace TileEngine.GUI
                 {
                     if (HasFlag(WindowFlags.WFLG_SIZEBRIGHT))
                     {
-                        borderRight += 10;
+                        if (borderRight < 18)
+                            borderRight = 18;
                     }
                     if (HasFlag(WindowFlags.WFLG_SIZEBBOTTOM))
                     {
-                        borderBottom += 10;
+                        if (borderBottom < 18)
+                            borderBottom = 18;
                     }
                 }
                 if (HasFlag(WindowFlags.WFLG_CLOSEGADGET | WindowFlags.WFLG_DRAGBAR | WindowFlags.WFLG_DEPTHGADGET | WindowFlags.WFLG_HASZOOM))
@@ -109,6 +113,16 @@ namespace TileEngine.GUI
         {
             get { return opacity; }
             set { opacity = value; }
+        }
+
+        public int HoverOpacity { get; set; }
+
+        public int RenderTransparency
+        {
+            get
+            {
+                return (moreFlags & MoreWindowFlags.WFLG_HOVER) == MoreWindowFlags.WFLG_HOVER ? 255 - HoverOpacity : 255 - opacity;
+            }
         }
 
         public Texture Bitmap
@@ -126,6 +140,26 @@ namespace TileEngine.GUI
         {
             get { return fgColor; }
             set { fgColor = value; }
+        }
+
+        internal bool IsTopMostWindow
+        {
+            get
+            {
+                if (screen != null)
+                {
+                    return screen.Windows.LastOrDefault() == this;
+                }
+                return false;
+            }
+        }
+
+        internal void Close()
+        {
+            if (screen != null) screen.RemoveWindow(this);
+            bitmap?.Dispose();
+            bitmap = null;
+            valid = true;
         }
         private void InitBitmap()
         {
@@ -208,6 +242,12 @@ namespace TileEngine.GUI
         {
             get { return flags; }
             set { flags = value; }
+        }
+
+        public MoreWindowFlags MoreFlags
+        {
+            get { return moreFlags; }
+            set { moreFlags = value; }
         }
 
         public IDCMPFlags IDCMPFlags
@@ -311,6 +351,16 @@ namespace TileEngine.GUI
         public int BorderBottom
         {
             get { return borderBottom; }
+        }
+
+        public int InnerWidth
+        {
+            get { return Width - BorderLeft - BorderRight; }
+        }
+
+        public int InnerHeight
+        {
+            get { return Height - BorderTop - BorderBottom; }
         }
 
         public bool Valid
@@ -458,6 +508,11 @@ namespace TileEngine.GUI
                 count++;
             }
             return result;
+        }
+
+        public override string ToString()
+        {
+            return $"Window {title}";
         }
     }
 }

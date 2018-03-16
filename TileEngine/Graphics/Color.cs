@@ -95,6 +95,10 @@ namespace TileEngine.Graphics
         {
             get { return new Color(105, 105, 105); }
         }
+        public static Color DarkGray
+        {
+            get { return new Color(50, 50, 50); }
+        }
 
         public static Color Gray
         {
@@ -104,6 +108,12 @@ namespace TileEngine.Graphics
         {
             get { return new Color(211, 211, 211); }
         }
+
+        public static Color BrightGray
+        {
+            get { return new Color(232, 232, 232); }
+        }
+
         public static Color WhiteSmoke
         {
             get { return new Color(245, 245, 245); }

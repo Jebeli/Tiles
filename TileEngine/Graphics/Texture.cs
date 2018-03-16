@@ -34,5 +34,9 @@ namespace TileEngine.Graphics
             return new TextureRegion(this, clipX, clipY, clipW, clipH, offsetX, offsetY);
         }
 
+        public TextureRegion GetRegion()
+        {
+            return new TextureRegion(this, 0, 0, Width, Height, 0, 0);
+        }
     }
 }

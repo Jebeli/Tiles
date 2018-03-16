@@ -49,14 +49,21 @@ namespace GDITiles
         public override void SetTarget(Texture tex)
         {
             var currentView = tex.GetBitmap();
-            oldGfx = gfx;
-            gfx = System.Drawing.Graphics.FromImage(currentView);
+            if (currentView != null)
+            {
+                oldGfx = gfx;
+                gfx = System.Drawing.Graphics.FromImage(currentView);
+            }
         }
 
         public override void ClearTarget()
         {
-            gfx.Dispose();
-            gfx = oldGfx;
+            if (oldGfx != null)
+            {
+                gfx.Dispose();
+                gfx = oldGfx;
+                oldGfx = null;
+            }
         }
 
 
@@ -75,6 +82,16 @@ namespace GDITiles
                 gfx.Clear(color.GetColor());
             }
         }
+
+        public override void SetClip(int x, int y, int width, int height)
+        {
+
+        }
+
+        public override void ClearClip()
+        {            
+        }
+
 
         public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)
         {

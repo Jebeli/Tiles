@@ -23,6 +23,7 @@ namespace TileEngine.Screens
     using Input;
     using System.Collections.Generic;
     using GUI;
+    using TileEngine.Graphics;
 
     public abstract class AbstractScreen : NamedObject, IScreen
     {
@@ -33,14 +34,35 @@ namespace TileEngine.Screens
         private int scaleIndex = 9;
         private List<Window> windows;
         private Window activeWindow;
+        private DrawInfo drawInfo;
 
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
             this.engine = engine;
             windows = new List<Window>();
+            drawInfo = new DrawInfo()
+            {
+                DetailPen = Color.Black,
+                BlockPen = Color.White,
+                TextPen = Color.Black,
+                ShinePen = Color.BrightGray,
+                ShadowPen = Color.DarkGray,
+                FillPen = new Color(62, 92, 154),
+                FillTextPen = Color.Black,
+                BackgoundPen = Color.Gray,
+                HighlightTextPen = Color.White,
+                HoverShinePen = Color.BrightGray,
+                HoverShadowPen = Color.DarkGray,
+                HoverBackgroundPen = new Color(62 + 20, 92 + 20, 154 + 20),
+                InactiveHoverBackgroundPen = new Color(210, 210, 210),
+                DisabledTextPen = new Color(32, 32, 32, 128),
+                PropClearPen = new Color(128, 128, 128),
+                Width = Width,
+                Height = Height
+            };
         }
-        public IList<Window> Windows
+        public IEnumerable<Window> Windows
         {
             get { return windows; }
         }
@@ -49,6 +71,52 @@ namespace TileEngine.Screens
         {
             get { return activeWindow; }
             set { activeWindow = value; }
+        }
+        public int Width { get { return engine.Graphics.ViewWidth; } }
+        public int Height { get { return engine.Graphics.ViewHeight; } }
+
+        public void RemoveWindow(Window window)
+        {
+            Logger.Info("Screen", $"Remove Window \"{window}\"");
+            if (activeWindow == window) { activeWindow = null; }
+            windows.Remove(window);
+            if (windows.Count > 0)
+            {
+                Intuition.ActivateWindow(windows[windows.Count - 1]);
+            }
+        }
+        public void AddWindow(Window window)
+        {
+            Logger.Info("Screen", $"Add Window \"{window}\"");
+            windows.Add(window);
+        }
+        public void WindowToFront(Window window)
+        {
+            if (windows.Remove(window))
+            {
+                windows.Add(window);
+            }
+        }
+        public void WindowToBack(Window window)
+        {
+            if (windows.Remove(window))
+            {
+                for (int i = 0; i < windows.Count; i++)
+                {
+                    if (!windows[i].HasFlag(WindowFlags.WFLG_BACKDROP))
+                    {
+                        windows.Insert(i, window);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public DrawInfo GetDrawInfo()
+        {
+            drawInfo.Width = Width;
+            drawInfo.Height = Height;
+            return drawInfo;
         }
 
         public virtual void Show()
@@ -89,6 +157,14 @@ namespace TileEngine.Screens
             Intuition.KeyUp(keyData, code);
         }
 
+        protected void InvalidateAllWindows()
+        {
+            foreach (var win in windows)
+            {
+                win.Invalidate();
+            }
+        }
+
         protected virtual void OnMouseWheel(float x, float y, int delta)
         {
             if (delta > 0)
@@ -126,22 +202,25 @@ namespace TileEngine.Screens
                 case IDCMPFlags.AUTOREQUEST:
                     OnAutoRequest(message.Code);
                     break;
+                case IDCMPFlags.CLOSEWINDOW:
+                    OnCloseWindow(message.Window);
+                    break;
             }
+        }
+
+        protected virtual void OnCloseWindow(Window window)
+        {
+            Logger.Info("Screen", $"Close Window \"{window}\" selected");
         }
 
         protected virtual void OnGadgetClick(Gadget gadget)
         {
-            Logger.Info("Screen", $"Gadget {gadget} Selected");
+            Logger.Info("Screen", $"Gadget \"{gadget}\" selected");
         }
 
         protected virtual void OnAutoRequest(int gadNum)
         {
-            Logger.Info("Screen", $"Requester Gadget {gadNum} Selected");
-        }
-
-        protected static ValueTuple<WATags, object> Tag(WATags tag, object value)
-        {
-            return tag.T(value);
+            Logger.Info("Screen", $"Requester Gadget {gadNum} selected");
         }
 
         private void LinkInput()
@@ -204,6 +283,7 @@ namespace TileEngine.Screens
         {
             scaleIndex++;
             if (scaleIndex >= scales.Length) scaleIndex = scales.Length - 1;
+            InvalidateAllWindows();
             engine.SetViewScale(scales[scaleIndex]);
         }
 
@@ -211,6 +291,7 @@ namespace TileEngine.Screens
         {
             scaleIndex--;
             if (scaleIndex < 0) scaleIndex = 0;
+            InvalidateAllWindows();
             engine.SetViewScale(scales[scaleIndex]);
         }
     }

@@ -29,10 +29,12 @@ namespace MONOTiles
         private MONOGame game;
         private Microsoft.Xna.Framework.Graphics.RenderTarget2D view;
         private ExtendedSpriteBatch batch;
+        private Microsoft.Xna.Framework.Graphics.RasterizerState rasterizeState;
         public MONOGraphics(MONOGame game, int width, int height, DebugOptions debugOptions = null)
             : base(width, height, debugOptions)
         {
             this.game = game;
+            rasterizeState = new Microsoft.Xna.Framework.Graphics.RasterizerState() { ScissorTestEnable = true };
         }
 
         public override void SetTarget(Texture tex)
@@ -93,6 +95,27 @@ namespace MONOTiles
         {
             game.GraphicsDevice.Clear(Microsoft.Xna.Framework.Graphics.ClearOptions.Target, Microsoft.Xna.Framework.Color.Transparent, 1.0f, 0);
             game.GraphicsDevice.Clear(color.GetColor());
+        }
+
+        public override void SetClip(int x, int y, int width, int height)
+        {
+            batch.End();
+            batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
+                Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
+                Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
+                Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
+                rasterizeState);
+            game.GraphicsDevice.ScissorRectangle = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+        }
+
+        public override void ClearClip()
+        {
+            batch.End();
+            batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
+                Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
+                Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
+                Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
+                Microsoft.Xna.Framework.Graphics.RasterizerState.CullCounterClockwise);
         }
 
         public override void DrawTextures(Texture texture, int[] vertices, int offset, int count)

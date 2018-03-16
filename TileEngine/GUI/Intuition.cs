@@ -25,60 +25,73 @@ namespace TileEngine.GUI
     using TileEngine.Core;
     using TileEngine.Graphics;
     using TileEngine.Input;
+    using TileEngine.Logging;
     using TileEngine.Screens;
 
     public static class Intuition
     {
 
+        public const string ROOTCLASS = "rootclass";
+        public const string IMAGECLASS = "imageclass";
+        public const string FRAMEICLASS = "frameiclass";
+        public const string SYSICLASS = "sysiclass";
+        public const string FILLRECTCLASS = "fillrectclass";
+        public const string ITEXTICLASS = "itexticlass";
+        public const string GADGETCLASS = "gadgetclass";
+        public const string PROPGCLASS = "propgclass";
+        public const string STRGCLASS = "strgclass";
+        public const string BUTTONGCLASS = "buttongclass";
+        public const string FRBUTTONCLASS = "frbuttonclass";
+        public const string GROUPGCLASS = "groupgclass";
+        public const string ICCLASS = "icclass";
+        public const string MODELCLASS = "modelclass";
+
         private static Engine engine;
         private static IScreen Screen { get { return engine.Screen; } }
         private static Window activeWindow;
+        private static Window hoverWindow;
+
         private static Gadget activeGadget;
         private static Gadget selectedGadget;
+        private static Gadget hoverGadget;
+
         private static int mouseStartX;
         private static int mouseStartY;
+        private static int propStartX;
+        private static int propStartY;
         private static Color colorText = Color.Black;
         private static Color colorActive = new Color(62, 92, 154);
         private static Color colorInactive = Color.Gray;
-        private static Color colorDarkEdge = Color.Black;
+        private static Color colorDarkEdge = new Color(64, 64, 64);
         private static Color colorLightEdge = Color.White;
-        private static Color colorWindow = Color.DimGray;
-        private static TimeSpan blinkDuration = TimeSpan.FromMilliseconds(666);
-        private static TimeSpan lastBlink;
-        private static bool cursorBlink;
-        private static Image sizeNormal;
-        private static Image sizeSelected;
-        private static Image closeNormal;
-        private static Image closeSelected;
-        private static Image depthNormal;
-        private static Image depthSelected;
-        private static Image zoomNormal;
-        private static Image zoomSelected;
-        private static Image titleNormal;
-        private static Image titleSelected;
-        private static NinePatch button9P;
-        private static NinePatch button9PS;
+        private static Color colorMidEdge = new Color(128, 128, 128);
+        private static Color colorWindow = new Color(128, 128, 128);
+        private static TimeSpan tickDuration = TimeSpan.FromMilliseconds(100);
+        private static TimeSpan lastTick;
         private static AutoRequestPositionMode autoRequestPositionMode;
+        private static bool moveActiveWindowToFront;
+        private static List<IClass> classes = new List<IClass>();
 
         public static event EventHandler<IntuiMessage> Message;
 
         private static void OnMessage(Gadget gadget, IDCMPFlags msg, int code = 0)
         {
-            OnMessage(gadget.Window, new IntuiMessage(msg, gadget, code));
+            OnMessage(gadget?.Window, new IntuiMessage(msg, gadget, code));
         }
 
         private static void OnMessage(Window window, IDCMPFlags msg, int code = 0)
         {
-            if ((window.IDCMPFlags & msg) == msg)
+            if ((window != null) && (window.IDCMPFlags & msg) == msg)
             {
                 OnMessage(window, new IntuiMessage(msg, null, code));
             }
         }
         private static void OnMessage(Window window, IntuiMessage msg)
         {
-            if ((window.IDCMPFlags & msg.Message) == msg.Message)
+            if ((window != null) && (window.IDCMPFlags & msg.Message) == msg.Message)
             {
                 Message?.Invoke(window, msg);
+
             }
         }
 
@@ -86,6 +99,12 @@ namespace TileEngine.GUI
         {
             get { return autoRequestPositionMode; }
             set { autoRequestPositionMode = value; }
+        }
+
+        public static bool MoveActiveWindowToFront
+        {
+            get { return moveActiveWindowToFront; }
+            set { moveActiveWindowToFront = value; }
         }
 
         public static Color ColorText
@@ -112,175 +131,139 @@ namespace TileEngine.GUI
             set { colorLightEdge = value; }
         }
 
+        public static Color ColorMidEdge
+        {
+            get { return colorMidEdge; }
+            set { colorMidEdge = value; }
+        }
+
         public static void Init(Engine engine)
         {
             Intuition.engine = engine;
-            Texture sizeTex = engine.GetTexture("gui/Size.png");
-            sizeNormal = new Image(sizeTex.GetRegion(0, 0, sizeTex.Width / 2, sizeTex.Height));
-            sizeSelected = new Image(sizeTex.GetRegion(sizeTex.Width / 2, 0, sizeTex.Width / 2, sizeTex.Height));
-            Texture closeTex = engine.GetTexture("gui/Close.png");
-            closeNormal = new Image(closeTex.GetRegion(0, 0, closeTex.Width / 2, closeTex.Height));
-            closeSelected = new Image(closeTex.GetRegion(closeTex.Width / 2, 0, closeTex.Width / 2, closeTex.Height));
-            Texture depthTex = engine.GetTexture("gui/Depth.png");
-            depthNormal = new Image(depthTex.GetRegion(0, 0, depthTex.Width / 2, depthTex.Height));
-            depthSelected = new Image(depthTex.GetRegion(depthTex.Width / 2, 0, depthTex.Width / 2, depthTex.Height));
-            Texture zoomTex = engine.GetTexture("gui/Zoom.png");
-            zoomNormal = new Image(zoomTex.GetRegion(0, 0, zoomTex.Width / 2, zoomTex.Height));
-            zoomSelected = new Image(zoomTex.GetRegion(zoomTex.Width / 2, 0, zoomTex.Width / 2, zoomTex.Height));
-            Texture titleTex = engine.GetTexture("gui/Title.png");
-            NinePatch tN9P = new NinePatch(titleTex, 3, 3, 3, 3);
-            titleNormal = new Image(tN9P);
-            Texture titleSTex = engine.GetTexture("gui/TitleS.png");
-            NinePatch tS9P = new NinePatch(titleSTex, 3, 3, 3, 3);
-            titleSelected = new Image(tS9P);
-            Texture buttonTex = engine.GetTexture("gui/Button.png");
-            button9P = new NinePatch(buttonTex, 3, 3, 3, 3);
-            Texture buttonSTex = engine.GetTexture("gui/ButtonS.png");
-            button9PS = new NinePatch(buttonSTex, 3, 3, 3, 3);
+            InitClasses();
         }
 
-        internal static void InitGadget(Gadget gadget)
-        {
-            switch (gadget.GadgetType & ~GadgetType.GADGETTYPE)
-            {
-                case GadgetType.BOOLGADGET:
-                    gadget.GadgetImage = new Image(button9P);
-                    gadget.GadgetImage.Width = Math.Abs(gadget.Width);
-                    gadget.GadgetImage.Height = Math.Abs(gadget.Height);
-                    gadget.SelectImage = new Image(button9PS);
-                    gadget.SelectImage.Width = Math.Abs(gadget.Width);
-                    gadget.SelectImage.Height = Math.Abs(gadget.Height);
-                    break;
-                case GadgetType.PROPGADGET:
-                    break;
-            }
-            if (gadget.Width <= 0)
-            {
-                gadget.Flags |= GadgetFlags.GRELWIDTH;
-            }
-            if (gadget.Height <= 0)
-            {
-                gadget.Flags |= GadgetFlags.GRELHEIGHT;
-            }
-        }
-
-        public static Window OpenWindowTags(NewWindow newWindow, params ValueTuple<WATags, object>[] tags)
+        public static Window OpenWindowTags(NewWindow newWindow, params (Tags, object)[] tags)
         {
             if (newWindow == null) newWindow = new NewWindow();
             int opacity = 255;
+            int hoverOpacity = 255;
             Color bgColor = colorWindow;
             Color fgColor = colorText;
             if (tags != null)
             {
-                newWindow.Flags |= ((WindowFlags)tags.GetTagData(WATags.WA_Flags) & ~WindowFlags.WFLG_PRIVATEFLAGS);
+                newWindow.Flags |= (tags.GetTagData(Tags.WA_Flags, WindowFlags.None) & ~WindowFlags.WFLG_PRIVATEFLAGS);//  ((WindowFlags)tags.GetTagData(Tags.WA_Flags) & ~WindowFlags.WFLG_PRIVATEFLAGS);
                 foreach (var tag in tags)
                 {
                     switch (tag.Item1)
                     {
-                        case WATags.WA_Left:
+                        case Tags.WA_Left:
                             newWindow.LeftEdge = (int)tag.Item2;
                             break;
-                        case WATags.WA_Top:
+                        case Tags.WA_Top:
                             newWindow.TopEdge = (int)tag.Item2;
                             break;
-                        case WATags.WA_Width:
+                        case Tags.WA_Width:
                             newWindow.Width = (int)tag.Item2;
                             break;
-                        case WATags.WA_Height:
+                        case Tags.WA_Height:
                             newWindow.Height = (int)tag.Item2;
                             break;
-                        case WATags.WA_IDCMP:
+                        case Tags.WA_IDCMP:
                             newWindow.IDCMPFlags = (IDCMPFlags)tag.Item2;
                             break;
-                        case WATags.WA_MinWidth:
+                        case Tags.WA_MinWidth:
                             newWindow.MinWidth = (int)tag.Item2;
                             break;
-                        case WATags.WA_MinHeight:
+                        case Tags.WA_MinHeight:
                             newWindow.MinHeight = (int)tag.Item2;
                             break;
-                        case WATags.WA_MaxWidth:
+                        case Tags.WA_MaxWidth:
                             newWindow.MaxWidth = (int)tag.Item2;
                             break;
-                        case WATags.WA_MaxHeight:
+                        case Tags.WA_MaxHeight:
                             newWindow.MaxHeight = (int)tag.Item2;
                             break;
-                        case WATags.WA_Gadgets:
+                        case Tags.WA_Gadgets:
                             newWindow.Gadgets = (IList<Gadget>)tag.Item2;
                             break;
-                        case WATags.WA_Title:
+                        case Tags.WA_Title:
                             newWindow.Title = (string)tag.Item2;
                             break;
-                        case WATags.WA_Screen:
+                        case Tags.WA_Screen:
                             newWindow.Screen = (IScreen)tag.Item2;
                             break;
-                        case WATags.WA_SizeGadget:
+                        case Tags.WA_SizeGadget:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_SIZEGADGET);
                             break;
-                        case WATags.WA_DragBar:
+                        case Tags.WA_DragBar:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_DRAGBAR);
                             break;
-                        case WATags.WA_DepthGadget:
+                        case Tags.WA_DepthGadget:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_DEPTHGADGET);
                             break;
-                        case WATags.WA_CloseGadget:
+                        case Tags.WA_CloseGadget:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_CLOSEGADGET);
                             break;
-                        case WATags.WA_Backdrop:
+                        case Tags.WA_Backdrop:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_BACKDROP);
                             break;
-                        case WATags.WA_ReportMouse:
+                        case Tags.WA_ReportMouse:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_REPORTMOUSE);
                             break;
-                        case WATags.WA_NoCareRefresh:
+                        case Tags.WA_NoCareRefresh:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_NOCAREREFRESH);
                             break;
-                        case WATags.WA_Borderless:
+                        case Tags.WA_Borderless:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_BORDERLESS);
                             break;
-                        case WATags.WA_Activate:
+                        case Tags.WA_Activate:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_ACTIVATE);
                             break;
-                        case WATags.WA_RMBTrap:
+                        case Tags.WA_RMBTrap:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_RMBTRAP);
                             break;
-                        case WATags.WA_WBenchWindow:
+                        case Tags.WA_WBenchWindow:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_WBENCHWINDOW);
                             break;
-                        case WATags.WA_SizeBRight:
+                        case Tags.WA_SizeBRight:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_SIZEBRIGHT);
                             break;
-                        case WATags.WA_SizeBBottom:
+                        case Tags.WA_SizeBBottom:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_SIZEBBOTTOM);
                             break;
-                        case WATags.WA_GimmeZeroZero:
+                        case Tags.WA_GimmeZeroZero:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_GIMMEZEROZERO);
                             break;
-                        case WATags.WA_NewLookMenus:
+                        case Tags.WA_NewLookMenus:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_NEWLOOKMENUS);
                             break;
-                        case WATags.WA_ToolBox:
+                        case Tags.WA_ToolBox:
                             ModifyFlag(newWindow, tag, WindowFlags.WFLG_TOOLBOX);
                             break;
-                        case WATags.WA_Opacity:
+                        case Tags.WA_Opacity:
                             opacity = (int)tag.Item2;
                             break;
-                        case WATags.WA_BackgroundColor:
+                        case Tags.WA_HoverOpacity:
+                            hoverOpacity = (int)tag.Item2;
+                            break;
+                        case Tags.WA_BackgroundColor:
                             bgColor = (Color)tag.Item2;
                             break;
-                        case WATags.WA_ForegroundColor:
+                        case Tags.WA_ForegroundColor:
                             fgColor = (Color)tag.Item2;
                             break;
-                        case WATags.WA_Zoom:
+                        case Tags.WA_Zoom:
 
                             break;
-                        case WATags.WA_SimpleRefresh:
+                        case Tags.WA_SimpleRefresh:
                             if ((bool)tag.Item2)
                             {
                                 newWindow.Flags &= ~WindowFlags.WFLG_REFRESHBITS;
                                 newWindow.Flags |= WindowFlags.WFLG_SIMPLE_REFRESH;
                             }
                             break;
-                        case WATags.WA_SmartRefresh:
+                        case Tags.WA_SmartRefresh:
                             if ((bool)tag.Item2)
                             {
                                 newWindow.Flags &= ~WindowFlags.WFLG_REFRESHBITS;
@@ -309,15 +292,17 @@ namespace TileEngine.GUI
             Window window = new Window(engine, newWindow);
             window.IDCMPFlags |= IDCMPFlags.AUTOREQUEST;
             window.Opacity = opacity;
+            window.HoverOpacity = hoverOpacity;
             window.BgColor = bgColor;
             window.FgColor = fgColor;
-            window.Screen.Windows.Add(window);
             AddSysGadgets(window);
             AddGList(window, newWindow.Gadgets, -1, -1);
+            window.Screen.AddWindow(window);
             if (window.HasFlag(WindowFlags.WFLG_ACTIVATE))
             {
                 ActivateWindow(window);
             }
+            Logger.Info("Intuition", $"OpenWindow: {window}");
             return window;
         }
         public static Window OpenWindow(NewWindow newWindow)
@@ -327,22 +312,13 @@ namespace TileEngine.GUI
 
         public static void CloseWindow(Window window)
         {
-            window.Screen.Windows.Remove(window);
-            window.Bitmap?.Dispose();
+            Logger.Info("Intuition", $"CloseWindow: {window}");
+            window.Close();
         }
 
         public static void Update(TimeInfo time)
         {
-            var timeDiff = time.TotalGameTime - lastBlink;
-            if (timeDiff > blinkDuration)
-            {
-                lastBlink = time.TotalGameTime;
-                cursorBlink = !cursorBlink;
-                if (activeWindow != null && activeGadget != null)
-                {
-                    activeWindow.Invalidate();
-                }
-            }
+            CheckIntuiTick(time);
         }
 
         public static void Render(IGraphics graphics, TimeInfo time)
@@ -360,9 +336,84 @@ namespace TileEngine.GUI
             }
         }
 
+        private static void InitClasses()
+        {
+            classes = new List<IClass>();
+            classes.Add(new IClass(BUTTONGCLASS, typeof(ButtonGadget)));
+            classes.Add(new IClass(FRBUTTONCLASS, typeof(FrameButtonGadget)));
+            classes.Add(new IClass(PROPGCLASS, typeof(PropGadget)));
+            classes.Add(new IClass(STRGCLASS, typeof(StringGadget)));
+            classes.Add(new IClass(GROUPGCLASS, typeof(GroupGadget)));
+            classes.Add(new IClass(FRAMEICLASS, typeof(FrameImage)));
+            classes.Add(new IClass(SYSICLASS, typeof(SysImage)));
+            classes.Add(new IClass(MODELCLASS, typeof(Model)));
+        }
+
+        private static IClass FindClass(string classId)
+        {
+            return classes.FirstOrDefault(c => c.Name.Equals(classId));
+        }
+
+        public static Root NewObject(string classId, IList<(Tags, object)> tags)
+        {
+            return NewObject(null, classId, tags);
+        }
+        public static Root NewObject(string classId, params (Tags, object)[] tags)
+        {
+            return NewObject(null, classId, (IList<(Tags, object)>)tags);
+        }
+        public static Root NewObject(IClass @class, params (Tags, object)[] tags)
+        {
+            return NewObject(@class, null, (IList<(Tags, object)>)tags);
+        }
+        public static Root NewObject(IClass @class, IList<(Tags, object)> tags)
+        {
+            return NewObject(@class, null, tags);
+        }
+        public static Root NewObject(IClass @class, string classId, params (Tags, object)[] tags)
+        {
+            return NewObject(@class, classId, (IList<(Tags, object)>)tags);
+        }
+        public static Root NewObject(IClass @class, string classId, IList<(Tags, object)> tags)
+        {
+            if (@class == null) @class = FindClass(classId);
+            if (@class != null)
+            {
+                return @class.Create(tags);
+            }
+            return null;
+        }
+
+        private static void CheckIntuiTick(TimeInfo time)
+        {
+            var timeDiff = time.TotalGameTime - lastTick;
+            if (timeDiff > tickDuration)
+            {
+                lastTick = time.TotalGameTime;
+                if (activeGadget != null)
+                {
+                    InputEvent ie = new InputEvent()
+                    {
+                        InputClass = InputClass.TIMER,
+                        Key = Key.None,
+                        MouseButton = MouseButton.None,
+                        X = -1,
+                        Y = -1
+                    };
+                    int termination = 0;
+                    HandleActiveGadgetInput(ie, ref termination);
+                    OnMessage(activeGadget, IDCMPFlags.INTUITICKS);
+                }
+                else if (activeWindow != null)
+                {
+                    OnMessage(activeWindow, IDCMPFlags.INTUITICKS);
+                }
+            }
+        }
+
         private static void RenderWindowBitmap(Window window, IGraphics graphics)
         {
-            graphics.Render(window.Bitmap, window.LeftEdge, window.TopEdge, 255 - window.Opacity);
+            graphics.Render(window.Bitmap, window.LeftEdge, window.TopEdge, window.RenderTransparency);
         }
 
         public static bool Request(Requester req, Window window)
@@ -422,7 +473,7 @@ namespace TileEngine.GUI
             {
                 if (activeWindow.Gadgets.Contains(gadget))
                 {
-                    activeGadget = gadget;
+                    SetActiveGadget(gadget);
                     return true;
                 }
             }
@@ -444,6 +495,10 @@ namespace TileEngine.GUI
                 {
                     activeWindow.Flags |= WindowFlags.WFLG_WINDOWACTIVE;
                     activeWindow.Screen.ActiveWindow = activeWindow;
+                    if (moveActiveWindowToFront && ((activeWindow.Flags & WindowFlags.WFLG_BACKDROP) != WindowFlags.WFLG_BACKDROP))
+                    {
+                        WindowToFront(activeWindow);
+                    }
                     activeWindow.Invalidate();
                     OnMessage(activeWindow, IDCMPFlags.ACTIVEWINDOW);
                 }
@@ -510,23 +565,12 @@ namespace TileEngine.GUI
 
         public static void WindowToBack(Window window)
         {
-            IList<Window> windows = window.Screen.Windows;
-            windows.Remove(window);
-            for (int i = 0; i < windows.Count; i++)
-            {
-                if (!windows[i].HasFlag(WindowFlags.WFLG_BACKDROP))
-                {
-                    windows.Insert(i, window);
-                    break;
-                }
-            }
+            window.Screen.WindowToBack(window);
         }
 
         public static void WindowToFront(Window window)
         {
-            IList<Window> windows = window.Screen.Windows;
-            windows.Remove(window);
-            windows.Add(window);
+            window.Screen.WindowToFront(window);
         }
 
         public static void ZipWindow(Window window)
@@ -546,14 +590,39 @@ namespace TileEngine.GUI
         public static Window BuildSysRequest(Window window, IntuiText bodyText, string posText, string negText, IDCMPFlags flags, int width, int height)
         {
             IScreen screen = window != null ? window.Screen : Screen;
-            Gadget posGad = Gadget.MakeBoolGadget(posText, width / 4, height / 4);
-            posGad.Activation |= GadgetActivation.ENDGADGET | GadgetActivation.TOGGLESELECT;
-            posGad.SetPosition(5, 2 * height / 3);
-            posGad.GadgetId = 1;
-            Gadget negGad = Gadget.MakeBoolGadget(negText, width / 4, height / 4, GadgetFlags.GRELRIGHT);
-            negGad.Activation |= GadgetActivation.ENDGADGET | GadgetActivation.TOGGLESELECT;
-            negGad.SetPosition(-(5 + width / 4), 2 * height / 3);
-            negGad.GadgetId = 0;
+            List<Gadget> gadgets = new List<Gadget>();
+            int gadWidth = width / 4;
+            int gadHeight = height / 4;
+            var btnImage = NewObject(Intuition.FRAMEICLASS,
+                (Tags.IA_Width, gadWidth),
+                (Tags.IA_Height, gadHeight),
+                (Tags.IA_EdgesOnly, false),
+                (Tags.IA_FrameType, FrameType.Button)
+            );
+            NewObject(FRBUTTONCLASS,
+                (Tags.GA_List, gadgets),
+                (Tags.GA_Left, 5),
+                (Tags.GA_Top, 2 * height / 3),
+                (Tags.GA_Width, gadWidth),
+                (Tags.GA_Height, gadHeight),
+                (Tags.GA_EndGadget, true),
+                (Tags.GA_ToggleSelect, true),
+                (Tags.GA_ID, 1),
+                (Tags.GA_Text, posText),
+                (Tags.GA_Image, btnImage)
+                );
+            NewObject(FRBUTTONCLASS,
+                (Tags.GA_List, gadgets),
+                (Tags.GA_RelRight, -(5 + width / 4)),
+                (Tags.GA_Top, 2 * height / 3),
+                (Tags.GA_Width, gadWidth),
+                (Tags.GA_Height, gadHeight),
+                (Tags.GA_EndGadget, true),
+                (Tags.GA_ToggleSelect, true),
+                (Tags.GA_ID, 0),
+                (Tags.GA_Text, negText),
+                (Tags.GA_Image, btnImage)
+                );
             string title = window.Title;
             if (string.IsNullOrEmpty(title)) title = "System Request";
             int x = 0;
@@ -569,16 +638,6 @@ namespace TileEngine.GUI
                     y = window.TopEdge + window.Height / 2 - (height + 2 * 4 + 16) / 2;
                     break;
             }
-            Window reqWin = OpenWindowTags(null,
-                T(WATags.WA_Left, x),
-                T(WATags.WA_Top, y),
-                T(WATags.WA_Width, width + 2 * 4),
-                T(WATags.WA_Height, height + 2 * 4 + 16),
-                T(WATags.WA_Flags, WindowFlags.WFLG_DRAGBAR | WindowFlags.WFLG_DEPTHGADGET | WindowFlags.WFLG_ACTIVATE),
-                T(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
-                T(WATags.WA_Title, title),
-                T(WATags.WA_Screen, screen)
-                );
             bodyText.LeftEdge = width / 2;
             IntuiText txt = bodyText.NextText;
             int countTexts = 1;
@@ -607,7 +666,17 @@ namespace TileEngine.GUI
             req.BackFill = Color.Gray;
             req.Flags |= ReqFlags.SYSREQUEST;
             req.ReqBorder = new Border(width, height);
-            req.ReqGadgets = new[] { posGad, negGad };
+            req.ReqGadgets = gadgets;
+            Window reqWin = OpenWindowTags(null,
+                (Tags.WA_Left, x),
+                (Tags.WA_Top, y),
+                (Tags.WA_Width, width + 2 * 4),
+                (Tags.WA_Height, height + 2 * 4 + 16),
+                (Tags.WA_Flags, WindowFlags.WFLG_DRAGBAR | WindowFlags.WFLG_DEPTHGADGET | WindowFlags.WFLG_ACTIVATE),
+                (Tags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                (Tags.WA_Title, title),
+                (Tags.WA_Screen, screen)
+                );
             Request(req, reqWin);
             return reqWin;
         }
@@ -643,19 +712,31 @@ namespace TileEngine.GUI
             int width = 0;
             int posX = 4;
             int height = 120;
+            var btnImage = NewObject(Intuition.FRAMEICLASS,
+                (Tags.IA_Width, gadWidth),
+                (Tags.IA_Height, gadHeight),
+                (Tags.IA_EdgesOnly, false),
+                (Tags.IA_FrameType, FrameType.Button)
+            );
+
             foreach (var fs in formats)
             {
                 object arg = null;
                 if (args.Length > count) arg = args[1 + count];
                 string gadText = string.Format(fs, arg);
-                Gadget gad = Gadget.MakeBoolGadget(gadText, gadWidth, gadHeight);
-                gad.Activation |= GadgetActivation.ENDGADGET | GadgetActivation.TOGGLESELECT;
-                gad.GadgetId = count < numGads ? count + 1 : 0;
-                gad.LeftEdge = posX;
-                gad.TopEdge = height - gadHeight - 8;
-                gadgets.Add(gad);
-                posX += gadWidth;
-                posX += 4;
+                NewObject(FRBUTTONCLASS,
+                    (Tags.GA_List, gadgets),
+                    (Tags.GA_Left, posX),
+                    (Tags.GA_Top, height - gadHeight - 8),
+                    (Tags.GA_Width, gadWidth),
+                    (Tags.GA_Height, gadHeight),
+                    (Tags.GA_EndGadget, true),
+                    (Tags.GA_ToggleSelect, true),
+                    (Tags.GA_ID, count < numGads - 1 ? count + 1 : 0),
+                    (Tags.GA_Text, gadText),
+                    (Tags.GA_Image, btnImage)
+                    );
+                posX += (gadWidth + 4);
                 width = posX;
                 count++;
             }
@@ -673,16 +754,6 @@ namespace TileEngine.GUI
                     y = window.TopEdge + window.Height / 2 - (height + 2 * 4 + 16) / 2;
                     break;
             }
-            Window reqWin = OpenWindowTags(null,
-                T(WATags.WA_Left, x),
-                T(WATags.WA_Top, y),
-                T(WATags.WA_Width, width + 2 * 4),
-                T(WATags.WA_Height, height + 2 * 4 + 16),
-                T(WATags.WA_Flags, WindowFlags.WFLG_DRAGBAR | WindowFlags.WFLG_DEPTHGADGET | WindowFlags.WFLG_ACTIVATE),
-                T(WATags.WA_IDCMP, IDCMPFlags.GADGETUP),
-                T(WATags.WA_Title, title),
-                T(WATags.WA_Screen, screen)
-                );
             body.LeftEdge = width / 2;
             IntuiText txt = body.NextText;
             int countTexts = 1;
@@ -712,26 +783,18 @@ namespace TileEngine.GUI
             req.Flags |= ReqFlags.SYSREQUEST;
             req.ReqBorder = new Border(width, height);
             req.ReqGadgets = gadgets;
+            Window reqWin = OpenWindowTags(null,
+                (Tags.WA_Left, x),
+                (Tags.WA_Top, y),
+                (Tags.WA_Width, width + 2 * 4),
+                (Tags.WA_Height, height + 2 * 4 + 16),
+                (Tags.WA_Flags, WindowFlags.WFLG_DRAGBAR | WindowFlags.WFLG_DEPTHGADGET | WindowFlags.WFLG_ACTIVATE),
+                (Tags.WA_IDCMP, IDCMPFlags.GADGETUP),
+                (Tags.WA_Title, title),
+                (Tags.WA_Screen, screen)
+                );
             Request(req, reqWin);
-
-            return null;
-        }
-
-        private static IntuiText BuildMultiLineText(string txt)
-        {
-            IntuiText topText = new IntuiText(txt);
-            IntuiText text = topText;
-            var lines = txt.Split(new char[] { '\n', '\r' });
-            if (lines.Length > 1)
-            {
-                text.IText = lines[0];
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    text.NextText = new IntuiText(lines[i]);
-                    text = text.NextText;
-                }
-            }
-            return topText;
+            return reqWin;
         }
 
         public static void FreeEasyRequest(Window window)
@@ -769,233 +832,410 @@ namespace TileEngine.GUI
             RenderWindow(window, engine.Graphics);
         }
 
+        public static void NewModifyProp(Gadget gadget, Window window, Requester req, PropFlags flags, int horizPot, int vertPot, int horizBody, int vertBody, int numGads)
+        {
+            PropInfo pi = gadget?.PropInfo;
+            if (pi != null)
+            {
+                pi.Flags = flags;
+                pi.HorizPot = horizPot;
+                pi.HorizBody = horizBody;
+                pi.VertPot = vertPot;
+                pi.VertBody = vertBody;
+            }
+        }
+
         public static void KeyDown(Key key, char code)
         {
-
+            HandleInput(new InputEvent()
+            {
+                InputClass = InputClass.KEYDOWN,
+                Key = key
+            });
         }
 
         public static void KeyUp(Key key, char code)
         {
-            if (activeGadget != null)
+            HandleInput(new InputEvent()
             {
-                Gadget gadget = activeGadget;
-                if ((gadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.STRGADGET)
-                {
-                    string str = gadget.StringInfo.Buffer;
-                    int pos = gadget.StringInfo.BufferPos;
-                    switch (key)
-                    {
-                        case Key.Enter:
-                            OnMessage(gadget, IDCMPFlags.GADGETUP);
-                            UnselectGadget(gadget);
-                            activeGadget = null;
-                            break;
-                        case Key.Left:
-                            gadget.StringInfo.BufferPos--;
-                            break;
-                        case Key.Right:
-                            gadget.StringInfo.BufferPos++;
-                            break;
-                        case Key.Delete:
-                            if (pos < str.Length)
-                            {
-                                str = str.Remove(pos, 1);
-                                gadget.StringInfo.Buffer = str;
-                            }
-                            break;
-                        case Key.Back:
-                            if (pos > 0)
-                            {
-                                str = str.Remove(pos - 1, 1);
-                                gadget.StringInfo.Buffer = str;
-                                gadget.StringInfo.BufferPos--;
-                            }
-                            break;
-                        default:
-                            if (!char.IsControl(code) || key == Key.Space)
-                            {
+                InputClass = InputClass.KEYUP,
+                Key = key
+            });
+        }
 
-                                str = str.Insert(pos, "" + code);
-                                if (str.Length < gadget.StringInfo.MaxChars)
+        private static bool ValidCode(Gadget gadget, char code)
+        {
+            if ((gadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.STRGADGET)
+            {
+                bool intGad = ((gadget.Activation & GadgetActivation.LONGINT) == GadgetActivation.LONGINT);
+                int pos = gadget.StringInfo.BufferPos;
+                if (intGad)
+                {
+                    if (char.IsDigit(code)) return true;
+                    if (pos == 0)
+                    {
+                        if ((code == '+') || (code == '-')) return true;
+                    }
+                }
+                else
+                {
+                    if (code >= ' ')
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static IntuiText BuildMultiLineText(string txt)
+        {
+            IntuiText topText = new IntuiText(txt);
+            IntuiText text = topText;
+            var lines = txt.Split(new char[] { '\n', '\r' });
+            if (lines.Length > 1)
+            {
+                text.IText = lines[0];
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    text.NextText = new IntuiText(lines[i]);
+                    text = text.NextText;
+                }
+            }
+            return topText;
+        }
+
+        private static void HandleMouseDown(Gadget gadget, int x, int y)
+        {
+            mouseStartX = x;
+            mouseStartY = y;
+            SetHoverGadget(gadget);
+            SetSelectedGadget(gadget);
+            SetActiveGadget(gadget);
+            if (gadget != null)
+            {
+                Window window = gadget.Window;
+                if ((gadget.Flags & GadgetFlags.GADGDISABLED) == GadgetFlags.GADGDISABLED)
+                {
+                    return;
+                }
+                if ((gadget.GadgetType & GadgetType.GTYPEMASK) == GadgetType.PROPGADGET)
+                {
+                    PropInfo pi = gadget.PropInfo;
+                    if (pi != null)
+                    {
+                        int mx = x - window.LeftEdge;
+                        int my = y - window.TopEdge;
+                        int dx = pi.HorizPot;
+                        int dy = pi.VertPot;
+                        IBox knob = GetKnobDimensions(gadget);
+                        if (knob.ContainsPoint(mx, my))
+                        {
+                            propStartX = mx - knob.LeftEdge;
+                            propStartY = my - knob.TopEdge;
+                            pi.Flags |= PropFlags.KNOBHIT;
+                        }
+                        else
+                        {
+                            pi.Flags &= ~PropFlags.KNOBHIT;
+                            if (((pi.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ))
+                            {
+                                if (mx < knob.LeftEdge)
                                 {
-                                    gadget.StringInfo.Buffer = str;
-                                    gadget.StringInfo.BufferPos++;
+                                    if (dx > pi.HPotRes)
+                                    {
+                                        dx -= pi.HPotRes;
+                                    }
+                                    else
+                                    {
+                                        dx = 0;
+                                    }
+                                }
+                                else if (mx > knob.RightEdge)
+                                {
+                                    if (dx < PropInfo.MAXPOT - pi.HPotRes)
+                                    {
+                                        dx += pi.HPotRes;
+                                    }
+                                    else
+                                    {
+                                        dx = PropInfo.MAXPOT;
+                                    }
+                                }
+                            }
+                            if (((pi.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT))
+                            {
+                                if (my < knob.TopEdge)
+                                {
+                                    if (dy > pi.VPotRes)
+                                    {
+                                        dy -= pi.VPotRes;
+                                    }
+                                    else
+                                    {
+                                        dy = 0;
+                                    }
+                                }
+                                else if (my > knob.BottomEdge)
+                                {
+                                    if (dy < PropInfo.MAXPOT - pi.VPotRes)
+                                    {
+                                        dy += pi.VPotRes;
+                                    }
+                                    else
+                                    {
+                                        dy = PropInfo.MAXPOT;
+                                    }
+                                }
+                            }
+                            NewModifyProp(gadget, window, gadget.Requester, pi.Flags, dx, dy, pi.HorizBody, pi.VertBody, 1);
+                        }
+                    }
+                }
+
+                if ((gadget.Activation & GadgetActivation.GADGIMMEDIATE) == GadgetActivation.GADGIMMEDIATE)
+                {
+                    OnMessage(gadget, IDCMPFlags.GADGETDOWN);
+                }
+
+            }
+
+        }
+
+        private static void HandleMouseUp(Gadget gadget, InputEvent ie, int x, int y)
+        {
+            int termination = 0;
+            mouseStartX = x;
+            mouseStartY = y;
+            SetHoverGadget(gadget);
+            SetSelectedGadget(null);
+            if (gadget != null)
+            {
+                Window window = gadget.Window;
+                Requester req = gadget.Requester;
+                if (window != null)
+                {
+                    if ((gadget.Flags & GadgetFlags.GADGDISABLED) == GadgetFlags.GADGDISABLED)
+                    {
+                        return;
+                    }
+                    switch (gadget.GadgetType & GadgetType.SYSTYPEMASK)
+                    {
+                        case GadgetType.WDEPTH:
+                            if (window.IsTopMostWindow)
+                            {
+                                WindowToBack(activeWindow);
+                            }
+                            else
+                            {
+                                WindowToFront(activeWindow);
+                            }
+                            break;
+                        case GadgetType.WZOOM:
+                            window.Zip();
+                            break;
+                        case GadgetType.CLOSE:
+                            OnMessage(activeGadget, IDCMPFlags.CLOSEWINDOW);
+                            break;
+                    }
+                    switch (gadget.GadgetType & GadgetType.GTYPEMASK)
+                    {
+                        case GadgetType.PROPGADGET:
+                            PropInfo pi = gadget.PropInfo;
+                            if (pi != null)
+                            {
+                                pi.Flags &= ~PropFlags.KNOBHIT;
+                            }
+                            break;
+                    }
+                    if ((gadget.Activation & GadgetActivation.RELVERIFY) == GadgetActivation.RELVERIFY)
+                    {
+                        if (gadget == activeGadget)
+                        {
+                            var tie = new InputEvent(ie);
+                            tie.InputClass = InputClass.GADGETUP;
+                            HandleActiveGadgetInput(tie, ref termination);
+                            OnMessage(gadget, IDCMPFlags.GADGETUP);
+                        }
+                    }
+                    if ((gadget.Activation & GadgetActivation.ENDGADGET) == GadgetActivation.ENDGADGET)
+                    {
+                        InternalEndRequest(req, window, gadget);
+                    }
+                }
+            }
+        }
+
+        private static void HandleMouseMove(Gadget gadget, int x, int y)
+        {
+            SetHoverGadget(gadget);
+            int deltaX = x - mouseStartX;
+            int deltaY = y - mouseStartY;
+            mouseStartX = x;
+            mouseStartY = y;
+            if (selectedGadget != null)
+            {
+                if ((selectedGadget.Flags & GadgetFlags.GADGDISABLED) == GadgetFlags.GADGDISABLED)
+                {
+                    return;
+                }
+                Window window = selectedGadget.Window;
+                Requester req = selectedGadget.Requester;
+                if (window != null)
+                {
+                    switch (selectedGadget.GadgetType & GadgetType.SYSTYPEMASK)
+                    {
+                        case GadgetType.SIZING:
+                            SizeWindow(window, deltaX, deltaY);
+                            break;
+                        case GadgetType.WDRAGGING:
+                            MoveWindow(window, deltaX, deltaY);
+                            break;
+                    }
+                    switch (selectedGadget.GadgetType & GadgetType.GTYPEMASK)
+                    {
+                        case GadgetType.PROPGADGET:
+                            PropInfo pi = selectedGadget.PropInfo;
+                            if (pi != null & (pi.Flags & PropFlags.KNOBHIT) == PropFlags.KNOBHIT)
+                            {
+                                int mx = x - window.LeftEdge - pi.LeftBorder;
+                                int my = y - window.TopEdge - pi.TopBorder;
+                                int dx = mx - propStartX;
+                                int dy = my - propStartY;
+                                IBox knob = GetKnobDimensions(selectedGadget);
+
+                                if (((pi.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ) && (pi.CWidth != knob.Width))
+                                {
+                                    dx = (dx * PropInfo.MAXPOT) / (pi.CWidth - knob.Width);
+                                    if (dx < 0) dx = 0;
+                                    if (dx > PropInfo.MAXPOT) dx = PropInfo.MAXPOT;
+                                }
+                                if (((pi.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT) && (pi.CHeight != knob.Height))
+                                {
+                                    dy = (dy * PropInfo.MAXPOT) / (pi.CHeight - knob.Height);
+                                    if (dy < 0) dx = 0;
+                                    if (dy > PropInfo.MAXPOT) dx = PropInfo.MAXPOT;
+                                }
+                                if ((((pi.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ) && (dx != pi.HorizPot)) ||
+                                    (((pi.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT) && (dy != pi.VertPot)))
+                                {
+                                    NewModifyProp(selectedGadget, window, req, pi.Flags, dx, dy, pi.HorizBody, pi.VertBody, 1);
+
                                 }
                             }
                             break;
                     }
                 }
-                gadget.Window.Invalidate();
             }
+        }
+        private static GadgetActive HandleGadgetInput(InputEvent ie, Gadget gadget, ref int termination)
+        {
+            GadgetActive ga = GadgetActive.MeActive;
+            if (gadget != null)
+            {
+                Window win = gadget.Window;
+                Requester req = gadget.Requester;
+                GadgetInfo gi = SetupGInfo(win, req, gadget, null);
+                int mx = ie.X - win.LeftEdge;
+                int my = ie.Y - win.TopEdge;
+                ga = gadget.HandleInput(gi, ie, ref termination, mx, my);
+                if (ga == GadgetActive.MeActive)
+                {
+                    win.Invalidate();
+                }
+            }
+            return ga;
+        }
+
+        private static GadgetActive HandleActiveGadgetInput(InputEvent ie, ref int termination)
+        {
+            return HandleGadgetInput(ie, activeGadget, ref termination);
+        }
+
+        private static GadgetActive HandleHoverGadgetInput(InputEvent ie, ref int termination)
+        {
+            return HandleGadgetInput(ie, hoverGadget, ref termination);
+        }
+
+
+        private static void HandleInput(InputEvent ie)
+        {
+            if (FindInput(ie, out IScreen scr, out Window win, out Requester req, out Gadget gad))
+            {
+                SetHoverWindow(win);
+                int termination = 0;
+                GadgetInfo gi = SetupGInfo(win, req, gad, null);
+                GadgetActive ga = GadgetActive.MeActive;
+                switch (ie.InputClass)
+                {
+                    case InputClass.MOUSEDOWN:
+                        ActivateWindow(win);
+                        HandleMouseDown(gad, ie.X, ie.Y);
+                        ga = HandleActiveGadgetInput(ie, ref termination);
+                        break;
+                    case InputClass.MOUSEUP:
+                        HandleMouseUp(gad, ie, ie.X, ie.Y);
+                        ga = HandleActiveGadgetInput(ie, ref termination);
+                        break;
+                    case InputClass.MOUSEMOVE:
+                        HandleMouseMove(gad, ie.X, ie.Y);
+                        ga = HandleHoverGadgetInput(ie, ref termination);
+                        break;
+                    case InputClass.KEYDOWN:
+                        ga = HandleActiveGadgetInput(ie, ref termination);
+                        break;
+                    case InputClass.KEYUP:
+                        ga = HandleActiveGadgetInput(ie, ref termination);
+                        break;
+                    case InputClass.TIMER:
+                        ga = HandleActiveGadgetInput(ie, ref termination);
+                        break;
+                }
+            }
+        }
+
+        public static void DrawImageState(IGraphics rPort, Image image, int x, int y, int width, int height, ImageState state, DrawInfo drawInfo = null)
+        {
+            image.DrawFrame(rPort, x, y, width, height, state, drawInfo);
+        }
+
+        public static void DrawImageState(IGraphics rPort, Image image, int x, int y, ImageState state, DrawInfo drawInfo = null)
+        {
+            image.Draw(rPort, x, y, state, drawInfo);
         }
 
         public static void MouseMove(int x, int y, MouseButton button)
         {
-            if (selectedGadget != null)
+            HandleInput(new InputEvent()
             {
-                Gadget gadget = selectedGadget;
-                Window window = gadget.Window;
-                int deltaX = x - mouseStartX;
-                int deltaY = y - mouseStartY;
-                mouseStartX = x;
-                mouseStartY = y;
-                switch (gadget.GadgetType & ~GadgetType.GADGETTYPE)
-                {
-                    case GadgetType.SIZING:
-                        SizeWindow(window, deltaX, deltaY);
-                        break;
-                    case GadgetType.WDRAGGING:
-                        MoveWindow(window, deltaX, deltaY);
-                        break;
-                    case GadgetType.PROPGADGET:
-                        if ((gadget.PropInfo.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ)
-                        {
-                            int posX = x - gadget.PropInfo.LeftBorder;
-                            posX *= PropInfo.MAXPOT;
-                            posX /= gadget.PropInfo.CWidth;
-                            gadget.PropInfo.HorizPot = posX;
-                        }
-                        if ((gadget.PropInfo.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT)
-                        {
-                            int posY = y - gadget.PropInfo.TopBorder;
-                            posY *= PropInfo.MAXPOT;
-                            posY /= gadget.PropInfo.CHeight;
-                            gadget.PropInfo.VertPot = posY;
-                        }
-                        break;
-                }
-                window.Invalidate();
-            }
-            else
-            {
-                Window window = GetMouseWindow(x, y);
-                Requester req = GetMouseRequester(window, x, y);
-                Gadget gadget = GetMouseGadget(window, req, x, y);
-            }
+                InputClass = InputClass.MOUSEMOVE,
+                X = x,
+                Y = y,
+                MouseButton = button
+            });
         }
         public static void MouseDown(int x, int y, MouseButton button)
         {
-            Window window = GetMouseWindow(x, y);
-            Requester req = GetMouseRequester(window, x, y);
-            Gadget gadget = GetMouseGadget(window, req, x, y);
-            mouseStartX = x;
-            mouseStartY = y;
-            ActivateWindow(window);
-            if (gadget != null)
+            HandleInput(new InputEvent()
             {
-                if ((gadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.PROPGADGET)
-                {
-                    int kx;
-                    int ky;
-                    int kw;
-                    int kh;
-
-                    GetKnobDimensions(window, req, gadget, out kx, out ky, out kw, out kh);
-                    if (x >= kx && y >= ky && x <= kx + kw && y <= ky + kh)
-                    {
-                        gadget.PropInfo.Flags |= PropFlags.KNOBHIT;
-                    }
-                    else
-                    {
-                        gadget.PropInfo.Flags &= ~PropFlags.KNOBHIT;
-                    }
-                }
-                if ((gadget.Activation & GadgetActivation.GADGIMMEDIATE) == GadgetActivation.GADGIMMEDIATE)
-                {
-                    OnMessage(gadget, IDCMPFlags.GADGETDOWN);
-                }
-            }
-            SelectGadget(gadget);
+                InputClass = InputClass.MOUSEDOWN,
+                X = x,
+                Y = y,
+                MouseButton = button
+            });
         }
         public static void MouseUp(int x, int y, MouseButton button)
         {
-            Window window = GetMouseWindow(x, y);
-            Requester req = GetMouseRequester(window, x, y);
-            Gadget gadget = GetMouseGadget(window, req, x, y);
-            if (activeGadget != null)
+            HandleInput(new InputEvent()
             {
-                if ((activeGadget.Activation & GadgetActivation.RELVERIFY) == GadgetActivation.RELVERIFY)
-                {
-                    if (activeGadget != gadget)
-                    {
-                        UnselectGadget(activeGadget);
-                        return;
-                    }
-                }
-                Window activeWindow = activeGadget.Window;
-                if (activeWindow == null) { activeWindow = window; }
-                IList<Window> windows = activeWindow.Screen.Windows;
-                if ((activeGadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.WDEPTH)
-                {
-                    if (windows.IndexOf(activeWindow) >= windows.Count - 1)
-                    {
-                        WindowToBack(activeWindow);
-                    }
-                    else
-                    {
-                        WindowToFront(activeWindow);
-                    }
-                }
-                else if ((activeGadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.WZOOM)
-                {
-                    activeWindow.Zip();
-                }
-                else if ((activeGadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.CLOSE)
-                {
-                    OnMessage(activeGadget, IDCMPFlags.CLOSEWINDOW);
-                }
-                else if ((activeGadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.PROPGADGET)
-                {
-                    int kx;
-                    int ky;
-                    int kw;
-                    int kh;
-
-                    GetKnobDimensions(activeWindow, req, activeGadget, out kx, out ky, out kw, out kh);
-                    if (x >= kx && y >= ky && x <= kx + kw && y <= ky + kh)
-                    {
-                        activeGadget.PropInfo.Flags |= PropFlags.KNOBHIT;
-                    }
-                    else
-                    {
-                        activeGadget.PropInfo.Flags &= ~PropFlags.KNOBHIT;
-                        if (x < kx && ((activeGadget.PropInfo.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ))
-                        {
-                            activeGadget.PropInfo.HorizPot -= activeGadget.PropInfo.HorizBody;
-
-                        }
-                        if (x > kx + kw && ((activeGadget.PropInfo.Flags & PropFlags.FREEHORIZ) == PropFlags.FREEHORIZ))
-                        {
-                            activeGadget.PropInfo.HorizPot += activeGadget.PropInfo.HorizBody;
-                        }
-                        if (y < ky && ((activeGadget.PropInfo.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT))
-                        {
-                            activeGadget.PropInfo.VertPot -= activeGadget.PropInfo.VertBody;
-
-                        }
-                        if (y > ky + kh && ((activeGadget.PropInfo.Flags & PropFlags.FREEVERT) == PropFlags.FREEVERT))
-                        {
-                            activeGadget.PropInfo.VertPot += activeGadget.PropInfo.VertBody;
-                        }
-                    }
-                }
-                if ((activeGadget.Activation & GadgetActivation.RELVERIFY) == GadgetActivation.RELVERIFY)
-                {
-                    OnMessage(activeGadget, IDCMPFlags.GADGETUP);
-                }
-                if ((activeGadget.Activation & GadgetActivation.ENDGADGET) == GadgetActivation.ENDGADGET)
-                {
-                    InternalEndRequest(req, window, activeGadget);
-                }
-                UnselectGadget(activeGadget);
-            }
-            else
-            {
-                UnselectGadget(gadget);
-            }
+                InputClass = InputClass.MOUSEUP,
+                X = x,
+                Y = y,
+                MouseButton = button
+            });
         }
 
-        private static void DrawIntuiText(IGraphics graphics, IntuiText text, int x, int y)
+        internal static void DrawIntuiText(IGraphics graphics, IntuiText text, int x, int y)
         {
             while (text != null)
             {
@@ -1004,7 +1244,7 @@ namespace TileEngine.GUI
             }
         }
 
-        private static void DrawBorder(IGraphics graphics, Border border, int x, int y)
+        internal static void DrawBorder(IGraphics graphics, Border border, int x, int y)
         {
             while (border != null)
             {
@@ -1031,183 +1271,334 @@ namespace TileEngine.GUI
             }
         }
 
-        private static void SelectGadget(Gadget gadget)
+        private static void SetActiveGadget(Gadget gadget)
         {
-            if (gadget != null)
+            if (activeGadget != gadget)
             {
-                gadget.Selected = true;
-                gadget.Window.Invalidate();
+                if (activeGadget != null)
+                {
+                    activeGadget.Activation &= ~GadgetActivation.ACTIVEGADGET;
+                }
+                activeGadget = null;
+                if (gadget != null && !gadget.Disabled)
+                {
+                    activeGadget = gadget;
+                    activeGadget.Activation |= GadgetActivation.ACTIVEGADGET;
+                    ActivateWindow(activeGadget.Window);
+                }
             }
-            activeGadget = gadget;
-            selectedGadget = gadget;
         }
 
-        private static void UnselectGadget(Gadget gadget)
+        private static void SetSelectedGadget(Gadget gadget)
         {
-            if (gadget != null)
+            if (selectedGadget != gadget)
             {
-                gadget.Selected = false;
-                gadget.Window.Invalidate();
+                if (selectedGadget != null)
+                {
+                    selectedGadget.Selected = false;
+                }
+                selectedGadget = null;
+                if (gadget != null && !gadget.Disabled)
+                {
+                    selectedGadget = gadget;
+                    selectedGadget.Selected = true;
+                }
             }
-            selectedGadget = null;
+        }
+
+        private static void SetHoverGadget(Gadget gadget)
+        {
+            if (hoverGadget != gadget)
+            {
+                if (hoverGadget != null)
+                {
+                    hoverGadget.Flags &= ~GadgetFlags.HOVER;
+                    hoverGadget.Window.Invalidate();
+                }
+                hoverGadget = gadget;
+                if (hoverGadget != null)
+                {
+                    hoverGadget.Flags |= GadgetFlags.HOVER;
+                    hoverGadget.Window.Invalidate();
+                    Logger.Info("Intuition", $"Hover Gadget: \"{hoverGadget}\"");
+                }
+            }
+        }
+
+        private static void SetHoverWindow(Window window)
+        {
+            if (hoverWindow != window)
+            {
+                if (hoverWindow != null)
+                {
+                    hoverWindow.MoreFlags &= ~MoreWindowFlags.WFLG_HOVER;
+                    hoverWindow.Invalidate();
+                }
+                hoverWindow = window;
+                if (hoverWindow != null)
+                {
+                    hoverWindow.MoreFlags |= MoreWindowFlags.WFLG_HOVER;
+                    hoverWindow.Invalidate();
+                    Logger.Info("Intuition", $"Hover Window: \"{hoverWindow}\"");
+                }
+            }
         }
 
         private static void AddSysGadgets(Window window)
         {
             int titleLeft = 0;
             int titleRight = 0;
+            int titleBarHeight = 20;
             if (window.HasFlag(WindowFlags.WFLG_CLOSEGADGET))
             {
-                Gadget closeGadget = new Gadget();
-                closeGadget.LeftEdge = 0;
-                closeGadget.TopEdge = 0;
-                closeGadget.Width = closeNormal.Width;
-                closeGadget.Height = closeNormal.Height;
-                closeGadget.Flags = GadgetFlags.GADGIMAGE;
-                closeGadget.Activation = GadgetActivation.RELVERIFY;
-                closeGadget.GadgetType = GadgetType.SYSGADGET | GadgetType.CLOSE;
-                closeGadget.GadgetImage = closeNormal;
-                closeGadget.SelectImage = closeSelected;
+                var closeImage = NewObject(SYSICLASS,
+                    (Tags.SYSIA_Which, SysImageType.Close)
+                    );
+                Gadget closeGadget = (Gadget)NewObject(FRBUTTONCLASS,
+                    (Tags.GA_Left, 0),
+                    (Tags.GA_Top, 0),
+                    (Tags.GA_Width, 20),
+                    (Tags.GA_Height, titleBarHeight),
+                    (Tags.GA_TopBorder, true),
+                    (Tags.GA_SysGadget, true),
+                    (Tags.GA_RelVerify, true),
+                    (Tags.GA_SysGType, GadgetType.CLOSE),
+                    (Tags.GA_Image, closeImage)
+                    );
                 window.AddGadget(closeGadget, -1);
                 titleLeft += closeGadget.Width;
             }
             if (window.HasFlag(WindowFlags.WFLG_DEPTHGADGET))
             {
-                Gadget depthGadget = new Gadget();
-                depthGadget.LeftEdge = -depthNormal.Width;
-                depthGadget.TopEdge = 0;
-                depthGadget.Width = depthNormal.Width;
-                depthGadget.Height = depthNormal.Height;
-                depthGadget.Flags = GadgetFlags.GRELRIGHT | GadgetFlags.GADGIMAGE;
-                depthGadget.Activation = GadgetActivation.RELVERIFY;
-                depthGadget.GadgetType = GadgetType.SYSGADGET | GadgetType.WDEPTH;
-                depthGadget.GadgetImage = depthNormal;
-                depthGadget.SelectImage = depthSelected;
+                var depthImage = NewObject(SYSICLASS,
+                    (Tags.SYSIA_Which, SysImageType.Depth)
+                    );
+                Gadget depthGadget = (Gadget)NewObject(FRBUTTONCLASS,
+                    (Tags.GA_RelRight, -23),
+                    (Tags.GA_Top, 0),
+                    (Tags.GA_Width, 24),
+                    (Tags.GA_Height, titleBarHeight),
+                    (Tags.GA_TopBorder, true),
+                    (Tags.GA_SysGadget, true),
+                    (Tags.GA_RelVerify, true),
+                    (Tags.GA_SysGType, GadgetType.WDEPTH),
+                    (Tags.GA_Image, depthImage)
+                    );
                 window.AddGadget(depthGadget, -1);
                 titleRight += depthGadget.Width;
             }
             if (window.HasFlag(WindowFlags.WFLG_HASZOOM))
             {
-                Gadget zoomGadget = new Gadget();
-                zoomGadget.LeftEdge = -(depthNormal.Width + zoomNormal.Width);
-                zoomGadget.TopEdge = 0;
-                zoomGadget.Width = zoomNormal.Width;
-                zoomGadget.Height = zoomNormal.Height;
-                zoomGadget.Flags = GadgetFlags.GRELRIGHT | GadgetFlags.GADGIMAGE;
-                zoomGadget.Activation = GadgetActivation.RELVERIFY;
-                zoomGadget.GadgetImage = zoomNormal;
-                zoomGadget.SelectImage = zoomSelected;
-                zoomGadget.GadgetType = GadgetType.SYSGADGET | GadgetType.WZOOM;
+                var zoomImage = NewObject(SYSICLASS,
+                    (Tags.SYSIA_Which, SysImageType.Zoom)
+                    );
+                Gadget zoomGadget = (Gadget)NewObject(FRBUTTONCLASS,
+                    (Tags.GA_RelRight, -23 - 24),
+                    (Tags.GA_Top, 0),
+                    (Tags.GA_Width, 24),
+                    (Tags.GA_Height, titleBarHeight),
+                    (Tags.GA_TopBorder, true),
+                    (Tags.GA_SysGadget, true),
+                    (Tags.GA_RelVerify, true),
+                    (Tags.GA_SysGType, GadgetType.WZOOM),
+                    (Tags.GA_Image, zoomImage)
+                    );
                 window.AddGadget(zoomGadget, -1);
                 titleRight += zoomGadget.Width;
             }
             if (window.HasFlag(WindowFlags.WFLG_DRAGBAR))
             {
-                Gadget dragGadget = new Gadget();
-                dragGadget.LeftEdge = titleLeft;
-                dragGadget.TopEdge = 0;
-                dragGadget.Width = -(titleRight);
-                dragGadget.Height = titleNormal.Height;
-                dragGadget.Flags = GadgetFlags.GRELWIDTH | GadgetFlags.GADGIMAGE;
-                dragGadget.GadgetImage = titleNormal;
-                dragGadget.SelectImage = titleSelected;
-                dragGadget.GadgetType = GadgetType.SYSGADGET | GadgetType.WDRAGGING;
+                var dragImage = NewObject(SYSICLASS,
+                    (Tags.SYSIA_Which, SysImageType.Drag)
+                    );
+                Gadget dragGadget = (Gadget)NewObject(FRBUTTONCLASS,
+                    (Tags.GA_Left, titleLeft),
+                    (Tags.GA_Top, 0),
+                    (Tags.GA_RelWidth, -(titleRight + titleLeft)),
+                    (Tags.GA_Height, titleBarHeight),
+                    (Tags.GA_TopBorder, true),
+                    (Tags.GA_SysGadget, true),
+                    (Tags.GA_RelVerify, false),
+                    (Tags.GA_SysGType, GadgetType.WDRAGGING),
+                    (Tags.GA_Image, dragImage)
+                );
                 window.AddGadget(dragGadget, -1);
             }
             if (window.HasFlag(WindowFlags.WFLG_SIZEGADGET))
             {
-                Gadget sizeGadget = new Gadget();
-                sizeGadget.Width = sizeNormal.Width;
-                sizeGadget.Height = sizeNormal.Height;
-                sizeGadget.LeftEdge = -sizeNormal.Width;
-                sizeGadget.TopEdge = -sizeNormal.Height;
-                sizeGadget.Flags = GadgetFlags.GRELRIGHT | GadgetFlags.GRELBOTTOM | GadgetFlags.GADGIMAGE;
-                sizeGadget.GadgetType = GadgetType.SYSGADGET | GadgetType.SIZING;
-                sizeGadget.GadgetImage = sizeNormal;
-                sizeGadget.SelectImage = sizeSelected;
+                var sizeImage = NewObject(SYSICLASS,
+                    (Tags.SYSIA_Which, SysImageType.Size)
+                );
+                Gadget sizeGadget = (Gadget)NewObject(FRBUTTONCLASS,
+                    (Tags.GA_RelRight, -17),
+                    (Tags.GA_RelBottom, -17),
+                    (Tags.GA_Width, 18),
+                    (Tags.GA_Height, 18),
+                    (Tags.GA_SysGadget, true),
+                    (Tags.GA_RelVerify, false),
+                    (Tags.GA_BottomBorder, (window.Flags & WindowFlags.WFLG_SIZEBBOTTOM) == WindowFlags.WFLG_SIZEBBOTTOM),
+                    (Tags.GA_RightBorder, (window.Flags & WindowFlags.WFLG_SIZEBRIGHT) == WindowFlags.WFLG_SIZEBRIGHT),
+                    (Tags.GA_SysGType, GadgetType.SIZING),
+                    (Tags.GA_Image, sizeImage)
+                );
                 window.AddGadget(sizeGadget, -1);
+            }
+        }
 
+        private static void CheckRectFill(IGraphics rport, int left, int top, int right, int bottom, Color c)
+        {
+            int width = right - left + 1;
+            int height = bottom - top + 1;
+            if (width > 0 && height > 0)
+            {
+                rport.FillRectangle(left, top, width, height, c);
             }
         }
 
         private static void RenderWindow(Window window, IGraphics graphics)
         {
             graphics.SetTarget(window.Bitmap);
+            RenderWindowBorder(graphics, window);
+            RenderBorderGadgets(graphics, window);
+            RenderWindowTitle(graphics, window);
+            graphics.SetClip(window.BorderLeft, window.BorderTop, window.InnerWidth, window.InnerHeight);
+            RenderInnerGadgets(graphics, window);
+            graphics.ClearClip();
+            RenderRequesters(graphics, window);
+            graphics.ClearTarget();
+            window.Validate();
+        }
+
+        private static void RenderRequesters(IGraphics graphics, Window window)
+        {
+            foreach (Requester req in window.Requesters)
+            {
+                RenderRequest(graphics, window, req);
+            }
+        }
+        private static void RenderSysGadgets(IGraphics graphics, Window window)
+        {
+            foreach (Gadget gadget in window.Gadgets)
+            {
+                if ((gadget.GadgetType & GadgetType.SYSGADGET) == GadgetType.SYSGADGET)
+                {
+                    RenderGadget(window, null, gadget, graphics);
+                }
+            }
+        }
+
+        private static void RenderBorderGadgets(IGraphics graphics, Window window)
+        {
+            foreach (Gadget gadget in window.Gadgets)
+            {
+                if ((gadget.Activation & (GadgetActivation.BOTTOMBORDER | GadgetActivation.TOPBORDER | GadgetActivation.LEFTBORDER | GadgetActivation.RIGHTBORDER)) != GadgetActivation.NONE)
+                {
+                    RenderGadget(window, null, gadget, graphics);
+                }
+            }
+        }
+
+        private static void RenderInnerGadgets(IGraphics graphics, Window window)
+        {
+            foreach (Gadget gadget in window.Gadgets)
+            {
+                if ((gadget.Activation & (GadgetActivation.BOTTOMBORDER | GadgetActivation.TOPBORDER | GadgetActivation.LEFTBORDER | GadgetActivation.RIGHTBORDER)) == GadgetActivation.NONE)
+                {
+                    RenderGadget(window, null, gadget, graphics);
+                }
+            }
+        }
+
+        private static void RenderUserGadgets(IGraphics graphics, Window window)
+        {
+            foreach (Gadget gadget in window.Gadgets)
+            {
+                if ((gadget.GadgetType & GadgetType.SYSGADGET) != GadgetType.SYSGADGET)
+                {
+                    RenderGadget(window, null, gadget, graphics);
+                }
+            }
+        }
+
+        private static void RenderWindowTitle(IGraphics graphics, Window window)
+        {
+            if (window.Title != null)
+            {
+                int titleX = window.BorderLeft;
+                int titleY = window.BorderTop / 2;
+                if ((window.Flags & WindowFlags.WFLG_CLOSEGADGET) == WindowFlags.WFLG_CLOSEGADGET)
+                {
+                    titleX += 20;
+                }
+                graphics.RenderText(window.Title, titleX, titleY, Color.Black, HorizontalTextAlign.Left, VerticalTextAlign.Center);
+            }
+        }
+
+        private static void RenderWindowBorder(IGraphics graphics, Window window)
+        {
             bool active = window.HasFlag(WindowFlags.WFLG_WINDOWACTIVE);
             Color backColor = active ? colorActive : colorInactive;
             Color borderColorTopLeft = colorLightEdge;
             Color borderColorBottomRight = colorDarkEdge;
-            //int x = window.LeftEdge;
-            //int y = window.TopEdge;
             int x = 0;
             int y = 0;
             int w = window.Width;
             int h = window.Height;
             graphics.FillRectangle(x, y, w, h, window.BgColor);
+            if (window.BorderTop > 0)
+            {
+                CheckRectFill(graphics, 0, 0, w - 1, 0, borderColorTopLeft);
+            }
             if (window.BorderLeft > 0)
             {
-                graphics.DrawLine(x, y, x, y + h - 1, borderColorTopLeft);
-                for (int i = 1; i < window.BorderLeft - 1; i++)
-                {
-                    graphics.DrawLine(x + i, y, x + i, y + h - 1, backColor);
-                }
-                graphics.DrawLine(x + window.BorderLeft - 1, y, x + window.BorderLeft - 1, y + h - 1, borderColorBottomRight);
+                CheckRectFill(graphics, 0, 0, 0, h - 1, borderColorTopLeft);
+            }
+            if (window.BorderRight > 1)
+            {
+                CheckRectFill(graphics, w - window.BorderRight, window.BorderTop, w - window.BorderRight, h - window.BorderBottom, borderColorTopLeft);
+            }
+            if (window.BorderBottom > 1)
+            {
+                CheckRectFill(graphics, window.BorderLeft, h - window.BorderBottom, w - window.BorderRight, h - window.BorderBottom, borderColorTopLeft);
             }
             if (window.BorderRight > 0)
             {
-                graphics.DrawLine(x + w - 1, y, x + w - 1, y + h - 1, borderColorBottomRight);
-                for (int i = 1; i < window.BorderRight - 1; i++)
-                {
-                    graphics.DrawLine(x + w - 1 - i, y, x + w - 1 - i, y + h - 1, backColor);
-                }
-                graphics.DrawLine(x + w - window.BorderRight, y, x + w - window.BorderRight, y + h - 1, borderColorTopLeft);
+                CheckRectFill(graphics, w - 1, 1, w - 1, h - 1, borderColorBottomRight);
             }
             if (window.BorderBottom > 0)
             {
-                graphics.DrawLine(x + 1, y + h - 1, x + w - 1, y + h - 1, borderColorBottomRight);
-                for (int i = 1; i < window.BorderBottom - 1; i++)
-                {
-                    graphics.DrawLine(x + 1, y + h - i - 1, x + w - 1, y + h - i - 1, backColor);
-                }
-                graphics.DrawLine(x + window.BorderLeft, y + h - window.BorderBottom, x + w - window.BorderRight - 1, y + h - window.BorderBottom, borderColorTopLeft);
+                CheckRectFill(graphics, 1, h - 1, w - 1, h - 1, borderColorBottomRight);
             }
-            if (window.BorderTop > 0)
+            if (window.BorderLeft > 1)
             {
-                graphics.DrawLine(x + 1, y, x + w - 1, y, borderColorTopLeft);
-                for (int i = 1; i < window.BorderTop - 1; i++)
-                {
-                    graphics.DrawLine(x + 1, y + i, x + w - 1, y + i, backColor);
-                }
-                graphics.DrawLine(x + 1, y + window.BorderTop - 1, x + w - 1, y + window.BorderTop - 1, borderColorBottomRight);
+                CheckRectFill(graphics, window.BorderLeft - 1, window.BorderTop - 1, window.BorderLeft - 1, h - window.BorderBottom, borderColorBottomRight);
             }
-
-            foreach (Gadget gadget in window.Gadgets)
+            if (window.BorderTop > 1)
             {
-                RenderGadget(window, null, gadget, graphics);
+                CheckRectFill(graphics, window.BorderLeft - 1, window.BorderTop - 1, w - window.BorderRight, window.BorderTop - 1, borderColorBottomRight);
             }
-            if (window.Title != null)
+            if (window.BorderTop > 2)
             {
-                int titleX = window.BorderLeft;
-                if ((window.Flags & WindowFlags.WFLG_CLOSEGADGET) == WindowFlags.WFLG_CLOSEGADGET)
-                {
-                    titleX += closeNormal.Width;
-                }
-                graphics.RenderText(window.Title, x + titleX, y + titleNormal.Height / 2, Color.Black, HorizontalTextAlign.Left, VerticalTextAlign.Center);
+                CheckRectFill(graphics, 1, 1, w - 2, window.BorderTop - 2, backColor);
             }
-            foreach (Requester req in window.Requesters)
+            if (window.BorderLeft > 2)
             {
-                RenderRequest(graphics, window, req);
+                CheckRectFill(graphics, 1, 1, window.BorderLeft - 2, h - 2, backColor);
             }
-            graphics.ClearTarget();
-            window.Validate();
+            if (window.BorderRight > 2)
+            {
+                CheckRectFill(graphics, w - window.BorderRight + 1, 1, w - 2, h - 2, backColor);
+            }
+            if (window.BorderBottom > 2)
+            {
+                CheckRectFill(graphics, 1, h - window.BorderBottom + 1, w - 2, h - 2, backColor);
+            }
         }
 
         private static void RenderRequest(IGraphics graphics, Window window, Requester req)
         {
             if (req != null)
             {
-                //int x = window.LeftEdge;
-                //int y = window.TopEdge;
                 int x = 0;
                 int y = 0;
                 int w = window.Width;
@@ -1226,95 +1617,133 @@ namespace TileEngine.GUI
             }
         }
 
+        public static IBox GetGadgetDomain(Gadget gadget, IScreen screen, Window window, Requester req, ref IBox box)
+        {
+            if (box == null) box = new Box();
+            if (window != null)
+            {
+                box.LeftEdge = 0;
+                box.TopEdge = 0;
+                box.Width = window.Width;
+                box.Height = window.Height;
+                if (gadget != null)
+                {
+                    switch (gadget.GadgetType & (GadgetType.GADGETTYPE & ~GadgetType.SYSGADGET))
+                    {
+                        case GadgetType.SCRGADGET:
+                            box.LeftEdge = 0;
+                            box.TopEdge = 0;
+                            box.Width = screen.Width;
+                            box.Height = screen.Height;
+                            break;
+                        case GadgetType.GZZGADGET:
+                            box.LeftEdge = 0;
+                            box.TopEdge = 0;
+                            box.Width = window.Width;
+                            box.Height = window.Height;
+                            break;
+                        case GadgetType.REQGADGET:
+                            //box.LeftEdge = req.LeftEdge + window.BorderLeft;
+                            //box.TopEdge = req.TopEdge + window.BorderTop;
+                            box.LeftEdge = req.LeftEdge;
+                            box.TopEdge = req.TopEdge;
+                            box.Width = req.Width;
+                            box.Height = req.Height;
+                            break;
+                        default:
+                            if ((window.Flags & WindowFlags.WFLG_GIMMEZEROZERO) == WindowFlags.WFLG_GIMMEZEROZERO)
+                            {
+                                box.LeftEdge = window.BorderLeft;
+                                box.TopEdge = window.BorderTop;
+                                box.Width = window.Width - window.BorderLeft - window.BorderRight;
+                                box.Height = window.Height - window.BorderTop - window.BorderBottom;
+                            }
+                            break;
+                    }
+                }
+            }
+            return box;
+        }
+
+        internal static GadgetInfo SetupGInfo(Window window, Requester req, Gadget gadget, IGraphics graphics)
+        {
+            IBox box = null;
+            IScreen screen = window?.Screen ?? Screen;
+            GadgetInfo gi = new GadgetInfo()
+            {
+                Screen = screen,
+                Window = window,
+                Requester = req,
+                RastPort = graphics,
+                Domain = GetGadgetDomain(gadget, screen, window, req, ref box),
+                DrawInfo = screen.GetDrawInfo()
+            };
+            return gi;
+        }
+
+        private static void RefreshBoopsiGadget(Gadget gadget, Window window, Requester req, IGraphics graphics)
+        {
+            GadgetInfo gi = SetupGInfo(window, req, gadget, graphics);
+            gadget.Render(gi, graphics, GadgetRedraw.Redraw);
+        }
+
         private static void RenderGadget(Window window, Requester req, Gadget gadget, IGraphics graphics)
         {
-            bool active = window.HasFlag(WindowFlags.WFLG_WINDOWACTIVE);
-            int x = 0;
-            int y = 0;
-            int w = 0;
-            int h = 0;
-            GetGadgetDimensions(window, req, gadget, out x, out y, out w, out h);
-            x -= window.LeftEdge;
-            y -= window.TopEdge;
-            Color backColor = active ? colorActive : colorInactive;
-            Color borderColorTopLeft = colorLightEdge;
-            Color borderColorBottomRight = colorDarkEdge;
-            bool selected = gadget.Selected;
-            if ((gadget.GadgetType & GadgetType.SYSGADGET) == GadgetType.SYSGADGET)
-            {
-                if (selected)
-                {
-                    borderColorBottomRight = colorLightEdge;
-                    borderColorTopLeft = colorDarkEdge;
-                }
-                switch (gadget.GadgetType & ~GadgetType.GADGETTYPE)
-                {
-                    case GadgetType.SIZING:
-                    case GadgetType.CLOSE:
-                    case GadgetType.WDEPTH:
-                    case GadgetType.WZOOM:
-                        DrawImage(graphics, gadget.Image, x, y);
-                        break;
-                }
-            }
-            switch (gadget.GadgetType & ~GadgetType.GADGETTYPE)
-            {
-                case GadgetType.PROPGADGET:
-                    int kx;
-                    int ky;
-                    int kw;
-                    int kh;
+            RefreshBoopsiGadget(gadget, window, req, graphics);
+            //if ((gadget.Flags & GadgetFlags.BOOPSIGADGET) == GadgetFlags.BOOPSIGADGET)
+            //{
+            //    RefreshBoopsiGadget(gadget, window, req, graphics);
+            //    return;
+            //}
+            //bool active = window.HasFlag(WindowFlags.WFLG_WINDOWACTIVE);
+            //bool selected = gadget.Selected;
+            //bool borderGadget = (gadget.Activation & (GadgetActivation.BOTTOMBORDER | GadgetActivation.LEFTBORDER | GadgetActivation.RIGHTBORDER | GadgetActivation.TOPBORDER)) != 0;
+            //IBox box = null;
+            //IScreen screen = window?.Screen;
+            //gadget.GetWinGadgetIBox(screen, window, req, ref box);
+            //int x = box.LeftEdge;
+            //int y = box.TopEdge;
+            //int w = box.Width;
+            //int h = box.Height;
+            //Color backColor = active ? colorActive : colorInactive;
+            //Color borderColorTopLeft = selected ? colorDarkEdge : colorLightEdge;
+            //Color borderColorBottomRight = selected ? colorLightEdge : colorDarkEdge;
+            //Color bgColor = borderGadget ? backColor : gadget.BgColor;
+            //switch (gadget.GadgetType & GadgetType.GTYPEMASK)
+            //{
+            //    case GadgetType.BOOLGADGET:
+            //        graphics.FillRectangle(x, y, w, h, bgColor);
+            //        DrawImage(graphics, gadget.Image, x, y);
+            //        DrawBorder(graphics, gadget.Border, x, y);
+            //        DrawIntuiText(graphics, gadget.GadgetText, x, y, x + 1, y + 1, w - 2, h - 2);
+            //        break;
+            //    case GadgetType.STRGADGET:
+            //        graphics.FillRectangle(x, y, w, h, colorWindow);
+            //        graphics.DrawLine(x, y + h, x + w, y + h, colorLightEdge);
+            //        graphics.DrawLine(x + w, y, x + w, y + h, colorLightEdge);
+            //        graphics.DrawRectangle(x + 1, y + 1, w - 2, h - 2, Color.Black);
+            //        int txtX = x + 4;
+            //        int txtY = y + 3;
+            //        gadget.StringInfo.CLeft = txtX;
+            //        gadget.StringInfo.CTop = txtY;
+            //        graphics.SetClip(x + 1, y + 1, w - 2, h - 2);
+            //        graphics.RenderText(gadget.StringInfo.Buffer, txtX, txtY, colorText, HorizontalTextAlign.Left, VerticalTextAlign.Top);
+            //        graphics.ClearClip();
+            //        if (cursorBlink && gadget == activeGadget)
+            //        {
+            //            DrawCursor(graphics, gadget);
+            //        }
+            //        DrawIntuiText(graphics, gadget.GadgetText, x, y);
+            //        break;
+            //    case GadgetType.PROPGADGET:
+            //        PropGadget.RefreshPropGadget(gadget, window, req, graphics);
+            //        break;
 
-                    GetKnobDimensions(window, req, gadget, out kx, out ky, out kw, out kh);
-                    kx -= window.LeftEdge;
-                    ky -= window.TopEdge;
-                    graphics.FillRectangle(x, y, w, h, colorWindow);
-                    if ((gadget.PropInfo.Flags & PropFlags.PROPBORDERLESS) != PropFlags.PROPBORDERLESS)
-                    {
-                        graphics.DrawLine(x, y, x + w, y, borderColorBottomRight);
-                        graphics.DrawLine(x, y, x, y + h, borderColorBottomRight);
-                        graphics.DrawLine(x, y + h, x + w, y + h, borderColorTopLeft);
-                        graphics.DrawLine(x + w, y, x + w, y + h, borderColorTopLeft);
-                    }
-                    if ((gadget.PropInfo.Flags & PropFlags.AUTOKNOB) == PropFlags.AUTOKNOB)
-                    {
-                        graphics.FillRectangle(kx, ky, kw, kh, selected ? colorInactive : colorWindow);
-                        graphics.DrawLine(kx, ky, kx + kw, ky, borderColorTopLeft);
-                        graphics.DrawLine(kx, ky, kx, ky + kh, borderColorTopLeft);
-                        graphics.DrawLine(kx, ky + kh, kx + kw, ky + kh, borderColorBottomRight);
-                        graphics.DrawLine(kx + kw, ky, kx + kw, ky + kh, borderColorBottomRight);
-                    }
-                    else
-                    {
-
-                    }
-                    break;
-                case GadgetType.BOOLGADGET:
-                    graphics.FillRectangle(x, y, w, h, gadget.BgColor);
-                    DrawImage(graphics, gadget.Image, x, y);
-                    DrawIntuiText(graphics, gadget.GadgetText, x, y);
-                    break;
-                case GadgetType.STRGADGET:
-                    graphics.FillRectangle(x, y, w, h, colorWindow);
-                    graphics.DrawLine(x, y, x + w, y, borderColorBottomRight);
-                    graphics.DrawLine(x, y, x, y + h, borderColorBottomRight);
-                    graphics.DrawLine(x, y + h, x + w, y + h, borderColorTopLeft);
-                    graphics.DrawLine(x + w, y, x + w, y + h, borderColorTopLeft);
-                    int txtX = x + 2;
-                    int txtY = y + 2;
-                    gadget.StringInfo.CLeft = txtX;
-                    gadget.StringInfo.CTop = txtY;
-                    graphics.RenderText(gadget.StringInfo.Buffer, txtX, txtY, colorText, HorizontalTextAlign.Left, VerticalTextAlign.Top);
-                    if (cursorBlink && gadget == activeGadget)
-                    {
-                        DrawCursor(graphics, gadget);
-                    }
-                    break;
-            }
-            if ((gadget.Flags & GadgetFlags.GADGDISABLED) == GadgetFlags.GADGDISABLED)
-            {
-                DrawDisabled(graphics, x, y, w, h);
-            }
+            //}
+            //if ((gadget.Flags & GadgetFlags.GADGDISABLED) == GadgetFlags.GADGDISABLED)
+            //{
+            //    DrawDisabled(graphics, x, y, w, h);
+            //}
         }
 
         private static void DrawDisabled(IGraphics graphics, int x, int y, int w, int h)
@@ -1322,252 +1751,97 @@ namespace TileEngine.GUI
             Color color = new Color(128, 128, 128, 128);
             graphics.FillRectangle(x, y, w, h, color);
         }
-
-        private static void DrawCursor(IGraphics graphics, Gadget gadget)
+        private static bool FindInput(InputEvent ie, out IScreen screen, out Window win, out Requester req, out Gadget gad)
         {
-            if (gadget != null && gadget.StringInfo != null)
+            win = null;
+            req = null;
+            gad = null;
+            IBox box = new Box();
+            screen = Screen;
+            GadgetInfo gi = new GadgetInfo()
             {
-                int pos = gadget.StringInfo.BufferPos;
-                int startPos = gadget.StringInfo.DispPos;
-                string part = gadget.StringInfo.Buffer.Substring(startPos, pos - startPos);
-                int width = graphics.MeasureTextWidth(part);
-                int x = gadget.StringInfo.CLeft + width + 1;
-                int y = gadget.StringInfo.CTop + 1;
-                graphics.DrawLine(x, y, x, y + 14, colorText);
-            }
-        }
-
-        private static Gadget GetMouseGadget(Window window, Requester req, int x, int y)
-        {
-            Gadget gad = null;
-            if (window != null)
+                Screen = screen
+            };
+            if (screen != null && ie != null)
             {
-                if (req != null && window.HasFlag(WindowFlags.WFLG_INREQUEST))
-                {
-                    foreach (Gadget gadget in req.ReqGadgets)
-                    {
-                        if ((gadget.Flags & GadgetFlags.GADGDISABLED) != GadgetFlags.GADGDISABLED)
-                        {
-                            int gx = 0;
-                            int gy = 0;
-                            int gw = 0;
-                            int gh = 0;
-                            GetGadgetDimensions(window, req, gadget, out gx, out gy, out gw, out gh);
-                            if ((x >= gx) && (y >= gy) && (x <= gx + gw) && (y <= gy + gh))
-                            {
-                                gad = gadget;
-                            }
-                        }
-                    }
-                }
-                else if (window.HasFlag(WindowFlags.WFLG_INREQUEST))
-                {
-                    foreach (Gadget gadget in window.Gadgets)
-                    {
-                        if (((gadget.Flags & GadgetFlags.GADGDISABLED) != GadgetFlags.GADGDISABLED) &&
-                            ((gadget.GadgetType & GadgetType.SYSGADGET) == GadgetType.SYSGADGET))
-                        {
-                            int gx = 0;
-                            int gy = 0;
-                            int gw = 0;
-                            int gh = 0;
-                            GetGadgetDimensions(window, req, gadget, out gx, out gy, out gw, out gh);
-                            if ((x >= gx) && (y >= gy) && (x <= gx + gw) && (y <= gy + gh))
-                            {
-                                gad = gadget;
-                            }
-                        }
-                    }
-                }
-                else if (!window.HasFlag(WindowFlags.WFLG_INREQUEST))
-                {
-                    foreach (Gadget gadget in window.Gadgets)
-                    {
-                        if ((gadget.Flags & GadgetFlags.GADGDISABLED) != GadgetFlags.GADGDISABLED)
-                        {
-                            int gx = 0;
-                            int gy = 0;
-                            int gw = 0;
-                            int gh = 0;
-                            GetGadgetDimensions(window, req, gadget, out gx, out gy, out gw, out gh);
-                            if ((x >= gx) && (y >= gy) && (x <= gx + gw) && (y <= gy + gh))
-                            {
-                                gad = gadget;
-                            }
-                        }
-                    }
-                }
-            }
-            return gad;
-        }
-
-        private static Requester GetMouseRequester(Window window, int x, int y)
-        {
-            Requester req = null;
-            if (window != null)
-            {
-                foreach (Requester requester in window.Requesters)
-                {
-                    int rx = 0;
-                    int ry = 0;
-                    int rw = 0;
-                    int rh = 0;
-                    GetRequesterDimensions(window, requester, out rx, out ry, out rw, out rh);
-                    if ((x >= rx) && (y >= ry) && (x <= rx + rw) && (y <= ry + rh))
-                    {
-                        req = requester;
-                    }
-                }
-            }
-            return req;
-        }
-
-
-        private static Window GetMouseWindow(int x, int y)
-        {
-            Window window = null;
-            if (Screen != null)
-            {
-                foreach (Window w in Screen.Windows)
+                int x = ie.X;
+                int y = ie.Y;
+                foreach (var w in screen.Windows)
                 {
                     if ((w.LeftEdge <= x) && (w.TopEdge <= y) && (w.LeftEdge + w.Width > x) && (w.TopEdge + w.Height > y))
                     {
-                        window = w;
+                        win = w;
                     }
                 }
-            }
-            return window;
-        }
-
-        private static void GetKnobDimensions(Window window, Requester req, Gadget gadget, out int x, out int y, out int w, out int h)
-        {
-            GetGadgetDimensions(window, req, gadget, out x, out y, out w, out h);
-            if ((gadget.GadgetType & ~GadgetType.GADGETTYPE) == GadgetType.PROPGADGET)
-            {
-                if ((gadget.PropInfo.Flags & PropFlags.PROPBORDERLESS) == PropFlags.PROPBORDERLESS)
+                if (win != null)
                 {
-                }
-                else
-                {
-                    x++;
-                    y++;
-                    w -= 2;
-                    h -= 2;
-                }
-                gadget.PropInfo.CWidth = w;
-                gadget.PropInfo.CHeight = h;
-                gadget.PropInfo.LeftBorder = x;
-                gadget.PropInfo.TopBorder = y;
-                gadget.PropInfo.HPotRes = PropInfo.MAXPOT / gadget.PropInfo.HorizBody;
-                gadget.PropInfo.VPotRes = PropInfo.MAXPOT / gadget.PropInfo.VertBody;
-                if ((gadget.PropInfo.Flags & PropFlags.AUTOKNOB) == PropFlags.AUTOKNOB)
-                {
-                    w = gadget.PropInfo.CWidth * gadget.PropInfo.HorizBody / PropInfo.MAXBODY;
-                    h = gadget.PropInfo.CHeight * gadget.PropInfo.VertBody / PropInfo.MAXBODY;
-                    x = gadget.PropInfo.LeftBorder + gadget.PropInfo.CWidth * gadget.PropInfo.HorizPot / PropInfo.MAXPOT;
-                    y = gadget.PropInfo.TopBorder + gadget.PropInfo.CHeight * gadget.PropInfo.VertPot / PropInfo.MAXPOT;
-                    x = Math.Min(x, gadget.PropInfo.LeftBorder + gadget.PropInfo.CWidth - w);
-                    y = Math.Min(y, gadget.PropInfo.TopBorder + gadget.PropInfo.CHeight - h);
-                }
-            }
-        }
-
-        private static void GetRequesterDimensions(Window window, Requester req, out int x, out int y, out int w, out int h)
-        {
-            x = window.LeftEdge + req.LeftEdge;
-            y = window.TopEdge + req.TopEdge;
-            w = req.Width;
-            h = req.Height;
-        }
-
-        private static void GetGadgetDimensions(Window window, Requester req, Gadget gadget, out int x, out int y, out int w, out int h)
-        {
-            x = window.LeftEdge;
-            y = window.TopEdge;
-            if (req != null)
-            {
-                x += req.LeftEdge;
-                y += req.TopEdge;
-            }
-            if ((gadget.Flags & GadgetFlags.GRELRIGHT) == GadgetFlags.GRELRIGHT)
-            {
-                if (req != null)
-                {
-                    x += (req.Width + gadget.LeftEdge);
-                }
-                else
-                {
-                    x += (window.Width + gadget.LeftEdge);
-                }
-            }
-            else
-            {
-                x += gadget.LeftEdge;
-            }
-            if ((gadget.Flags & GadgetFlags.GRELBOTTOM) == GadgetFlags.GRELBOTTOM)
-            {
-                if (req != null)
-                {
-                    y += (req.Height + gadget.TopEdge);
-                }
-                else
-                {
-                    y += (window.Height + gadget.TopEdge);
-                }
-            }
-            else
-            {
-                y += gadget.TopEdge;
-            }
-            if ((gadget.Flags & GadgetFlags.GRELWIDTH) == GadgetFlags.GRELWIDTH)
-            {
-                int right = window.LeftEdge + window.Width + gadget.Width;
-                w = right - x;
-            }
-            else
-            {
-                w = gadget.Width;
-            }
-            if ((gadget.Flags & GadgetFlags.GRELHEIGHT) == GadgetFlags.GRELHEIGHT)
-            {
-                int bottom = window.TopEdge + window.Height + gadget.Height;
-                h = bottom - y;// window.Height + gadget.Height;
-            }
-            else
-            {
-                h = gadget.Height;
-            }
-        }
-
-        private static object GetTagData(this ValueTuple<WATags, object>[] tags, WATags tag)
-        {
-            if (tags != null)
-            {
-                foreach (var t in tags)
-                {
-                    if (t.Item1 == tag)
+                    gi.Window = win;
+                    int wx = x - win.LeftEdge;
+                    int wy = y - win.TopEdge;
+                    foreach (var r in win.Requesters)
                     {
-                        return t.Item2;
+                        if ((r.LeftEdge <= wx) && (r.TopEdge <= wy) && (r.LeftEdge + r.Width > wx) && (r.TopEdge + r.Height > wy))
+                        {
+                            req = r;
+                        }
+                    }
+                    if (req != null)
+                    {
+                        gi.Requester = req;
+                        int rx = wx - req.LeftEdge;
+                        int ry = wy - req.TopEdge;
+
+                        foreach (var g in req.ReqGadgets)
+                        {
+                            g.GetScrGadgetIBox(screen, win, req, ref box);
+                            if (box.ContainsPoint(x, y))
+                            {
+                                if (g.HitTest(gi, rx, ry) == HitTestResult.GadgetHit)
+                                {
+                                    gad = g;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var g in win.Gadgets)
+                        {
+                            g.GetScrGadgetIBox(screen, win, req, ref box);
+                            if (box.ContainsPoint(x, y))
+                            {
+                                if (g.HitTest(gi, wx, wy) == HitTestResult.GadgetHit)
+                                {
+                                    gad = g;
+                                }
+                            }
+                        }
                     }
                 }
+                return true;
             }
-            return 0;
-        }
-        private static void ModifyFlag(NewWindow newWindow, ValueTuple<WATags, object> tag, WindowFlags flag)
-        {
-            if ((bool)tag.Item2)
-            {
-                newWindow.Flags |= flag;
-            }
-            else
-            {
-                newWindow.Flags &= ~flag;
-            }
+            return false;
         }
 
-        public static ValueTuple<WATags, object> T(this WATags tag, object value)
+        private static IBox GetKnobDimensions(Gadget gadget)
         {
-            return ValueTuple.Create<WATags, object>(tag, value);
+            IBox knob = new Box();
+            if (gadget != null)
+            {
+                IBox box = null;
+                Window window = gadget.Window;
+                IScreen screen = window?.Screen;
+                Requester req = gadget.Requester;
+                gadget.GetWinGadgetIBox(screen, window, req, ref box);
+                PropGadget.CalcKnobSize(gadget, box, ref knob);
+            }
+            return knob;
         }
+
+        private static void ModifyFlag(NewWindow newWindow, ValueTuple<Tags, object> tag, WindowFlags flag)
+        {
+            if ((bool)tag.Item2) { newWindow.Flags |= flag; } else { newWindow.Flags &= ~flag; }
+        }
+
     }
 }
