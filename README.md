@@ -8,6 +8,9 @@ _Portable Tile Engine_
 # TileEngine
 The portable tile engine.
 
+# SDLTiles
+Uses TileEngine with SDL.
+
 # MONOTiles
 Uses TileEngine with MonoGame.
 
