@@ -1,0 +1,159 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TileEngine.Core;
+using TileEngine.Graphics;
+
+namespace TileEngine.YGUI
+{
+    public enum Orientation
+    {
+        Horizontal = 0,
+        Vertical
+    };
+
+    public enum Alignment
+    {
+        Minimum = 0,
+        Middle,
+        Maximum,
+        Fill
+    };
+
+    public abstract class Layout
+    {
+        public abstract void PerformLayout(IGraphics gfx, Gadget gadget);
+        public abstract Vector2 GetPreferredSize(IGraphics gfx, Gadget gadget);
+
+        protected internal static Vector2 GetValidSize(Vector2 pref, Vector2 fix)
+        {
+            return new Vector2(fix.X != 0 ? fix.X : pref.X, fix.Y != 0 ? fix.Y : pref.Y);
+        }
+    }
+
+    public class BoxLayout : Layout
+    {
+        protected Orientation orientation;
+        protected Alignment alignment;
+        protected int margin;
+        protected int spacing;
+
+        public BoxLayout(Orientation orientation, Alignment alignment = Alignment.Middle, int margin = 0, int spacing = 0)
+        {
+            this.orientation = orientation;
+            this.alignment = alignment;
+            this.margin = margin;
+            this.spacing = spacing;
+        }
+
+        public Orientation Orientation
+        {
+            get { return orientation; }
+            set { orientation = value; }
+        }
+
+        public Alignment Alignment
+        {
+            get { return alignment; }
+            set { alignment = value; }
+        }
+
+        public int Margin
+        {
+            get { return margin; }
+            set { margin = value; }
+        }
+
+        public int Spacing
+        {
+            get { return spacing; }
+            set { spacing = value; }
+        }
+
+        public override Vector2 GetPreferredSize(IGraphics gfx, Gadget gadget)
+        {
+            Vector2 size = new Vector2(2 * margin, 2 * margin);
+            int xOffset = gadget.BorderLeft + gadget.BorderRight;
+            int yOffset = gadget.BorderTop + gadget.BorderBottom;
+            bool first = true;
+            int axis1 = (int)orientation;
+            int axis2 = (((int)orientation) + 1) % 2;
+            foreach (var w in gadget.Children)
+            {
+                if (!w.Visible) continue;
+                if (first)
+                    first = false;
+                else
+                    size[axis1] += spacing;
+
+                Vector2 ps = w.GetPreferredSize(gfx);
+                Vector2 fs = w.FixedSize;
+                Vector2 targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
+                size[axis1] += targetSize[axis1];
+                size[axis2] = Math.Max(size[axis2], targetSize[axis2] + 2 * margin);
+                first = false;
+            }
+            return size + new Vector2(xOffset, yOffset);
+        }
+
+        public override void PerformLayout(IGraphics gfx, Gadget gadget)
+        {
+            Vector2 fs_w = gadget.FixedSize;
+            Vector2 s_w = gadget.Size;
+            Vector2 containerSize = GetValidSize(s_w, fs_w);// new Vector2(fs_w.X != 0 ? fs_w.X : widget.Width, fs_w.Y != 0 ? fs_w.Y : widget.Height);
+            containerSize.X -= gadget.BorderLeft;
+            containerSize.X -= gadget.BorderRight;
+            containerSize.Y -= gadget.BorderTop;
+            containerSize.Y -= gadget.BorderBottom;
+            int axis1 = (int)orientation;
+            int axis2 = (((int)orientation) + 1) % 2;
+            int position = margin;
+            if (orientation == Orientation.Vertical)
+            {
+                position += gadget.BorderTop;
+            }
+            else
+            {
+                position += gadget.BorderLeft;
+            }
+            int xOffset = gadget.BorderLeft;
+            int yOffset = gadget.BorderTop;
+            bool first = true;
+            foreach (var w in gadget.Children)
+            {
+                if (!w.Visible) continue;
+                if (first)
+                    first = false;
+                else
+                    position += spacing;
+                Vector2 ps = w.GetPreferredSize(gfx);
+                Vector2 fs = w.FixedSize;
+                Vector2 targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
+                Vector2 pos = new Vector2(xOffset, yOffset);
+                pos[axis1] = position;
+                switch (alignment)
+                {
+                    case Alignment.Minimum:
+                        pos[axis2] += margin;
+                        break;
+                    case Alignment.Middle:
+                        pos[axis2] += (containerSize[axis2] - targetSize[axis2]) / 2;
+                        break;
+                    case Alignment.Maximum:
+                        pos[axis2] += containerSize[axis2] - targetSize[axis2] - margin * 2;
+                        break;
+                    case Alignment.Fill:
+                        pos[axis2] += margin;
+                        targetSize[axis2] = fs[axis2] != 0 ? fs[axis2] : (containerSize[axis2] - margin * 2);
+                        break;
+                }
+                w.Position = pos;
+                w.Size = targetSize;
+                w.PerformLayout(gfx);
+                position += targetSize[axis1];
+            }
+        }
+    }
+}

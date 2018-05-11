@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ExtendedSpriteBatch.cs" />
+    <Compile Include="MONOFont.cs" />
+    <Compile Include="MONOFontEngine.cs" />
     <Compile Include="MONOGame.cs" />
     <Compile Include="MONOExtensions.cs" />
     <Compile Include="MONOFileResolver.cs" />

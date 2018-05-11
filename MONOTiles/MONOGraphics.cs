@@ -23,18 +23,18 @@ namespace MONOTiles
     using TileEngine.Graphics;
     using TileEngine.Logging;
     using MonoGame.Extended.BitmapFonts;
+    using TileEngine.Fonts;
 
     public class MONOGraphics : AbstractGraphics
     {
+        private Rect clipRect;
         private MONOGame game;
         private Microsoft.Xna.Framework.Graphics.RenderTarget2D view;
         private ExtendedSpriteBatch batch;
-        private Microsoft.Xna.Framework.Graphics.RasterizerState rasterizeState;
-        public MONOGraphics(MONOGame game, int width, int height, DebugOptions debugOptions = null)
-            : base(width, height, debugOptions)
+        public MONOGraphics(MONOGame game, int width, int height, IFontEngine fontEngine, DebugOptions debugOptions = null)
+            : base(width, height, fontEngine, debugOptions)
         {
             this.game = game;
-            rasterizeState = new Microsoft.Xna.Framework.Graphics.RasterizerState() { ScissorTestEnable = true };
         }
 
         public override void SetTarget(Texture tex)
@@ -99,17 +99,40 @@ namespace MONOTiles
 
         public override void SetClip(int x, int y, int width, int height)
         {
-            batch.End();
-            batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
-                Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
-                Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
-                Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
-                rasterizeState);
-            game.GraphicsDevice.ScissorRectangle = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            if (width * height > 0)
+            {
+                clipX = x;
+                clipY = y;
+                clipW = width;
+                clipH = height;
+                x += transX;
+                y += transY;
+
+                clipRect = new Rect(x, y, width, height);
+                batch.End();
+                batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
+                    Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
+                    Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp,
+                    Microsoft.Xna.Framework.Graphics.DepthStencilState.None,
+                    new Microsoft.Xna.Framework.Graphics.RasterizerState()
+                    {
+                        ScissorTestEnable = true
+                    });
+                game.GraphicsDevice.ScissorRectangle = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            }
+            else
+            {
+                ClearClip();
+            }
         }
 
         public override void ClearClip()
         {
+            clipX = 0;
+            clipY = 0;
+            clipW = 0;
+            clipH = 0;
+            clipRect = Rect.Empty;
             batch.End();
             batch.Begin(Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred,
                 Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend,
@@ -126,8 +149,8 @@ namespace MONOTiles
                 for (int i = 0; i < count; i++)
                 {
                     int idx = offset;
-                    int x = vertices[idx];
-                    int y = vertices[idx + 1];
+                    int x = vertices[idx] + transX;
+                    int y = vertices[idx + 1] + transY;
                     int width = vertices[idx + 2];
                     int height = vertices[idx + 3];
                     int srcX = vertices[idx + 4];
@@ -159,6 +182,8 @@ namespace MONOTiles
             var bmp = texture.GetTexture();
             if (bmp != null)
             {
+                x += transX;
+                y += transY;
                 var dstRect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
                 var srcRect = new Microsoft.Xna.Framework.Rectangle(srcX, srcY, srcWidth, srcHeight);
                 var col = Microsoft.Xna.Framework.Color.White;
@@ -167,13 +192,25 @@ namespace MONOTiles
                     col *= (float)((255 - trans) / 256.0);
                 }
                 batch.Draw(bmp, dstRect, srcRect, col, 0.0f, Microsoft.Xna.Framework.Vector2.Zero, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 1.0f);
+                Logger.Detail("GFX", $"inside clip {x} {y} {clipRect}");
+                if (clipRect.IsEmpty)
+                {
+                    Logger.Info("GFX", $"No Clip Rect!");
+                }
+            }
+            else
+            {
+                Logger.Detail("GFX", $"outside clip {x} {y} {clipRect}");
             }
         }
 
-        public override void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        public override void RenderText(Font font, string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
+            if (font == null) return;
+            x += transX;
+            y += transY;
             var c = color.GetColor();
-            var fnt = game.smallFont;
+            var fnt = font.GetFont();
             var size = fnt.MeasureString(text);
             var pos = new Microsoft.Xna.Framework.Vector2(x, y);
             if (hAlign == HorizontalTextAlign.Center)
@@ -202,74 +239,163 @@ namespace MONOTiles
             batch.DrawString(fnt, text, pos, c);
         }
 
-        public override int MeasureTextWidth(string text)
+        public override void RenderText(Font font, string text, int x, int y, Color color, Color bg, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var fnt = game.smallFont;
+            if (font == null) return;
+            x += transX;
+            y += transY;
+            var c = color.GetColor();
+            var fnt = font.GetFont();
             var size = fnt.MeasureString(text);
-            return (int)size.Width;
+            var pos = new Microsoft.Xna.Framework.Vector2(x, y);
+            if (hAlign == HorizontalTextAlign.Center)
+            {
+                pos.X -= size.Width / 2;
+            }
+            else if (hAlign == HorizontalTextAlign.Left)
+            {
+            }
+            else if (hAlign == HorizontalTextAlign.Right)
+            {
+                pos.X -= size.Width;
+            }
+            if (vAlign == VerticalTextAlign.Center)
+            {
+                pos.Y -= size.Height / 2;
+            }
+            else if (vAlign == VerticalTextAlign.Bottom)
+            {
+                pos.Y -= size.Height;
+            }
+            batch.DrawString(fnt, text, pos, c);
         }
 
-        public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
+        public override void RenderIcon(int icon, int x, int y)
         {
-            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
-            if (pressed)
+            var fnt = FontEngine.IconFont;
+            if (fnt != null)
             {
-                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.DimGray * 0.5f);
-                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+                x += transX;
+                y += transY;
+                var pos = new Microsoft.Xna.Framework.Vector2(x, y);
+                var col = Microsoft.Xna.Framework.Color.White;
+                string txt = "" + (char)icon;
+                batch.DrawString(fnt.GetFont() , txt, pos, col);
             }
-            else if (hover && enabled)
-            {
-                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.LightGray * 0.5f);
-                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
-            }
-            else if (enabled)
-            {
-                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.Gray * 0.5f);
-                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
-            }
-            else
-            {
-                batch.FillRectangle(rect, Microsoft.Xna.Framework.Color.DimGray * 0.5f);
-                batch.DrawRectangle(rect, Microsoft.Xna.Framework.Color.White);
+        }
 
+        public override void RenderIcon(int icon, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        {
+            var fnt = FontEngine.IconFont;
+            if (fnt != null)
+            {
+                x += transX;
+                y += transY;
+                var pos = new Microsoft.Xna.Framework.Vector2(x, y);
+                var col = color.GetColor();
+                string txt = "" + (char)icon;
+                var ft = fnt.GetFont();
+                var size = ft.MeasureString(txt);
+                if (hAlign == HorizontalTextAlign.Center)
+                {
+                    pos.X -= size.Width / 2;
+                }
+                else if (hAlign == HorizontalTextAlign.Left)
+                {
+                }
+                else if (hAlign == HorizontalTextAlign.Right)
+                {
+                    pos.X -= size.Width;
+                }
+                if (vAlign == VerticalTextAlign.Center)
+                {
+                    pos.Y -= size.Height / 2;
+                }
+                else if (vAlign == VerticalTextAlign.Bottom)
+                {
+                    pos.Y -= size.Height;
+                }
+                batch.DrawString(fnt.GetFont(), txt, pos, col);
             }
+
+        }
+        public override int MeasureTextWidth(Font font, string text)
+        {
+            if (string.IsNullOrEmpty(text)) return 0;
+            var fnt = font.GetFont();
+            if (fnt != null)
+            {
+                var size = fnt.MeasureString(text);
+                return (int)size.Width;
+            }
+            return text.Length * 8;
         }
 
         public override void DrawRectangle(int x, int y, int width, int height, Color color)
         {
+            x += transX;
+            y += transY;
             var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
             batch.DrawRectangle(rect, color.GetColor());
         }
 
+        public override void DrawRoundedRectangle(int x, int y, int width, int height, Color color)
+        {
+            x += transX;
+            y += transY;
+            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            batch.DrawRoundedRectangle(rect, color.GetColor());
+        }
+
         public override void FillRectangle(int x, int y, int width, int height, Color color)
         {
+            x += transX;
+            y += transY;
             var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
             batch.FillRectangle(rect, color.GetColor());
         }
 
+        public override void FillRectangle(int x, int y, int width, int height, Color color, Color color2)
+        {
+            x += transX;
+            y += transY;
+            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
+            batch.FillRectangle(rect, color.GetColor(), color2.GetColor());
+        }
+
         public override void DrawLine(int x1, int y1, int x2, int y2, Color color)
         {
+            x1 += transX;
+            y1 += transY;
+            x2 += transX;
+            y2 += transY;
             var start = new Microsoft.Xna.Framework.Vector2(x1, y1);
             var end = new Microsoft.Xna.Framework.Vector2(x2, y2);
             batch.DrawLine(start, end, color.GetColor());
         }
-        public override void DrawText(string text, int x, int y)
+        public override void DrawText(Font font, string text, int x, int y)
         {
 
         }
 
         public override void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
+            x += transX;
+            y += transY;
             DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Wheat * 0.48f, oriention);
         }
 
         public override void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
+            x += transX;
+            y += transY;
             DrawTile(x, y, width, height, Microsoft.Xna.Framework.Color.Gold * 0.48f, oriention);
         }
 
         private void DrawTile(int x, int y, int width, int height, Microsoft.Xna.Framework.Color color, MapOrientation oriention = MapOrientation.Isometric)
         {
+            x += transX;
+            y += transY;
             if (oriention == MapOrientation.Orthogonal)
             {
                 var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);

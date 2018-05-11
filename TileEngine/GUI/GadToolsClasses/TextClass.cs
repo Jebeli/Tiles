@@ -65,7 +65,7 @@ namespace TileEngine.GUI.GadToolsClasses
             string txt = GTRenderText;
             if (!string.IsNullOrEmpty(txt))
             {
-                graphics.RenderText(txt, container.CenterX, container.CenterY, gadgetInfo.DrawInfo.TextPen);
+                graphics.RenderText(Font, txt, container.CenterX, container.CenterY, gadgetInfo.DrawInfo.TextPen);
             }
         }
 

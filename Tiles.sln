@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileEngine", "TileEngine\TileEngine.csproj", "{11C2AFBD-F201-4A52-A600-F6B63E27D7BA}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MONOTiles", "MONOTiles\MONOTiles.csproj", "{59E07112-AA06-4B74-8DE8-EEBFD3042C58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileContent", "TileContent\TileContent.csproj", "{5AD4412A-F16A-4F59-BF73-C5746F071545}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDLTiles", "SDLTiles\SDLTiles.csproj", "{852506C8-F232-4F44-8C15-F4134EEBB828}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +35,15 @@ Global
 		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AD4412A-F16A-4F59-BF73-C5746F071545}.Release|Any CPU.Build.0 = Release|Any CPU
+		{852506C8-F232-4F44-8C15-F4134EEBB828}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{852506C8-F232-4F44-8C15-F4134EEBB828}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{852506C8-F232-4F44-8C15-F4134EEBB828}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{852506C8-F232-4F44-8C15-F4134EEBB828}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D68A756C-1CAD-461E-AF69-6D2D4CF3D076}
 	EndGlobalSection
 EndGlobal

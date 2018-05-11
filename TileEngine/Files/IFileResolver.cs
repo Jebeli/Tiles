@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Files
 {
+    using System.Collections.Generic;
     using System.IO;
 
     public interface IFileResolver
@@ -24,5 +25,13 @@ namespace TileEngine.Files
         string Resolve(string fileId);
         Stream OpenFile(string fileId);
         Stream CreateFile(string fileId);
+
+        IList<string> GetVolumes();
+        IList<string> GetDirectories(string dir);
+        IList<string> GetFiles(string dir);
+        string GetParent(string dir);
+
+        IList<FileInfo> GetVolumeInfos();
+        IList<FileInfo> GetFileInfos(string dir);
     }
 }

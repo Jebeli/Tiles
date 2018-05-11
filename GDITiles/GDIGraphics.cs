@@ -20,6 +20,7 @@ namespace GDITiles
     using System;
     using TileEngine.Core;
     using TileEngine.Files;
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
     using TileEngine.Logging;
 
@@ -31,11 +32,10 @@ namespace GDITiles
         private System.Drawing.Graphics oldGfx;
         private System.Drawing.Pen gridPen;
         private System.Drawing.Pen selectPen;
-        private System.Drawing.Font smallFont;
         private System.Drawing.Brush textBrush;
 
-        public GDIGraphics(int width, int height, DebugOptions debugOptions = null)
-            : base(width, height, debugOptions)
+        public GDIGraphics(int width, int height, IFontEngine fontEngine, DebugOptions debugOptions = null)
+            : base(width, height, fontEngine, debugOptions)
         {
             InitPensAndFonts();
         }
@@ -66,7 +66,6 @@ namespace GDITiles
             }
         }
 
-
         public override void ClearScreen()
         {
             if (CheckInFrame())
@@ -85,11 +84,25 @@ namespace GDITiles
 
         public override void SetClip(int x, int y, int width, int height)
         {
-
+            if (width * height > 0)
+            {
+                clipX = x;
+                clipY = y;
+                clipW = width;
+                clipH = height;
+                x += transX;
+                y += transY;
+                gfx.SetClip(new System.Drawing.Rectangle(x, y, width, height), System.Drawing.Drawing2D.CombineMode.Replace);
+            }
+            else
+            {
+                ClearClip();
+            }
         }
 
         public override void ClearClip()
-        {            
+        {
+            gfx.SetClip(new System.Drawing.Rectangle(0, 0, viewWidth, viewHeight), System.Drawing.Drawing2D.CombineMode.Replace);
         }
 
 
@@ -126,18 +139,23 @@ namespace GDITiles
             var bmp = texture.GetBitmap();
             if (bmp != null)
             {
+                x += transX;
+                y += transY;
                 System.Drawing.Rectangle dstRect = new System.Drawing.Rectangle(x, y, width, height);
                 System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(srcX, srcY, srcWidth, srcHeight);
                 gfx.DrawImage(bmp, dstRect, srcRect, System.Drawing.GraphicsUnit.Pixel);
             }
         }
 
-        public override void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
+        public override void RenderText(Font font, string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var font = smallFont;
+            if (font == null) return;
+            x += transX;
+            y += transY;
+            var fnt = font.GetFont();
             float fx = x;
             float fy = y;
-            var size = gfx.MeasureString(text, font);
+            var size = gfx.MeasureString(text, fnt);
             if (hAlign == HorizontalTextAlign.Center)
             {
                 fx -= size.Width / 2;
@@ -163,47 +181,131 @@ namespace GDITiles
             }
             using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
             {
-                gfx.DrawString(text, smallFont, brush, fx, fy);
+                gfx.DrawString(text, fnt, brush, fx, fy);
             }
         }
 
-        public override int MeasureTextWidth(string text)
+        public override void RenderText(Font font, string text, int x, int y, Color color, Color bg, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var font = smallFont;
-            var size = gfx.MeasureString(text, font);
-            return (int)size.Width;
+            if (font == null) return;
+            x += transX;
+            y += transY;
+            var fnt = font.GetFont();
+            float fx = x;
+            float fy = y;
+            var size = gfx.MeasureString(text, fnt);
+            if (hAlign == HorizontalTextAlign.Center)
+            {
+                fx -= size.Width / 2;
+            }
+            else if (hAlign == HorizontalTextAlign.Left)
+            {
+            }
+            else if (hAlign == HorizontalTextAlign.Right)
+            {
+                fx -= size.Width;
+            }
+            if (vAlign == VerticalTextAlign.Center)
+            {
+                fy -= size.Height / 2;
+            }
+            else if (vAlign == VerticalTextAlign.Top)
+            {
+
+            }
+            else if (vAlign == VerticalTextAlign.Bottom)
+            {
+                fy -= size.Height;
+            }
+            using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
+            {
+                gfx.DrawString(text, fnt, brush, fx, fy);
+            }
+        }
+        public override void RenderIcon(int icon, int x, int y)
+        {
+            var fnt = FontEngine.IconFont;
+            if (fnt != null)
+            {
+                x += transX;
+                y += transY;
+                string txt = new string(new char[] { (char)icon });
+                gfx.DrawString(txt, fnt.GetFont(), System.Drawing.Brushes.White, x, y);
+            }
         }
 
-        public override void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed)
+        public override void RenderIcon(int icon, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center)
         {
-            var rect = new System.Drawing.Rectangle(x, y, width, height);
-            if (pressed)
+            var fnt = FontEngine.IconFont;
+            if (fnt != null)
             {
-                gfx.FillRectangle(System.Drawing.Brushes.DimGray, rect);
-                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+                x += transX;
+                y += transY;
+                string txt = new string(new char[] { (char)icon });
+                float fx = x;
+                float fy = y;
+                var ft = fnt.GetFont();
+                var size = gfx.MeasureString(txt, ft);
+                if (hAlign == HorizontalTextAlign.Center)
+                {
+                    fx -= size.Width / 2;
+                }
+                else if (hAlign == HorizontalTextAlign.Left)
+                {
+                }
+                else if (hAlign == HorizontalTextAlign.Right)
+                {
+                    fx -= size.Width;
+                }
+                if (vAlign == VerticalTextAlign.Center)
+                {
+                    fy -= size.Height / 2;
+                }
+                else if (vAlign == VerticalTextAlign.Top)
+                {
+
+                }
+                else if (vAlign == VerticalTextAlign.Bottom)
+                {
+                    fy -= size.Height;
+                }
+                using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
+                {
+                    gfx.DrawString(txt, fnt.GetFont(), brush, fx, fy);
+                }
             }
-            else if (hover && enabled)
+
+        }
+        public override int MeasureTextWidth(Font font, string text)
+        {
+            if (string.IsNullOrEmpty(text)) return 0;
+            var fnt = font.GetFont();
+            if (fnt != null)
             {
-                gfx.FillRectangle(System.Drawing.Brushes.LightGray, rect);
-                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
+                var size = gfx.MeasureString(text, fnt);
+                return (int)size.Width;
             }
-            else if (enabled)
-            {
-                gfx.FillRectangle(System.Drawing.Brushes.Gray, rect);
-                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
-            }
-            else
-            {
-                gfx.FillRectangle(System.Drawing.Brushes.DimGray, rect);
-                gfx.DrawRectangle(System.Drawing.Pens.White, rect);
-            }
+            return text.Length * 8;
         }
 
         public override void DrawRectangle(int x, int y, int width, int height, Color color)
         {
             using (var pen = new System.Drawing.Pen(color.GetColor()))
             {
-                var rect = new System.Drawing.Rectangle(x, y, width, height);
+                x += transX;
+                y += transY;
+                var rect = new System.Drawing.Rectangle(x, y, width - 1, height - 1);
+                gfx.DrawRectangle(pen, rect);
+            }
+        }
+
+        public override void DrawRoundedRectangle(int x, int y, int width, int height, Color color)
+        {
+            using (var pen = new System.Drawing.Pen(color.GetColor()))
+            {
+                x += transX;
+                y += transY;
+                var rect = new System.Drawing.Rectangle(x, y, width - 1, height - 1);
                 gfx.DrawRectangle(pen, rect);
             }
         }
@@ -212,6 +314,18 @@ namespace GDITiles
         {
             using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
             {
+                x += transX;
+                y += transY;
+                var rect = new System.Drawing.Rectangle(x, y, width, height);
+                gfx.FillRectangle(brush, rect);
+            }
+        }
+        public override void FillRectangle(int x, int y, int width, int height, Color color, Color color2)
+        {
+            using (var brush = new System.Drawing.SolidBrush(color.GetColor()))
+            {
+                x += transX;
+                y += transY;
                 var rect = new System.Drawing.Rectangle(x, y, width, height);
                 gfx.FillRectangle(brush, rect);
             }
@@ -221,22 +335,32 @@ namespace GDITiles
         {
             using (var pen = new System.Drawing.Pen(color.GetColor()))
             {
+                x1 += transX;
+                y1 += transY;
+                x2 += transX;
+                y2 += transY;
                 gfx.DrawLine(pen, x1, y1, x2, y2);
             }
         }
 
-        public override void DrawText(string text, int x, int y)
+        public override void DrawText(Font font, string text, int x, int y)
         {
-            gfx.DrawString(text, smallFont, textBrush, x, y);
+            x += transX;
+            y += transY;
+            gfx.DrawString(text, font.GetFont(), textBrush, x, y);
         }
 
         public override void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
+            x += transX;
+            y += transY;
             DrawTile(x, y, width, height, gridPen, oriention);
         }
 
         public override void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
+            x += transX;
+            y += transY;
             DrawTile(x, y, width, height, selectPen, oriention);
         }
         public override Texture CreateTexture(string textureId, int width, int height)
@@ -284,7 +408,6 @@ namespace GDITiles
                 gridPen.Dispose();
                 selectPen.Dispose();
                 textBrush.Dispose();
-                smallFont.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -317,7 +440,6 @@ namespace GDITiles
             gridPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Wheat));
             selectPen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(96, System.Drawing.Color.Gold));
             textBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
-            smallFont = new System.Drawing.Font("Segoe UI", 8);
         }
         private void DrawTile(int x, int y, int width, int height, System.Drawing.Pen pen, MapOrientation oriention = MapOrientation.Isometric)
         {

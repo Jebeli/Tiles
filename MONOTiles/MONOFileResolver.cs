@@ -107,6 +107,82 @@ namespace MONOTiles
             return null;
         }
 
+        public override IList<string> GetVolumes()
+        {
+            List<string> volumes = new List<string>();
+            volumes.AddRange(Directory.GetLogicalDrives());
+            return volumes;
+        }
+
+        public override IList<string> GetDirectories(string dir)
+        {
+            return new List<string>(Directory.GetDirectories(dir));
+        }
+
+        public override IList<string> GetFiles(string dir)
+        {
+            return new List<string>(Directory.GetFiles(dir));
+        }
+
+        public override string GetParent(string dir)
+        {
+            return Path.GetDirectoryName(dir);
+        }
+        public override IList<TileEngine.Files.FileInfo> GetVolumeInfos()
+        {
+            List<TileEngine.Files.FileInfo> list = new List<TileEngine.Files.FileInfo>();
+            foreach (var d in Directory.GetLogicalDrives())
+            {
+                DirectoryInfo di = new DirectoryInfo(d);
+                var fi = new TileEngine.Files.FileInfo()
+                {
+                    Path = d,
+                    Name = d,
+                    IsDirectory = true,
+                    Size = 0,
+                    Date = di.LastWriteTime
+                };
+                list.Add(fi);
+            }
+            return list;
+        }
+
+
+        public override IList<TileEngine.Files.FileInfo> GetFileInfos(string dir)
+        {
+            List<TileEngine.Files.FileInfo> list = new List<TileEngine.Files.FileInfo>();
+            foreach (var d in Directory.GetDirectories(dir))
+            {
+                DirectoryInfo di = new DirectoryInfo(d);
+                var fi = new TileEngine.Files.FileInfo()
+                {
+                    Path = d,
+                    Name = Path.GetFileName(d),
+                    Directory = Path.GetDirectoryName(d),
+                    IsDirectory = true,
+                    Size = 0,
+                    Date = di.LastWriteTime
+                };
+                list.Add(fi);
+            }
+            foreach (var f in Directory.GetFiles(dir))
+            {
+                var fi = new System.IO.FileInfo(f);
+
+                var fin = new TileEngine.Files.FileInfo()
+                {
+                    Path = f,
+                    Name = Path.GetFileName(f),
+                    Directory = Path.GetDirectoryName(f),
+                    IsDirectory = false,
+                    Size = fi.Length,
+                    Date = fi.LastWriteTime
+                };
+                list.Add(fin);
+            }
+            return list;
+        }
+
 
         private string MakeAssetName(string fileId)
         {
@@ -136,6 +212,10 @@ namespace MONOTiles
                 {
                     return MakeAssetId(fileId);
                 }
+                else if (fileId.StartsWith("fonts/", StringComparison.OrdinalIgnoreCase) && fileId.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase))
+                {
+                    return MakeFontAssetId(fileId);
+                }
             }
             return null;
         }
@@ -146,6 +226,16 @@ namespace MONOTiles
             assetName = Path.ChangeExtension(assetName, null);
             assetName = assetName.Trim('.');
             return assetName;
+        }
+
+        private static string MakeFontAssetId(string fileId)
+        {
+            if (fileId.Contains("entypo"))
+            {
+                return "fonts/Icon";
+            }
+            return "fonts/Small";
+
         }
     }
 }

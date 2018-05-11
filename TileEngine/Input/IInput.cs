@@ -19,6 +19,8 @@ namespace TileEngine.Input
 {
 
     using System;
+
+    [Flags]
     public enum MouseButton
     {
         None = 0,
@@ -814,6 +816,8 @@ namespace TileEngine.Input
     {
         bool HandleScale { get; set; }
         float ViewScale { get; set; }
+        int MouseX { get; }
+        int MouseY { get; }
 
         event EventHandler<MouseEventArgs> OnMouseWheel;
 

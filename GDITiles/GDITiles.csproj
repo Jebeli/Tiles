@@ -49,6 +49,8 @@
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="GDIExtensions.cs" />
     <Compile Include="GDIFileResolver.cs" />
+    <Compile Include="GDIFont.cs" />
+    <Compile Include="GDIFontEngine.cs" />
     <Compile Include="GDIForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -72,6 +74,18 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Content\fonts\entypo.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\fonts\Roboto-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\fonts\Roboto-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\fonts\Topaz.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

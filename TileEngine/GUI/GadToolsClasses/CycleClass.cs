@@ -58,7 +58,7 @@ namespace TileEngine.GUI.GadToolsClasses
             {
                 int x = container.LeftEdge + ((container.Width - CYCLEIMAGEWIDTH) / 2);
                 int y = container.TopEdge + (container.Height / 2);
-                graphics.RenderText(label, x, y, gadgetInfo.DrawInfo.TextPen);
+                graphics.RenderText(Font, label, x, y, gadgetInfo.DrawInfo.TextPen);
                 x = container.LeftEdge + container.Width - CYCLEIMAGEWIDTH;
                 graphics.RectFill(x + 1, container.TopEdge + 2, x + 1, container.BottomEdge - 2, gadgetInfo.DrawInfo.ShinePen);
                 graphics.RectFill(x, container.TopEdge + 2, x, container.BottomEdge - 2, gadgetInfo.DrawInfo.ShadowPen);

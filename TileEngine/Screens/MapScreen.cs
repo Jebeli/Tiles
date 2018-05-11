@@ -18,63 +18,79 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine.Screens
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using Core;
     using Graphics;
-    using GUI;
     using Input;
+    using TileEngine.Maps;
+    using YGUI;
 
     public class MapScreen : AbstractScreen
     {
+        private const int GADID_EXIT = 1001;
+        private const int GADID_LOAD = 1002;
+        private const int GADID_SAVE = 1003;
+
         private MapRenderer renderer;
         private float mouseX;
         private float mouseY;
         private bool mousePanning;
         private bool panning;
         private bool hasPanned;
-
-        private Window win1;
-        private Gadget button1;
-        private Gadget button2;
-        private Gadget button3;
+        private TileEditor editor;
+        private FileGadget fileDialog;
 
         public MapScreen(Engine engine)
             : base(engine, "MapScreen")
         {
             renderer = new MapRenderer(engine);
             mousePanning = true;
-            MakeWindows();
         }
 
-        private void MakeWindows()
+        protected override void InitGUI(Screen screen)
         {
-            button1 = Gadget.MakeBoolGadget("Exit", 64, 32);
-            button1.SetPosition(5, 5);
-            button2 = Gadget.MakeBoolGadget("Load", 64, 32);
-            button2.SetPosition(5 + 64, 5);
-            button3 = Gadget.MakeBoolGadget("Save", 64, 32);
-            button3.SetPosition(5 + 64 * 2, 5);
-            win1 = Intuition.OpenWindowTags(null,
-                (Tags.WA_Left, 10),
-                (Tags.WA_Top, 10),
-                (Tags.WA_Width, 3 * 64 + 10),
-                (Tags.WA_Height, 32 + 10),
-                (Tags.WA_Flags, WindowFlags.WFLG_BORDERLESS),
-                (Tags.WA_IDCMP, IDCMPFlags.GADGETUP),
-                (Tags.WA_Gadgets, new[] { button1, button2, button3 }),
-                (Tags.WA_Opacity, 170),
-                (Tags.WA_Screen, this));
+            var window = new Window(screen, "", Orientation.Horizontal)
+            {
+                LeftEdge = 10,
+                TopEdge = 10,
+                Borderless = false,
+                ThinBorder = true
+            };
+            new ButtonGadget(window, "Exit")
+            {
+                GadgetUpEvent = (o, i) => { engine.SwitchToTitleScreen(); }
+            };
+            new ButtonGadget(window, "Load")
+            {
+                GadgetUpEvent = (o, i) =>
+                {
+                    fileDialog?.Cancel();
+                    string dir = Path.GetDirectoryName(engine.Map.FileName);
+                    fileDialog = FileGadget.ShowSelectFile(engine.FileResolver, screen, dir, LoadFileEvent);
+                }
+            };
+            new ButtonGadget(window, "Save")
+            {
+                GadgetDownEvent = (o, i) =>
+                {
+                    engine.SaveMap(engine.Map);
+                    foreach (var layer in engine.Map.Layers)
+                    {
+                        engine.SaveTileSet(layer.TileSet);
+                    }
+                }
+            };
         }
 
-        private void CloseWindows()
+        private void LoadFileEvent(object sender, EventArgs args)
         {
-            Intuition.CloseWindow(win1);
+            var fg = (FileGadget)sender;
+            string map = fg.SelectedFile.Path;
+            engine.SetNextMap(map, -1, -1);
+            engine.SwitchToLoadScreen();
         }
-
-        public override void Update(TimeInfo time)
-        {
-            base.Update(time);
-        }
-
 
         public override void Render(TimeInfo time)
         {
@@ -84,7 +100,7 @@ namespace TileEngine.Screens
 
         protected override bool OnMouseDown(float x, float y, MouseButton button)
         {
-            if (base.OnMouseDown(x, y, button))
+            if (!base.OnMouseDown(x, y, button))
             {
                 mouseX = x;
                 mouseY = y;
@@ -96,7 +112,7 @@ namespace TileEngine.Screens
 
         protected override bool OnMouseUp(float x, float y, MouseButton button)
         {
-            if (base.OnMouseUp(x, y, button))
+            if (!base.OnMouseUp(x, y, button))
             {
                 mouseX = x;
                 mouseY = y;
@@ -104,14 +120,14 @@ namespace TileEngine.Screens
                 {
                     panning = false;
                 }
-                Click(mouseX, mouseY, button);
+                MapClick(mouseX, mouseY, button);
             }
             return true;
         }
 
-        protected override void OnMouseMove(float x, float y, MouseButton button)
+        protected override bool OnMouseMove(float x, float y, MouseButton button)
         {
-            base.OnMouseMove(x, y, button);
+            bool ret = base.OnMouseMove(x, y, button);
             float oldMouseX = mouseX;
             float oldMouseY = mouseY;
             mouseX = x;
@@ -124,50 +140,18 @@ namespace TileEngine.Screens
             }
             else
             {
-                Hover(mouseX, mouseY);
+                MapHover(mouseX, mouseY);
             }
+            return ret;
         }
-
-        protected override void OnGadgetClick(Gadget gadget)
-        {
-            base.OnGadgetClick(gadget);
-            if (button1 == gadget)
-            {
-                Intuition.AutoRequestPositionMode = AutoRequestPositionMode.CenterScreen;
-                IntuiText body = new IntuiText("Return to the");
-                body.NextText = new IntuiText("Title Screen?");
-                Intuition.AutoRequest(win1, body, "Yes", "No", IDCMPFlags.GADGETUP, IDCMPFlags.GADGETUP, 200, 100);
-            }
-            else if (button2 == gadget)
-            {
-
-            }
-            else if (button3 == gadget)
-            {
-                engine.SaveMap(engine.Map);
-                foreach (var layer in engine.Map.Layers)
-                {
-                    engine.SaveTileSet(layer.TileSet);
-                }
-            }
-        }
-
-        protected override void OnAutoRequest(int gadNum)
-        {
-            base.OnAutoRequest(gadNum);
-            if (gadNum == 1)
-            {
-                engine.SwitchToTitleScreen();
-            }
-        }
-
+     
         private void Pan(float dx, float dy)
         {
             engine.Camera.Shift(dx, dy);
             hasPanned = true;
         }
 
-        private void Hover(float x, float y)
+        private void MapHover(float x, float y)
         {
             float mapX;
             float mapY;
@@ -179,7 +163,7 @@ namespace TileEngine.Screens
             engine.Camera.HoverTileY = tileY;
         }
 
-        private void Click(float x, float y, MouseButton button)
+        private void MapClick(float x, float y, MouseButton button)
         {
             float mapX;
             float mapY;
@@ -191,36 +175,246 @@ namespace TileEngine.Screens
             engine.Camera.ClickTileY = tileY;
             if (button == MouseButton.Right && !hasPanned)
             {
-                MakeEditor(tileX, tileY);
-            }
-            else
-            {
-                HideEditor();
+                ShowEditor(tileX, tileY);
             }
         }
 
         private void HideEditor()
         {
-            //if (editor != null)
-            //{
-            //    editor.Cancel();
-            //    RemoveWidget(editor);
-            //}
+            if (editor != null)
+            {
+                editor.Cancel();
+                editor = null;
+            }
         }
+
+        private void ShowEditor(int x, int y)
+        {
+            if (editor == null)
+            {
+                MakeEditor(x, y);
+                if (editor != null)
+                {
+                    engine.Camera.MapToScreen(x, y, out int sX, out int sY);
+                    sX += engine.Camera.TileWidth;
+                    sY += engine.Camera.TileHeight;
+                    editor.LeftEdge = sX;
+                    editor.TopEdge = sY;
+                }
+            }
+            if (editor != null)
+            {
+                editor.SetTile(engine.Map, x, y);
+                screen.ShowWindow(editor);
+                screen.WindowToFront(editor);
+                screen.ActivateWindow(editor);
+            }
+        }
+
         private void MakeEditor(int x, int y)
         {
             HideEditor();
-            //editor = new WidgetTileEditor(engine.Map, x, y);
-            //int sX;
-            //int sY;
-            //engine.Camera.MapToScreen(x, y, out sX, out sY);
-            //sX += engine.Camera.TileWidth;
-            //sY += engine.Camera.TileHeight;
-            //if (sX + editor.Width > engine.Camera.ViewWidth) { sX = engine.Camera.ViewWidth - editor.Width; }
-            //if (sY + editor.Height > engine.Camera.ViewHeight) { sY = engine.Camera.ViewHeight - editor.Height; }
-            //editor.SetPosition(sX, sY);
-            //AddWidget(editor);
-            //editor.Visible = true;
+            editor = new TileEditor(this, screen, engine.Map, x, y)
+            {
+                CloseGadget = true,
+                DepthGadget = true,
+                WindowCloseEvent = (o, i) => { HideEditor(); }
+            };
+        }
+
+        private class TileEditor : Window
+        {
+            private MapScreen mapScreen;
+            private Map map;
+            private Layer layer;
+            private Tile tile;
+            private int mapX;
+            private int mapY;
+            private LabelGadget labelInfo;
+            private BoxGadget layerBox;
+            private ImageGadget image;
+            private TableGadget table;
+            private List<int> backupIds;
+
+            public TileEditor(MapScreen mapScreen, Screen screen, Map map, int mapX, int mapY)
+                : base(screen, "Tile Editor")
+            {
+                this.mapScreen = mapScreen;
+                Init();
+                SetTile(map, mapX, mapY);
+            }
+
+            private void RememberTile()
+            {
+                List<int> ids = new List<int>();
+                int idx = 0;
+                foreach (Layer layer in map.Layers)
+                {
+                    int tileId = layer[mapX, mapY].TileId;
+                    ids.Add(tileId);
+                    idx++;
+                }
+                backupIds = ids;
+            }
+
+            private void RevertTile()
+            {
+                if (backupIds != null)
+                {
+                    int idx = 0;
+                    foreach (Layer layer in map.Layers)
+                    {
+                        int tileId = backupIds[idx];
+                        layer[mapX, mapY].TileId = tileId;
+                        idx++;
+                    }
+                }
+                map.InvalidateRenderLists();
+                backupIds = null;
+            }
+
+            public void SetTile(Map map, int x, int y)
+            {
+                this.map = map;
+                if (x >= map.Width) x = map.Width - 1;
+                if (y >= map.Height) y = map.Height - 1;
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
+                mapX = x;
+                mapY = y;
+                Refresh();
+                SetTile(null);
+                foreach (Layer layer in map.Layers.Reverse<Layer>())
+                {
+
+                    if (layer.Visible && layer[x, y].TileId >= 0)
+                    {
+                        SetLayer(layer);
+                        break;
+                    }
+                }
+                RememberTile();
+            }
+
+            public void SetLayer(Layer layer)
+            {
+                this.layer = layer;
+                foreach (var but in layerBox.Children)
+                {
+                    but.Selected = layer == but.Tag;
+                }
+                table.ClearRows();
+                if (layer != null)
+                {
+                    table.BeginUpdate();
+                    foreach (var tileId in layer.TileSet.Tiles)
+                    {
+                        string ic = "";
+                        string id = "" + tileId;
+                        string name = layer.TileSet.GetTileName(tileId);
+                        var row = table.AddRow(ic, id, name);
+                        row.Cells[0].Image = layer.TileSet.GetTile(tileId);
+                        row.Id = tileId;
+                    }
+                    table.EndUpdate();
+                    SetTile(layer[mapX, mapY]);
+                }
+                Invalidate();
+            }
+
+            public void SetTile(Tile tile)
+            {
+                this.tile = tile;
+                if (tile != null)
+                {
+                    TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
+                    image.Image = tex;
+                    table.SelectRow(table.FindRow(tile.TileId));
+                }
+                else
+                {
+                    image.Image = null;
+                    table.SelectRow(null);
+                }
+            }
+
+            private void ChangeTile()
+            {
+                if (layer != null)
+                {
+                    int tileId = table.SelectedRowId;
+                    layer[mapX, mapY].TileId = tileId;
+                    SetTile(layer[mapX, mapY]);
+                    map.InvalidateRenderLists();
+                }
+            }
+
+            private void Refresh()
+            {
+                labelInfo.Label = $"Tile {mapX}/{mapY}";
+                layerBox.Clear();
+                foreach (var layer in map.Layers)
+                {
+                    var layerGad = new ButtonGadget(layerBox, layer.Name)
+                    {
+                        Sticky = true,
+                        Tag = layer,
+                        GadgetUpEvent = (o, i) => { SetLayer(layer); }
+                    };
+                }
+            }
+
+            private void Init()
+            {
+                labelInfo = new LabelGadget(this, $"Tile {mapX}/{mapY}");
+                layerBox = new BoxGadget(this, Orientation.Horizontal);
+                var tileBox = new BoxGadget(this, Orientation.Horizontal);
+                image = new ImageGadget(tileBox)
+                {
+                    FixedHeight = 200,
+                    FixedWidth = 200
+                };
+                table = new TableGadget(tileBox)
+                {
+                    RowHeight = 64,
+                    EvenColumns = false,
+                    SelectedCellChangedEvent = (o, i) =>
+                    {
+                        ChangeTile();
+                    }
+                };
+                var colImg = table.AddColumn("Img", 64);
+                var colIdx = table.AddColumn("Id", 64);
+                var colName = table.AddColumn("Name", 200);
+
+                var butBox = new BoxGadget(this, Orientation.Horizontal, Alignment.Fill, 10, 10);
+                new ButtonGadget(butBox, "Ok")
+                {
+                    GadgetUpEvent = (o, i) =>
+                    {
+                        Apply();
+                        mapScreen.HideEditor();
+                    }
+                };
+                new ButtonGadget(butBox, "Cancel")
+                {
+                    GadgetUpEvent = (o, i) =>
+                    {
+                        mapScreen.HideEditor();
+                    }
+                };
+            }
+
+            public void Apply()
+            {
+                backupIds = null;
+            }
+
+            public void Cancel()
+            {
+                RevertTile();
+                CloseWindow();
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
     using TileEngine.Screens;
 
@@ -45,6 +46,7 @@ namespace TileEngine.GUI
         private PropInfo propInfo;
         private StringInfo stringInfo;
         private int gadgetId;
+        private Font font;
 
         private IList<Gadget> glist = null;
         private GroupGadget group = null;
@@ -593,6 +595,12 @@ namespace TileEngine.GUI
         }
 
         public object UserData { get; set; }
+
+        public Font Font
+        {
+            get { return font; }
+            set { font = value; }
+        }
 
         public Window Window
         {

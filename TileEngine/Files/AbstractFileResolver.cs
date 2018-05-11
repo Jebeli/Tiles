@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Files
 {
+    using System.Collections.Generic;
     using System.IO;
 
     public abstract class AbstractFileResolver : IFileResolver
@@ -24,6 +25,14 @@ namespace TileEngine.Files
         public abstract string Resolve(string fileId);
         public abstract Stream OpenFile(string fileId);
         public abstract Stream CreateFile(string fileId);
+
+        public abstract IList<string> GetVolumes();
+        public abstract IList<string> GetDirectories(string dir);
+        public abstract IList<string> GetFiles(string dir);
+        public abstract string GetParent(string dir);
+
+        public abstract IList<FileInfo> GetVolumeInfos();
+        public abstract IList<FileInfo> GetFileInfos(string dir);
 
     }
 }

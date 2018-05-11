@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Fonts;
 using TileEngine.Graphics;
 
 namespace TileEngine.GUI
@@ -44,10 +45,10 @@ namespace TileEngine.GUI
             }
         }
 
-        public static int TextFit(this IGraphics rport, string text, ref IBox textExtent, IBox constrainingExtent, int constrainingBitWidth, int constrainingBitHeight)
+        public static int TextFit(this IGraphics rport, Font font, string text, ref IBox textExtent, IBox constrainingExtent, int constrainingBitWidth, int constrainingBitHeight)
         {
             if (textExtent == null) textExtent = new Box();
-            int tw = rport.MeasureTextWidth(text);
+            int tw = rport.MeasureTextWidth(font, text);
             textExtent.Width = tw;
             int retVal = text.Length;
             if (constrainingExtent != null)
@@ -63,7 +64,7 @@ namespace TileEngine.GUI
             {
                 retVal--;
                 string txt = text.Substring(0, retVal);
-                tw = rport.MeasureTextWidth(txt);
+                tw = rport.MeasureTextWidth(font, txt);
                 if (tw <= constrainingBitWidth)
                 {
                     return retVal;

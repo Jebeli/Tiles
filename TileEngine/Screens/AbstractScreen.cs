@@ -22,110 +22,89 @@ namespace TileEngine.Screens
     using Core;
     using Input;
     using System.Collections.Generic;
-    using GUI;
     using TileEngine.Graphics;
+    using TileEngine.Fonts;
+    using YGUI;
 
     public abstract class AbstractScreen : NamedObject, IScreen
     {
+        private bool firstShown;
         private bool rendered;
         private TimeSpan startTime;
         protected Engine engine;
         private static readonly float[] scales = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f, 2.0f };
         private int scaleIndex = 9;
-        private List<Window> windows;
-        private Window activeWindow;
-        private DrawInfo drawInfo;
+        protected Screen screen;
+        private Font font;
+        private Font topazFont;
+        private static TimeSpan tickDuration = TimeSpan.FromMilliseconds(100);
+        private static TimeSpan lastTick;
+
 
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
             this.engine = engine;
-            windows = new List<Window>();
-            drawInfo = new DrawInfo()
-            {
-                DetailPen = Color.Black,
-                BlockPen = Color.White,
-                TextPen = Color.Black,
-                ShinePen = Color.BrightGray,
-                ShadowPen = Color.DarkGray,
-                FillPen = new Color(62, 92, 154),
-                FillTextPen = Color.Black,
-                BackgoundPen = Color.Gray,
-                HighlightTextPen = Color.White,
-                HoverShinePen = Color.BrightGray,
-                HoverShadowPen = Color.DarkGray,
-                HoverBackgroundPen = new Color(62 + 20, 92 + 20, 154 + 20),
-                InactiveHoverBackgroundPen = new Color(210, 210, 210),
-                DisabledTextPen = new Color(32, 32, 32, 128),
-                PropClearPen = new Color(128, 128, 128),
-                Width = Width,
-                Height = Height
-            };
-        }
-        public IEnumerable<Window> Windows
-        {
-            get { return windows; }
+            firstShown = false;
         }
 
-        public Window ActiveWindow
+        public Font Font
         {
-            get { return activeWindow; }
-            set { activeWindow = value; }
-        }
-        public int Width { get { return engine.Graphics.ViewWidth; } }
-        public int Height { get { return engine.Graphics.ViewHeight; } }
-
-        public void RemoveWindow(Window window)
-        {
-            Logger.Info("Screen", $"Remove Window \"{window}\"");
-            if (activeWindow == window) { activeWindow = null; }
-            windows.Remove(window);
-            if (windows.Count > 0)
+            get
             {
-                Intuition.ActivateWindow(windows[windows.Count - 1]);
+                if (font != null) return font;
+                return engine.Fonts.DefaultFont;
             }
-        }
-        public void AddWindow(Window window)
-        {
-            Logger.Info("Screen", $"Add Window \"{window}\"");
-            windows.Add(window);
-        }
-        public void WindowToFront(Window window)
-        {
-            if (windows.Remove(window))
+            set
             {
-                windows.Add(window);
-            }
-        }
-        public void WindowToBack(Window window)
-        {
-            if (windows.Remove(window))
-            {
-                for (int i = 0; i < windows.Count; i++)
-                {
-                    if (!windows[i].HasFlag(WindowFlags.WFLG_BACKDROP))
-                    {
-                        windows.Insert(i, window);
-                        break;
-                    }
-                }
+                font = value;
             }
         }
 
-        public DrawInfo GetDrawInfo()
+        public Font TopazFont
         {
-            drawInfo.Width = Width;
-            drawInfo.Height = Height;
-            return drawInfo;
+            get
+            {
+                if (topazFont != null) return topazFont;
+                return engine.Fonts.TopazFont;
+            }
+            set
+            {
+                topazFont = value;
+            }
         }
+
+        protected Screen Screen
+        {
+            get { return screen; }
+        }
+
+        public void PerformLayout()
+        {
+            screen?.PerformLayout();
+        }
+
+        public virtual void FirstShow()
+        {
+            firstShown = true;
+            Logger.Info("Screen", $"First Show Screen {Name}");
+            screen = new Screen(engine);
+            screen.Font = Font;
+            //screen.Input += Screen_Input;
+            InitGUI(screen);
+            SizeChanged(engine.Graphics.ViewWidth, engine.Graphics.ViewHeight);
+        }
+
 
         public virtual void Show()
         {
+            if (!firstShown) FirstShow();
             Logger.Info("Screen", $"Showing Screen {Name}");
             startTime = engine.GetCurrentTime();
             rendered = false;
             LinkInput();
-            Intuition.ActivateWindow(activeWindow);
+            SizeChanged(engine.Graphics.ViewWidth, engine.Graphics.ViewHeight);
+            screen.ActivateMouse(engine.Input.MouseX, engine.Input.MouseY);
         }
 
         public virtual void Hide()
@@ -137,6 +116,7 @@ namespace TileEngine.Screens
 
         public virtual void Update(TimeInfo time)
         {
+            CheckScreenTimer(time);
         }
 
         public virtual void Render(TimeInfo time)
@@ -146,23 +126,68 @@ namespace TileEngine.Screens
                 Logger.Info("Screen", $"Rendering Screen {Name}");
             }
             rendered = true;
+            screen.Render();
+        }
+
+        public void SizeChanged(int width, int height)
+        {
+            if (screen != null)
+            {
+                //screen.Size = new Vector2(width, height);
+                OnScreenSizeChanged(width, height);
+                screen.PerformLayout();
+            }
+        }
+
+        //private void Screen_Input(object sender, InputEvent e)
+        //{
+        //    switch (e.Class)
+        //    {
+        //        case IDCMPFlags.GadgetDown:
+        //            OnGadgetDown(e.Gadget);
+        //            break;
+        //        case IDCMPFlags.GadgetUp:
+        //            OnGadgetUp(e.Gadget);
+        //            break;
+        //        case IDCMPFlags.CloseWindow:
+        //            OnCloseWindow(e.Window);
+        //            break;
+        //    }
+        //}
+
+        protected virtual void InitGUI(Screen screen)
+        {
+
+        }
+
+        protected virtual void OnCloseWindow(Window window)
+        {
+
+        }
+
+        protected virtual void OnGadgetDown(Gadget gadget)
+        {
+
+        }
+
+        protected virtual void OnGadgetUp(Gadget gadget)
+        {
+
+        }
+
+        protected virtual void OnScreenSizeChanged(int width, int height)
+        {
+
         }
 
         protected virtual void OnKeyDown(Key keyData, Key keyCode, char code)
         {
-            Intuition.KeyDown(keyData, code);
-        }
-        protected virtual void OnKeyUp(Key keyData, Key keyCode, char code)
-        {
-            Intuition.KeyUp(keyData, code);
+            screen?.KeyDown(keyData, keyCode, code);
         }
 
-        protected void InvalidateAllWindows()
+        protected virtual void OnKeyUp(Key keyData, Key keyCode, char code)
         {
-            foreach (var win in windows)
-            {
-                win.Invalidate();
-            }
+            screen?.KeyUp(keyData, keyCode, code);
         }
 
         protected virtual void OnMouseWheel(float x, float y, int delta)
@@ -178,54 +203,32 @@ namespace TileEngine.Screens
         }
         protected virtual bool OnMouseDown(float x, float y, MouseButton button)
         {
-            Intuition.MouseDown((int)x, (int)y, button);
-            return true;
+            if (screen != null) return screen.MouseButtonDown((int)x, (int)y, button);
+            return false;
         }
 
         protected virtual bool OnMouseUp(float x, float y, MouseButton button)
         {
-            Intuition.MouseUp((int)x, (int)y, button);
-            return true;
+            if (screen != null) return screen.MouseButtonUp((int)x, (int)y, button);
+            return false;
         }
-        protected virtual void OnMouseMove(float x, float y, MouseButton button)
+        protected virtual bool OnMouseMove(float x, float y, MouseButton button)
         {
-            Intuition.MouseMove((int)x, (int)y, button);
+            if (screen != null) return screen.MouseMove((int)x, (int)y);
+            return false;
         }
 
-        protected virtual void OnIntuitionMessage(IntuiMessage message)
+        private void CheckScreenTimer(TimeInfo time)
         {
-            switch (message.Message)
+            var timeDiff = time.TotalGameTime - lastTick;
+            if (timeDiff > tickDuration)
             {
-                case IDCMPFlags.GADGETUP:
-                    OnGadgetClick(message.Gadget);
-                    break;
-                case IDCMPFlags.AUTOREQUEST:
-                    OnAutoRequest(message.Code);
-                    break;
-                case IDCMPFlags.CLOSEWINDOW:
-                    OnCloseWindow(message.Window);
-                    break;
+                lastTick = time.TotalGameTime;
+                screen.Timer();
             }
         }
-
-        protected virtual void OnCloseWindow(Window window)
-        {
-            Logger.Info("Screen", $"Close Window \"{window}\" selected");
-        }
-
-        protected virtual void OnGadgetClick(Gadget gadget)
-        {
-            Logger.Info("Screen", $"Gadget \"{gadget}\" selected");
-        }
-
-        protected virtual void OnAutoRequest(int gadNum)
-        {
-            Logger.Info("Screen", $"Requester Gadget {gadNum} selected");
-        }
-
         private void LinkInput()
         {
-            Intuition.Message += Intuition_Message;
             engine.Input.OnMouseDown += Input_OnMouseDown;
             engine.Input.OnMouseUp += Input_OnMouseUp;
             engine.Input.OnMouseMove += Input_OnMouseMove;
@@ -236,18 +239,12 @@ namespace TileEngine.Screens
 
         private void UnlinkInput()
         {
-            Intuition.Message -= Intuition_Message;
             engine.Input.OnMouseDown -= Input_OnMouseDown;
             engine.Input.OnMouseUp -= Input_OnMouseUp;
             engine.Input.OnMouseMove -= Input_OnMouseMove;
             engine.Input.OnMouseWheel -= Input_OnMouseWheel;
             engine.Input.OnKeyDown -= Input_OnKeyDown;
             engine.Input.OnKeyUp -= Input_OnKeyUp;
-        }
-
-        private void Intuition_Message(object sender, IntuiMessage e)
-        {
-            OnIntuitionMessage(e);
         }
 
         private void Input_OnKeyUp(object sender, KeyEventArgs e)
@@ -283,7 +280,6 @@ namespace TileEngine.Screens
         {
             scaleIndex++;
             if (scaleIndex >= scales.Length) scaleIndex = scales.Length - 1;
-            InvalidateAllWindows();
             engine.SetViewScale(scales[scaleIndex]);
         }
 
@@ -291,8 +287,8 @@ namespace TileEngine.Screens
         {
             scaleIndex--;
             if (scaleIndex < 0) scaleIndex = 0;
-            InvalidateAllWindows();
             engine.SetViewScale(scales[scaleIndex]);
         }
+
     }
 }

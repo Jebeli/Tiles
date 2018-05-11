@@ -19,6 +19,7 @@ namespace TileEngine.Graphics
 {
     using Core;
     using Files;
+    using TileEngine.Fonts;
 
     public enum HorizontalTextAlign
     {
@@ -36,6 +37,7 @@ namespace TileEngine.Graphics
 
     public interface IGraphics
     {
+        IFontEngine FontEngine { get; }
         int Width { get; }
         int Height { get; }
         int ViewWidth { get; }
@@ -47,9 +49,12 @@ namespace TileEngine.Graphics
 
         void SetTarget(Texture tex);
         void ClearTarget();
-
         void BeginFrame();
         void EndFrame();
+        void Translate(int x, int y);
+        string GetStateDescription();
+        void SaveState();
+        void RestoreState();
         void SetSize(int width, int height);
         void SetScale(float scale);
         void SetClip(int x, int y, int width, int height);
@@ -61,13 +66,17 @@ namespace TileEngine.Graphics
         void Render(TextureRegion textureRegion, int x, int y);
         void Render(TextureRegion textureRegion, int x, int y, int width, int height);
         void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans=0);
-        void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
-        int MeasureTextWidth(string text);
-        void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
+        void RenderText(Font font, string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        void RenderText(Font font, string text, int x, int y, Color color, Color bg, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        void RenderIcon(int icon, int x, int y);
+        void RenderIcon(int icon, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        int MeasureTextWidth(Font font, string text);
         void DrawRectangle(int x, int y, int width, int height, Color color);
+        void DrawRoundedRectangle(int x, int y, int width, int height, Color color);
         void FillRectangle(int x, int y, int width, int height, Color color);
+        void FillRectangle(int x, int y, int width, int height, Color color, Color color2);
         void DrawLine(int x1, int y1, int x2, int y2, Color color);
-        void DrawText(string text, int x, int y);
+        void DrawText(Font font, string text, int x, int y);
         void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
 

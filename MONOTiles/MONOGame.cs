@@ -40,6 +40,7 @@ namespace MONOTiles
         private Engine engine;
         private MONOGraphics monoGraphics;
         private MONOFileResolver fileResolver;
+        private MONOFontEngine fontEngine;
         private int mouseX;
         private int mouseY;
         private int mouseDelta;
@@ -47,6 +48,7 @@ namespace MONOTiles
         private bool rightMouseDown;
         private List<Keys> downKeys = new List<Keys>();
 
+        internal BitmapFont iconFont;
         internal BitmapFont smallFont;
         internal ExtendedSpriteBatch SpriteBatch
         {
@@ -70,14 +72,15 @@ namespace MONOTiles
             Window.AllowUserResizing = true;
             IsMouseVisible = true;
             fileResolver = new MONOFileResolver("Content");
-            monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height, new DebugOptions()
+            fontEngine = new MONOFontEngine(this);
+            monoGraphics = new MONOGraphics(this, Window.ClientBounds.Width, Window.ClientBounds.Height, fontEngine, new DebugOptions()
             {
                 ShowGrid = false,
                 ShowHighlight = true,
                 ShowTileCounter = false,
                 ShowCoordinates = false
             });
-            engine = new Engine(fileResolver, monoGraphics);
+            engine = new Engine(fileResolver, monoGraphics, fontEngine);
             base.Initialize();
         }
 
@@ -85,6 +88,7 @@ namespace MONOTiles
         {
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
             smallFont = Content.Load<BitmapFont>("fonts/Small");
+            iconFont = Content.Load<BitmapFont>("fonts/Icons");
             engine.SetNextMap(MAPNAME1, 25, 25);
             engine.Start();
         }
@@ -124,7 +128,7 @@ namespace MONOTiles
             {
                 if (!pressedKeys.Contains(k))
                 {
-                    downKeys.Remove(k);                                        
+                    downKeys.Remove(k);
                     engine.Input.KeyUp(baseKey | (Key)k);
                 }
             }
@@ -132,7 +136,7 @@ namespace MONOTiles
             {
                 if (!downKeys.Contains(k))
                 {
-                    downKeys.Add(k);                    
+                    downKeys.Add(k);
                     engine.Input.KeyDown(baseKey | (Key)k);
                 }
             }

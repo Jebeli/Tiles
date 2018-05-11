@@ -66,11 +66,20 @@ namespace TileEngine.Graphics
             set { a = value; }
         }
 
+        public bool IsEmpty
+        {
+            get { return a == 0 && r == 0 && g == 0 && b == 0; }
+        }
+
         public bool Equals(Color other)
         {
             return r == other.r && g == other.g && b == other.b && a == other.a;
         }
 
+        public static Color Empty
+        {
+            get { return new Color(0, 0, 0, 0); }
+        }
         public static Color White
         {
             get { return new Color(255, 255, 255); }

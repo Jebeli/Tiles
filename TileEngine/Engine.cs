@@ -22,13 +22,14 @@ namespace TileEngine
     using Files;
     using Graphics;
     using Maps;
+    //using NGUI;
     using Resources;
     using Screens;
     using Input;
     using Loaders;
     using System.Collections.Generic;
     using Savers;
-    using GUI;
+    using TileEngine.Fonts;
 
     public class Engine : ITimeInfoProvider
     {
@@ -37,6 +38,7 @@ namespace TileEngine
         private IGraphics graphics;
         private ITimeInfoProvider timeProvider;
         private IInput input;
+        private IFontEngine fonts;
         private ResourceManager<Texture> textureManager;
         private ResourceManager<TileSet> tileSetManager;
         private IScreen currentScreen;
@@ -45,7 +47,7 @@ namespace TileEngine
         private LoadScreen loadScreen;
         private MapScreen mapScreen;
         private ExitScreen exitScreen;
-        private IntuiTestScreen testScreen;
+        private TestScreen testScreen;
         private MapLoadInfo nextMap;
         private Map map;
         private Camera camera;
@@ -53,23 +55,25 @@ namespace TileEngine
         private List<ILoader> loaders;
         private List<ISaver> savers;
 
-        public Engine(IFileResolver fileResolver, IGraphics graphics)
+        public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts)
         {
             this.fileResolver = fileResolver;
             this.graphics = graphics;
+            this.fonts = fonts;
             timeProvider = new StopWatchTimeInfoProvider();
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
-            Intuition.Init(this);
-            GadTools.Init(this);
+            //GUISystem.Init(this);
+            //Intuition.Init(this);
+            //GadTools.Init(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
             splashScreen = new SplashScreen(this);
             titleScreen = new TitleScreen(this);
             exitScreen = new ExitScreen(this);
-            testScreen = new IntuiTestScreen(this);
+            testScreen = new TestScreen(this);
             map = MapFactory.MakeNullMap(this);
             camera = new Camera(map);
             frameCounter = new FrameCounter();
@@ -101,6 +105,11 @@ namespace TileEngine
         public IInput Input
         {
             get { return input; }
+        }
+
+        public IFontEngine Fonts
+        {
+            get { return fonts; }
         }
         public IScreen Screen
         {
@@ -137,7 +146,7 @@ namespace TileEngine
         {
             get
             {
-                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY}) CAM: ({camera.CameraX}/{camera.CameraY})";
+                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY}) CAM: ({camera.CameraX}/{camera.CameraY}) SIZE: {graphics.ViewWidth}/{graphics.ViewHeight} ZOOM: {graphics.ViewScale}";
             }
         }
         public bool Update()
@@ -149,7 +158,7 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
-                Intuition.Update(time);
+                //GUISystem.Update(time);
                 map.Update(time);
                 currentScreen.Update(time);
                 return true;
@@ -168,7 +177,7 @@ namespace TileEngine
             graphics.BeginFrame();
             graphics.ClearScreen();
             currentScreen.Render(time);
-            Intuition.Render(graphics, time);
+            //GUISystem.Render(graphics, time);
             graphics.EndFrame();
         }
 
@@ -230,6 +239,10 @@ namespace TileEngine
 
         public void Start()
         {
+            string defName = fileResolver.Resolve(@"fonts/Roboto-Regular.ttf");
+            string icoName = fileResolver.Resolve(@"fonts/entypo.ttf");
+            string tpzName = fileResolver.Resolve(@"fonts/Topaz.ttf");
+            fonts.Init(defName, 12, tpzName, 12, icoName, 16);
             SwitchToSplashScreen();
         }
 
@@ -289,6 +302,7 @@ namespace TileEngine
                     map = loader.LoadMap(mapId);
                     if (map != null)
                     {
+                        map.FileName = fileResolver.Resolve(mapId);
                         if (!map.HasLayer("buildings"))
                         {
                             Layer layer = map.AddLayer("buildings");
@@ -344,10 +358,16 @@ namespace TileEngine
 
         public void SetViewSize(int width, int height)
         {
+            bool sizeChanged = (graphics.Width != width || graphics.Height != height);
             graphics.SetSize(width, height);
             camera.ViewWidth = graphics.ViewWidth;
             camera.ViewHeight = graphics.ViewHeight;
             map.InvalidateRenderLists();
+            if (sizeChanged && currentScreen != null)
+            {
+                currentScreen.SizeChanged(graphics.ViewWidth, graphics.ViewHeight);
+                currentScreen.PerformLayout();
+            }
         }
 
         public void SetViewScale(float scale)
@@ -357,6 +377,11 @@ namespace TileEngine
             camera.ViewHeight = graphics.ViewHeight;
             input.ViewScale = scale;
             map.InvalidateRenderLists();
+            if (currentScreen != null)
+            {
+                currentScreen.SizeChanged(graphics.ViewWidth, graphics.ViewHeight);
+                currentScreen.PerformLayout();
+            }
         }
 
         internal void SetScreen(IScreen screen)

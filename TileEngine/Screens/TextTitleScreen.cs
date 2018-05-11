@@ -27,7 +27,7 @@ namespace TileEngine.Screens
 
     public class TextTitleScreen : AbstractScreen
     {
-        private string title;
+        protected string title;
         public TextTitleScreen(Engine engine, string name, string title) : base(engine, name)
         {
             this.title = title;
@@ -35,8 +35,9 @@ namespace TileEngine.Screens
 
         public override void Render(TimeInfo time)
         {
-            engine.Graphics.RenderText(title, engine.Graphics.ViewWidth / 2, engine.Graphics.ViewHeight / 2, Color.White);
+            engine.Graphics.RenderText(Font, title, engine.Graphics.ViewWidth / 2, engine.Graphics.ViewHeight / 2, Color.White);
             base.Render(time);
         }
+
     }
 }

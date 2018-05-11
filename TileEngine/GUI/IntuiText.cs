@@ -22,10 +22,12 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
 
     public class IntuiText
     {
+        private Font font;
         private Color frontPen;
         private Color backPen;
         private int leftEdge;
@@ -46,6 +48,11 @@ namespace TileEngine.GUI
             itext = text;
         }
 
+        public Font Font
+        {
+            get { return font; }
+            set { font = value; }
+        }
         public Color FrontPen
         {
             get { return frontPen; }

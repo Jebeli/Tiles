@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Fonts;
 using TileEngine.Graphics;
 using TileEngine.Input;
 
@@ -206,15 +207,15 @@ namespace TileEngine.GUI
                     int textleft = container.LeftEdge;
                     int texttop = container.TopEdge + container.Height / 2;
                     IBox textextent = null;
-                    int textLen = graphics.TextFit(dispstr, ref textextent, container, 0, 0);
-                    graphics.RenderText(dispstr.Substring(0, textLen), textleft, texttop, gadgetInfo.DrawInfo.TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Center);
+                    int textLen = graphics.TextFit(gadget.Font, dispstr, ref textextent, container, 0, 0);
+                    graphics.RenderText(gadget.Font, dispstr.Substring(0, textLen), textleft, texttop, gadgetInfo.DrawInfo.TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Center);
                     if ((gadget.Activation & GadgetActivation.ACTIVEGADGET) == GadgetActivation.ACTIVEGADGET)
                     {
                         dispstr += " ";
                         int curserpos = si.BufferPos - si.DispPos;
-                        textleft += TextLength(graphics, dispstr, curserpos);
+                        textleft += TextLength(graphics, gadget.Font, dispstr, curserpos);
                         string cursorText = dispstr.Substring(curserpos, 1);
-                        int cursorLength = TextLength(graphics, cursorText, 1) - 1;
+                        int cursorLength = TextLength(graphics, gadget.Font, cursorText, 1) - 1;
                         Color sp = new Color(128, 128, 128, 64);
                         graphics.RectFill(textleft, container.TopEdge, textleft + cursorLength, container.BottomEdge, sp);
                     }
@@ -224,11 +225,11 @@ namespace TileEngine.GUI
 
         }
 
-        private static int TextLength(IGraphics rp, string text, int length)
+        private static int TextLength(IGraphics rp, Font font, string text, int length)
         {
             if (length == 0) return 0;
             text = text.Substring(0, length);
-            return rp.MeasureTextWidth(text);
+            return rp.MeasureTextWidth(font, text);
         }
 
         private static void UpdateStringInfo(Gadget gadget)

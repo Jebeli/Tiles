@@ -19,23 +19,17 @@ namespace TileEngine.Screens
 {
     using Core;
     using System.Collections.Generic;
-    using TileEngine.GUI;
+    using TileEngine.Fonts;
 
-    public interface IScreen 
+    public interface IScreen
     {
+        Font Font { get; }
         string Name { get; }
         void Show();
         void Hide();
         void Update(TimeInfo time);
         void Render(TimeInfo time);
-        IEnumerable<Window> Windows { get; }
-        Window ActiveWindow { get; set; }
-        void RemoveWindow(Window window);
-        void AddWindow(Window window);
-        void WindowToFront(Window window);
-        void WindowToBack(Window window);
-        int Width { get; }
-        int Height { get; }
-        DrawInfo GetDrawInfo();
+        void SizeChanged(int width, int height);
+        void PerformLayout();
     }
 }

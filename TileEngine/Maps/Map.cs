@@ -21,12 +21,14 @@ namespace TileEngine.Maps
     using Core;
     public class Map : NamedObject
     {
+        private string fileName;
         private int width;
         private int height;
         private IList<Layer> layers;
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
+
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
         {
@@ -46,6 +48,12 @@ namespace TileEngine.Maps
         public int Height
         {
             get { return height; }
+        }
+
+        public string FileName
+        {
+            get { return fileName; }
+            set { fileName = value; }
         }
 
         public void InvalidateRenderLists()

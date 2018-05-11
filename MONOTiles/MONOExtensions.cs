@@ -23,12 +23,19 @@ namespace MONOTiles
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Core;
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
     public static class MONOExtensions
     {
         public static Microsoft.Xna.Framework.Graphics.Texture2D GetTexture(this Texture tex)
         {
             if (tex != null) { return ((MONOTexture)tex).Texture; }
+            return null;
+        }
+
+        public static MonoGame.Extended.BitmapFonts.BitmapFont GetFont(this Font font)
+        {
+            if (font != null) { return ((MONOFont)font).Font; }
             return null;
         }
 
@@ -40,6 +47,11 @@ namespace MONOTiles
         public static Microsoft.Xna.Framework.Color GetColor(this Color c)
         {
             return new Microsoft.Xna.Framework.Color(c.R, c.G, c.B, c.Alpha);
+        }
+
+        public static Microsoft.Xna.Framework.Rectangle GetRectangle(this Rect rect)
+        {
+            return new Microsoft.Xna.Framework.Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
         }
     }
 }

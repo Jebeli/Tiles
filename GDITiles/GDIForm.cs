@@ -31,6 +31,7 @@ namespace GDITiles
         private const string MAPNAME3 = "maps/part4_map.xml";
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
+        private GDIFontEngine gdiFonts;
         private Engine engine;
         public GDIForm()
         {
@@ -41,19 +42,20 @@ namespace GDITiles
             KeyPreview = true;
             Logger.AddLogger(new ConsoleLogger());
             gdiFileResolver = new GDIFileResolver("Content");
-            gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, new DebugOptions()
+            gdiFonts = new GDIFontEngine();
+            gdiGraphics = new GDIGraphics(ClientSize.Width, ClientSize.Height, gdiFonts, new DebugOptions()
             {
                 ShowGrid = false,
                 ShowHighlight = true,
                 ShowTileCounter = false,
                 ShowCoordinates = false
             });
-            engine = new Engine(gdiFileResolver, gdiGraphics);
+            engine = new Engine(gdiFileResolver, gdiGraphics, gdiFonts);
             Application.Idle += HandleApplicationIdle;
         }
 
         protected override void OnLoad(EventArgs e)
-        {            
+        {
             engine.SetNextMap(MAPNAME1, 25, 25);
             engine.Start();
             base.OnLoad(e);

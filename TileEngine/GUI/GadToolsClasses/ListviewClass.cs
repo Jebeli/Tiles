@@ -90,8 +90,8 @@ namespace TileEngine.GUI.GadToolsClasses
                 graphics.FillRectangle(left, top, width, height, gadgetInfo.DrawInfo.InactiveHoverBackgroundPen);
             }
             IBox extend = null;
-            int textlen = graphics.TextFit(text, ref extend, null, width, height);
-            graphics.RenderText(text.Substring(0, textlen), left, top + height / 2, gadgetInfo.DrawInfo.TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Center);
+            int textlen = graphics.TextFit(Font, text,  ref extend, null, width, height);
+            graphics.RenderText(Font, text.Substring(0, textlen), left, top + height / 2, gadgetInfo.DrawInfo.TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Center);
         }
 
         public override GadgetActive HandleInput(GadgetInfo gadgetInfo, InputEvent inputEvent, ref int termination, int mouseX, int mouseY)
@@ -136,12 +136,14 @@ namespace TileEngine.GUI.GadToolsClasses
                             SetSelectedIndex(newIndex - 1);
                             break;
                         case Key.Up | Key.Shift:
+                        case Key.PageUp:
                             SetSelectedIndex(newIndex - NumItemsFit());
                             break;
                         case Key.Down:
                             SetSelectedIndex(newIndex + 1);
                             break;
                         case Key.Down | Key.Shift:
+                        case Key.PageDown:
                             SetSelectedIndex(newIndex + NumItemsFit());
                             break;
                         case Key.Home:
@@ -150,6 +152,7 @@ namespace TileEngine.GUI.GadToolsClasses
                         case Key.End:
                             SetSelectedIndex(NumEntries - 1);
                             break;
+                            
                     }
                     break;
             }

@@ -23,6 +23,8 @@ namespace TileEngine.Input
     {
         private float viewScale = 1.0f;
         private bool handleScale = true;
+        private int mouseX;
+        private int mouseY;
         public bool HandleScale
         {
             get { return handleScale; }
@@ -34,6 +36,10 @@ namespace TileEngine.Input
             get { return viewScale; }
             set { viewScale = value; }
         }
+
+        public int MouseX { get { return mouseX; } }
+        public int MouseY { get { return mouseY; } }
+
 
         public event EventHandler<MouseEventArgs> OnMouseWheel;
 
@@ -49,21 +55,29 @@ namespace TileEngine.Input
 
         public void MouseDown(int screenX, int screenY, MouseButton button)
         {
+            mouseX = screenX;
+            mouseY = screenY;
             OnMouseDown?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
         }
 
         public void MouseMove(int screenX, int screenY, MouseButton button)
         {
+            mouseX = screenX;
+            mouseY = screenY;
             OnMouseMove?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
         }
 
         public void MouseUp(int screenX, int screenY, MouseButton button)
         {
+            mouseX = screenX;
+            mouseY = screenY;
             OnMouseUp?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
         }
 
         public void MouseWheel(int screenX, int screenY, int delta)
         {
+            mouseX = screenX;
+            mouseY = screenY;
             OnMouseWheel?.Invoke(this, CreateMouseEventArgs(screenX, screenY, delta));
         }
 

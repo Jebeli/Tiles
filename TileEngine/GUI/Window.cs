@@ -22,6 +22,7 @@ namespace TileEngine.GUI
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
     using TileEngine.Screens;
 
@@ -61,6 +62,7 @@ namespace TileEngine.GUI
         private int opacity;
         private Color bgColor;
         private Color fgColor;
+        private Font font;
         public Window(Engine engine, NewWindow nw)
         {
             this.engine = engine;
@@ -146,17 +148,17 @@ namespace TileEngine.GUI
         {
             get
             {
-                if (screen != null)
-                {
-                    return screen.Windows.LastOrDefault() == this;
-                }
+                //if (screen != null)
+                //{
+                //    return screen.Windows.LastOrDefault() == this;
+                //}
                 return false;
             }
         }
 
         internal void Close()
         {
-            if (screen != null) screen.RemoveWindow(this);
+            //if (screen != null) screen.RemoveWindow(this);
             bitmap?.Dispose();
             bitmap = null;
             valid = true;
@@ -255,7 +257,11 @@ namespace TileEngine.GUI
             get { return idcmpflags; }
             set { idcmpflags = value; }
         }
-
+        public Font Font
+        {
+            get { return font; }
+            set { font = value; }
+        }
         public string Title
         {
             get { return title; }

@@ -17,6 +17,7 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace GDITiles
 {
+    using TileEngine.Fonts;
     using TileEngine.Graphics;
 
     public static class GDIExtensions
@@ -26,6 +27,15 @@ namespace GDITiles
             if (tex != null)
             {
                 return ((GDITexture)tex).Bitmap;
+            }
+            return null;
+        }
+
+        public static System.Drawing.Font GetFont(this Font fnt)
+        {
+            if (fnt != null)
+            {
+                return ((GDIFont)fnt).Font;
             }
             return null;
         }

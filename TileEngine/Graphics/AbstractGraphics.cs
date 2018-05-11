@@ -20,9 +20,22 @@ namespace TileEngine.Graphics
     using System;
     using Files;
     using Core;
+    using System.Collections.Generic;
+    using TileEngine.Fonts;
 
     public abstract class AbstractGraphics : IGraphics, IDisposable
     {
+
+        private class GraphicsState
+        {
+            public int TransX;
+            public int TransY;
+            public int ClipX;
+            public int ClipY;
+            public int ClipW;
+            public int ClipH;
+        }
+
         private long frameId;
         private bool inFrame;
         private DebugOptions debugOptions;
@@ -32,15 +45,30 @@ namespace TileEngine.Graphics
         protected int viewHeight;
         protected float viewScale;
         protected const int NUM_VERTICES = 10;
+        protected int transX;
+        protected int transY;
+        protected int clipX;
+        protected int clipY;
+        protected int clipW;
+        protected int clipH;
+        private List<GraphicsState> states;
+        private IFontEngine fontEngine;
 
-        public AbstractGraphics(int width, int height, DebugOptions debugOptions = null)
+        public AbstractGraphics(int width, int height, IFontEngine fontEngine, DebugOptions debugOptions = null)
         {
             this.width = width;
             this.height = height;
+            this.fontEngine = fontEngine;
             viewWidth = width;
             viewHeight = height;
             viewScale = 1.0f;
             this.debugOptions = debugOptions ?? new DebugOptions();
+            states = new List<GraphicsState>();
+        }
+
+        public IFontEngine FontEngine
+        {
+            get { return fontEngine; }
         }
         public int Width
         {
@@ -92,6 +120,63 @@ namespace TileEngine.Graphics
             inFrame = false;
         }
 
+        public void Translate(int x, int y)
+        {
+            transX += x;
+            transY += y;
+        }
+
+        public string GetStateDescription()
+        {
+            var s = GetGraphicsState();
+            return $"{s.TransX}/{s.TransY} {s.ClipX}/{s.ClipY} {s.ClipW}/{s.ClipH}";
+        }
+
+
+        private GraphicsState GetGraphicsState()
+        {
+            GraphicsState state = new GraphicsState();
+            state.TransX = transX;
+            state.TransY = transY;
+            state.ClipX = clipX;
+            state.ClipY = clipY;
+            state.ClipW = clipW;
+            state.ClipH = clipH;
+            return state;
+        }
+
+        public void SaveState()
+        {
+            var state = GetGraphicsState();
+            states.Add(state);
+        }
+
+        public void RestoreState()
+        {
+            if (states.Count > 0)
+            {
+                var state = states[states.Count - 1];
+                states.RemoveAt(states.Count - 1);
+                transX = state.TransX;
+                transY = state.TransY;
+                clipX = state.ClipX;
+                clipY = state.ClipY;
+                clipW = state.ClipW;
+                clipH = state.ClipH;
+                SetClip(clipX, clipY, clipW, clipH);
+            }
+            else
+            {
+                transX = 0;
+                transY = 0;
+                clipX = 0;
+                clipY = 0;
+                clipW = 0;
+                clipH = 0;
+                ClearClip();
+            }
+        }
+
         public void SetSize(int width, int height)
         {
             this.width = width;
@@ -99,6 +184,7 @@ namespace TileEngine.Graphics
             viewWidth = (int)(width * viewScale);
             viewHeight = (int)(height * viewScale);
         }
+
         public void SetScale(float scale)
         {
             viewScale = scale;
@@ -106,7 +192,7 @@ namespace TileEngine.Graphics
             viewHeight = (int)(height * viewScale);
         }
         public abstract void SetClip(int x, int y, int width, int height);
-        public abstract void ClearClip();    
+        public abstract void ClearClip();
         public abstract void ClearScreen();
         public abstract void ClearScreen(Color color);
         public abstract void DrawTextures(Texture texture, int[] vertices, int offset, int count);
@@ -153,14 +239,20 @@ namespace TileEngine.Graphics
                     textureRegion.Height);
         }
 
-        public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans=0);
-        public abstract void RenderText(string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
-        public abstract int MeasureTextWidth(string text);
-        public abstract void RenderWidget(int x, int y, int width, int height, bool enabled, bool hover, bool pressed);
+        public abstract void Render(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight, int trans = 0);
+
+        public abstract void RenderText(Font font, string text, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        public abstract void RenderText(Font font, string text, int x, int y, Color color, Color bg, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+        public abstract void RenderIcon(int icon, int x, int y);
+        public abstract void RenderIcon(int icon, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
+
+        public abstract int MeasureTextWidth(Font font, string text);
         public abstract void DrawRectangle(int x, int y, int width, int height, Color color);
+        public abstract void DrawRoundedRectangle(int x, int y, int width, int height, Color color);
         public abstract void FillRectangle(int x, int y, int width, int height, Color color);
+        public abstract void FillRectangle(int x, int y, int width, int height, Color color, Color color2);
         public abstract void DrawLine(int x1, int y1, int x2, int y2, Color color);
-        public abstract void DrawText(string text, int x, int y);
+        public abstract void DrawText(Font font, string text, int x, int y);
         public abstract void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         public abstract void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric);
         public abstract Texture CreateTexture(string textureId, int width, int height);
@@ -183,7 +275,6 @@ namespace TileEngine.Graphics
         {
             if (NeedsInitGraphics) InitGraphics();
         }
-
         protected bool CheckInFrame(bool throwException = true)
         {
             if (!inFrame && throwException) { throw new InvalidOperationException("Render Operation while not in frame"); }

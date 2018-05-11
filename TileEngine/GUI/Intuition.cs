@@ -297,7 +297,7 @@ namespace TileEngine.GUI
             window.FgColor = fgColor;
             AddSysGadgets(window);
             AddGList(window, newWindow.Gadgets, -1, -1);
-            window.Screen.AddWindow(window);
+            //window.Screen.AddWindow(window);
             if (window.HasFlag(WindowFlags.WFLG_ACTIVATE))
             {
                 ActivateWindow(window);
@@ -323,17 +323,17 @@ namespace TileEngine.GUI
 
         public static void Render(IGraphics graphics, TimeInfo time)
         {
-            if (Screen != null)
-            {
-                foreach (Window window in Screen.Windows)
-                {
-                    if (!window.Valid)
-                    {
-                        RefreshWindowFrame(window);
-                    }
-                    RenderWindowBitmap(window, graphics);
-                }
-            }
+            //if (Screen != null)
+            //{
+            //    foreach (Window window in Screen.Windows)
+            //    {
+            //        if (!window.Valid)
+            //        {
+            //            RefreshWindowFrame(window);
+            //        }
+            //        RenderWindowBitmap(window, graphics);
+            //    }
+            //}
         }
 
         private static void InitClasses()
@@ -494,7 +494,7 @@ namespace TileEngine.GUI
                 if (activeWindow != null)
                 {
                     activeWindow.Flags |= WindowFlags.WFLG_WINDOWACTIVE;
-                    activeWindow.Screen.ActiveWindow = activeWindow;
+                    //activeWindow.Screen.ActiveWindow = activeWindow;
                     if (moveActiveWindowToFront && ((activeWindow.Flags & WindowFlags.WFLG_BACKDROP) != WindowFlags.WFLG_BACKDROP))
                     {
                         WindowToFront(activeWindow);
@@ -565,12 +565,12 @@ namespace TileEngine.GUI
 
         public static void WindowToBack(Window window)
         {
-            window.Screen.WindowToBack(window);
+            //window.Screen.WindowToBack(window);
         }
 
         public static void WindowToFront(Window window)
         {
-            window.Screen.WindowToFront(window);
+            //window.Screen.WindowToFront(window);
         }
 
         public static void ZipWindow(Window window)
@@ -1239,7 +1239,7 @@ namespace TileEngine.GUI
         {
             while (text != null)
             {
-                graphics.RenderText(text.IText, x + text.LeftEdge, y + text.TopEdge, text.FrontPen, text.HorizontalTextAlign, text.VerticalTextAlign);
+                graphics.RenderText(text.Font, text.IText, x + text.LeftEdge, y + text.TopEdge, text.FrontPen, text.HorizontalTextAlign, text.VerticalTextAlign);
                 text = text.NextText;
             }
         }
@@ -1530,7 +1530,7 @@ namespace TileEngine.GUI
                 {
                     titleX += 20;
                 }
-                graphics.RenderText(window.Title, titleX, titleY, Color.Black, HorizontalTextAlign.Left, VerticalTextAlign.Center);
+                graphics.RenderText(window.Font, window.Title, titleX, titleY, Color.Black, HorizontalTextAlign.Left, VerticalTextAlign.Center);
             }
         }
 
@@ -1633,8 +1633,8 @@ namespace TileEngine.GUI
                         case GadgetType.SCRGADGET:
                             box.LeftEdge = 0;
                             box.TopEdge = 0;
-                            box.Width = screen.Width;
-                            box.Height = screen.Height;
+                            //box.Width = screen.Width;
+                            //box.Height = screen.Height;
                             break;
                         case GadgetType.GZZGADGET:
                             box.LeftEdge = 0;
@@ -1643,8 +1643,6 @@ namespace TileEngine.GUI
                             box.Height = window.Height;
                             break;
                         case GadgetType.REQGADGET:
-                            //box.LeftEdge = req.LeftEdge + window.BorderLeft;
-                            //box.TopEdge = req.TopEdge + window.BorderTop;
                             box.LeftEdge = req.LeftEdge;
                             box.TopEdge = req.TopEdge;
                             box.Width = req.Width;
@@ -1675,8 +1673,8 @@ namespace TileEngine.GUI
                 Window = window,
                 Requester = req,
                 RastPort = graphics,
-                Domain = GetGadgetDomain(gadget, screen, window, req, ref box),
-                DrawInfo = screen.GetDrawInfo()
+                Domain = GetGadgetDomain(gadget, screen, window, req, ref box)//,
+                //DrawInfo = screen.GetDrawInfo()
             };
             return gi;
         }
@@ -1766,13 +1764,13 @@ namespace TileEngine.GUI
             {
                 int x = ie.X;
                 int y = ie.Y;
-                foreach (var w in screen.Windows)
-                {
-                    if ((w.LeftEdge <= x) && (w.TopEdge <= y) && (w.LeftEdge + w.Width > x) && (w.TopEdge + w.Height > y))
-                    {
-                        win = w;
-                    }
-                }
+                //foreach (var w in screen.Windows)
+                //{
+                //    if ((w.LeftEdge <= x) && (w.TopEdge <= y) && (w.LeftEdge + w.Width > x) && (w.TopEdge + w.Height > y))
+                //    {
+                //        win = w;
+                //    }
+                //}
                 if (win != null)
                 {
                     gi.Window = win;
