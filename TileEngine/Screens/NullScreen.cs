@@ -15,8 +15,6 @@ You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
 */
 
-using TileEngine.Nano;
-
 namespace TileEngine.Screens
 {
     public class NullScreen : AbstractScreen
