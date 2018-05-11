@@ -22,7 +22,6 @@ namespace TileEngine
     using Files;
     using Graphics;
     using Maps;
-    //using NGUI;
     using Resources;
     using Screens;
     using Input;
@@ -64,9 +63,6 @@ namespace TileEngine
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
-            //GUISystem.Init(this);
-            //Intuition.Init(this);
-            //GadTools.Init(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
@@ -158,7 +154,6 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
-                //GUISystem.Update(time);
                 map.Update(time);
                 currentScreen.Update(time);
                 return true;
@@ -177,7 +172,6 @@ namespace TileEngine
             graphics.BeginFrame();
             graphics.ClearScreen();
             currentScreen.Render(time);
-            //GUISystem.Render(graphics, time);
             graphics.EndFrame();
         }
 
