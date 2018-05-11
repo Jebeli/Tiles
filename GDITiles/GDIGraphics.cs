@@ -299,17 +299,6 @@ namespace GDITiles
             }
         }
 
-        public override void DrawRoundedRectangle(int x, int y, int width, int height, Color color)
-        {
-            using (var pen = new System.Drawing.Pen(color.GetColor()))
-            {
-                x += transX;
-                y += transY;
-                var rect = new System.Drawing.Rectangle(x, y, width - 1, height - 1);
-                gfx.DrawRectangle(pen, rect);
-            }
-        }
-
         public override void FillRectangle(int x, int y, int width, int height, Color color)
         {
             using (var brush = new System.Drawing.SolidBrush(color.GetColor()))

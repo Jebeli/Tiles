@@ -111,13 +111,6 @@ namespace SDLTiles
             SDL.SDL_RenderDrawRect(game.ren, ref rect);
         }
 
-        public override void DrawRoundedRectangle(int x, int y, int width, int height, Color color)
-        {
-            x += transX;
-            y += transY;
-            SDLDraw.RoundedRectangle(game.ren, x, y, x + width - 1, y + height - 1, 3, color);
-        }
-
         public override void DrawText(Font font, string text, int x, int y)
         {
             //throw new NotImplementedException();

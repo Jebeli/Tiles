@@ -339,14 +339,6 @@ namespace MONOTiles
             batch.DrawRectangle(rect, color.GetColor());
         }
 
-        public override void DrawRoundedRectangle(int x, int y, int width, int height, Color color)
-        {
-            x += transX;
-            y += transY;
-            var rect = new Microsoft.Xna.Framework.Rectangle(x, y, width, height);
-            batch.DrawRoundedRectangle(rect, color.GetColor());
-        }
-
         public override void FillRectangle(int x, int y, int width, int height, Color color)
         {
             x += transX;

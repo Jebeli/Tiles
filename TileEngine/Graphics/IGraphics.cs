@@ -72,7 +72,6 @@ namespace TileEngine.Graphics
         void RenderIcon(int icon, int x, int y, Color color, HorizontalTextAlign hAlign = HorizontalTextAlign.Center, VerticalTextAlign vAlign = VerticalTextAlign.Center);
         int MeasureTextWidth(Font font, string text);
         void DrawRectangle(int x, int y, int width, int height, Color color);
-        void DrawRoundedRectangle(int x, int y, int width, int height, Color color);
         void FillRectangle(int x, int y, int width, int height, Color color);
         void FillRectangle(int x, int y, int width, int height, Color color, Color color2);
         void DrawLine(int x1, int y1, int x2, int y2, Color color);

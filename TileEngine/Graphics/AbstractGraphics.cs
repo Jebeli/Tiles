@@ -248,7 +248,6 @@ namespace TileEngine.Graphics
 
         public abstract int MeasureTextWidth(Font font, string text);
         public abstract void DrawRectangle(int x, int y, int width, int height, Color color);
-        public abstract void DrawRoundedRectangle(int x, int y, int width, int height, Color color);
         public abstract void FillRectangle(int x, int y, int width, int height, Color color);
         public abstract void FillRectangle(int x, int y, int width, int height, Color color, Color color2);
         public abstract void DrawLine(int x1, int y1, int x2, int y2, Color color);
