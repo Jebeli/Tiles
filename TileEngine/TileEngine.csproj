@@ -78,6 +78,8 @@
     <Compile Include="Maps\Map.cs" />
     <Compile Include="Maps\MapFactory.cs" />
     <Compile Include="Maps\MapLoadInfo.cs" />
+    <Compile Include="Maps\MapParallax.cs" />
+    <Compile Include="Maps\ParallaxLayer.cs" />
     <Compile Include="Maps\Tile.cs" />
     <Compile Include="Maps\TileAnim.cs" />
     <Compile Include="Maps\TileSet.cs" />

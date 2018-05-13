@@ -30,12 +30,18 @@ namespace TileEngine.YGUI
     {
         private string buffer;
         private int bufferPos;
+
         private int labelOffset;
+        private int textTabWidth;
+        private int lineSkip;
+        private int bufferSelStart;
+        private int bufferSelEnd;
 
         public StrGadget(Gadget parent, string label = "")
             : base(parent, label)
         {
-
+            textTabWidth = 4 * 24;
+            lineSkip = 24;
         }
 
         public string Buffer
@@ -49,9 +55,56 @@ namespace TileEngine.YGUI
             get { return bufferPos; }
             set
             {
+                if (value == -1) value = buffer.Length;
                 if (value > buffer.Length) value = buffer.Length;
                 if (value < 0) value = 0;
+                bufferSelStart = 0;
+                bufferSelEnd = 0;
                 bufferPos = value;
+                NormSelection();
+            }
+        }
+
+        public int BufferSelStart
+        {
+            get { return bufferSelStart; }
+        }
+
+        public int BufferSelEnd
+        {
+            get { return bufferSelEnd; }
+        }
+
+        private void NormSelection()
+        {
+            if (bufferSelStart > bufferSelEnd)
+            {
+                int temp = bufferSelEnd;
+                bufferSelEnd = bufferSelStart;
+                bufferSelStart = temp;
+            }
+        }
+
+        private void SetBufferSel(int start, int end)
+        {
+            bufferSelStart = start;
+            bufferSelEnd = end;
+            NormSelection();
+        }
+
+        private void SetBufferSel(int pos)
+        {
+            if (pos < bufferPos)
+            {
+                SetBufferSel(pos, bufferPos);
+            }
+            else if (pos > bufferPos)
+            {
+                SetBufferSel(bufferSelStart, pos);
+            }
+            else
+            {
+                SetBufferSel(pos, pos);
             }
         }
 
@@ -82,6 +135,55 @@ namespace TileEngine.YGUI
             }
         }
 
+        protected bool WrapAtChar(int x, char s)
+        {
+            return false;
+        }
+
+        protected bool MapPosition(IGraphics gfx, int mx, int my, out int pos)
+        {
+            pos = -1;
+            int nLines = 0;
+            int x = 0;
+            int y = 0;
+            if (my < y) return false;
+            if (mx < x) return false;
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                char ch = buffer[i];
+                if (WrapAtChar(x, ch))
+                {
+                    x = 0;
+                    nLines++;
+                }
+                if (ch == '\n')
+                {
+                    x = 0;
+                    nLines++;
+                }
+                else if (ch == '\t')
+                {
+                    x += textTabWidth;
+                }
+                else
+                {
+                    int gx = gfx.MeasureTextWidth(Font, "" + ch);
+                    if ((my >= y && my <= (y + lineSkip)) && (mx >= x && mx <= x + gx))
+                    {
+                        pos = i;
+                        return true;
+                    }
+                    x += gx;
+                }
+            }
+            if ((my >= y && my <= (y + lineSkip)) && (mx >= x))
+            {
+                pos = buffer.Length;
+                return true;
+            }
+            return false;
+        }
+
         public override Vector2 GetPreferredSize(IGraphics gfx)
         {
             int labelW = 0;
@@ -99,6 +201,45 @@ namespace TileEngine.YGUI
         protected override void RenderGadget(IGraphics gfx)
         {
             theme.RenderGadget(gfx, this);
+        }
+
+        protected override void HandleSelectDown(Vector2 p)
+        {
+            var gfx = Screen?.Engine?.Graphics;
+            if (gfx != null)
+            {
+                if (MapPosition(gfx, p.X, p.Y, out int pos))
+                {
+                    BufferPos = pos;
+                }
+            }
+            base.HandleSelectDown(p);
+        }
+
+        protected override void HandleSelectUp(Vector2 p)
+        {
+            var gfx = Screen?.Engine?.Graphics;
+            if (gfx != null)
+            {
+                if (MapPosition(gfx, p.X, p.Y, out int pos))
+                {
+                    SetBufferSel(pos);
+                }
+            }
+            base.HandleSelectUp(p);
+        }
+
+        protected override void HandleSelectMove(Vector2 p)
+        {
+            var gfx = Screen?.Engine?.Graphics;
+            if (gfx != null)
+            {
+                if (MapPosition(gfx, p.X, p.Y, out int pos))
+                {
+                    SetBufferSel(pos);
+                }
+            }
+            base.HandleSelectMove(p);
         }
 
         public override void HandleKeyDown(Key keyData, Key keyCode, char code)

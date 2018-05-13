@@ -92,6 +92,15 @@ namespace TileEngine.Screens
             engine.SwitchToLoadScreen();
         }
 
+        public override void Update(TimeInfo time)
+        {
+            if (engine.Map != null)
+            {
+                BackgroundColor = engine.Map.BackgroundColor;
+            }
+            base.Update(time);
+        }
+
         public override void Render(TimeInfo time)
         {
             renderer.RenderMap(engine.Map);

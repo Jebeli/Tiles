@@ -199,6 +199,11 @@ namespace TileEngine.Maps
             return null;
         }
 
+        public bool IsAnimTile(int id)
+        {
+            return GetTileAnim(id) != null;
+        }
+
         public string GetTileName(int id)
         {
             if (id >= 0 && id < tileNames.Count)
@@ -207,6 +212,7 @@ namespace TileEngine.Maps
             }
             return null;
         }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

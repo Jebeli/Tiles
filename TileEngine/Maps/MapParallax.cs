@@ -13,25 +13,34 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 Tiles.  If not, see http://www.gnu.org/licenses/
-*/
+ */
 
-namespace TileEngine.Screens
+namespace TileEngine.Maps
 {
-    using Core;
+    using System;
     using System.Collections.Generic;
-    using TileEngine.Fonts;
-    using TileEngine.Graphics;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-    public interface IScreen
+    public class MapParallax
     {
-        Font Font { get; }
-        Color BackgroundColor { get; }
-        string Name { get; }
-        void Show();
-        void Hide();
-        void Update(TimeInfo time);
-        void Render(TimeInfo time);
-        void SizeChanged(int width, int height);
-        void PerformLayout();
+
+        private List<ParallaxLayer> layers;
+
+        public MapParallax()
+        {
+            layers = new List<ParallaxLayer>();
+        }
+
+        public IList<ParallaxLayer> Layers
+        {
+            get { return layers; }
+        }
+
+        public void AddLayer(ParallaxLayer layer)
+        {
+            layers.Add(layer);
+        }
     }
 }

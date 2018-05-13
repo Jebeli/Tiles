@@ -13,19 +13,31 @@ namespace TileEngine.Graphics
         private float mapY;
         private int screenX;
         private int screenY;
+        private bool isAnimTile;
+        private int id;
 
-        public RenderTextureRegion(TextureRegion region, float mapX, float mapY, int screenX, int screenY)
+        public RenderTextureRegion(int id, TextureRegion region, float mapX, float mapY, int screenX, int screenY, bool isAnimTile = false)
         {
+            this.id = id;
             this.region = region;
             this.mapX = mapX;
             this.mapY = mapY;
             this.screenX = screenX;
             this.screenY = screenY;
+            this.isAnimTile = isAnimTile;
         }
+
         public TextureRegion TextureRegion
         {
             get { return region; }
+            set { region = value; }
         }
+
+        public int Id
+        {
+            get { return id; }
+        }
+
         public float MapX
         {
             get { return mapX; }
@@ -45,5 +57,11 @@ namespace TileEngine.Graphics
         {
             get { return screenY; }
         }
+
+        public bool IsAnimTile
+        {
+            get { return isAnimTile; }
+        }
+
     }
 }

@@ -44,6 +44,8 @@ namespace TileEngine.Loaders
         
         public abstract TileSet LoadTileSet(string fileId);
 
+        public abstract MapParallax LoadParallax(string fileId);
+
         protected void AddExtension(string ext)
         {
             extensions.Add(ext);

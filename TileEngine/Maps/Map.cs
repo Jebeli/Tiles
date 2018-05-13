@@ -17,8 +17,11 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 
 namespace TileEngine.Maps
 {
+    using System;
     using System.Collections.Generic;
     using Core;
+    using TileEngine.Graphics;
+
     public class Map : NamedObject
     {
         private string fileName;
@@ -28,10 +31,13 @@ namespace TileEngine.Maps
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
+        private Color backgroundColor;
+        private MapParallax parallax;
 
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
         {
+            backgroundColor = new Color(0, 0, 0, 255);
             this.width = width;
             this.height = height;
             this.tileWidth = tileWidth;
@@ -54,6 +60,18 @@ namespace TileEngine.Maps
         {
             get { return fileName; }
             set { fileName = value; }
+        }
+
+        public MapParallax Parallax
+        {
+            get { return parallax; }
+            set { parallax = value; }
+        }
+
+        public Color BackgroundColor
+        {
+            get { return backgroundColor; }
+            set { backgroundColor = value; }
         }
 
         public void InvalidateRenderLists()
@@ -88,7 +106,19 @@ namespace TileEngine.Maps
             {
                 l.Update(time);
             }
+            if (parallax != null)
+            {
+                //if (time.GetElapsedTimeSince(lastParallaxTime).TotalSeconds > 1)
+                //{
+                //    lastParallaxTime = time.TotalGameTime;
+                    foreach (var p in parallax.Layers)
+                    {
+                        p.Update();
+                    }
+                //}
+            }
         }
+
         public Layer AddLayer(string name)
         {
             Layer layer = null;

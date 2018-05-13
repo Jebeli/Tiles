@@ -93,10 +93,12 @@ namespace TileEngine.Maps
         {
             get { return oversizeY; }
         }
+
         public Tile this[int index]
         {
             get { return tiles[index]; }
         }
+
         public Tile this[int x, int y]
         {
             get { return tiles[XYToIndex(x, y)]; }
@@ -106,6 +108,7 @@ namespace TileEngine.Maps
         {
             tileSet?.Update();
         }
+
         public void Fill(int tileId)
         {
             foreach (var tile in tiles)
@@ -151,19 +154,19 @@ namespace TileEngine.Maps
         {
             return y * width + x;
         }
+
         private void IndexToXY(int index, out int x, out int y)
         {
             y = index / width;
             x = index - y * width;
         }
+
         private void InitTiles()
         {
             tiles = new Tile[width * height];
             for (int i = 0; i < tiles.Length; i++)
             {
-                int x;
-                int y;
-                IndexToXY(i, out x, out y);
+                IndexToXY(i, out int x, out int y);
                 tiles[i] = new Tile(this, x, y);
             }
         }

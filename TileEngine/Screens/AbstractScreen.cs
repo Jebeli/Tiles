@@ -37,6 +37,7 @@ namespace TileEngine.Screens
         protected Screen screen;
         private Font font;
         private Font topazFont;
+        private Color backgroundColor;
         private static TimeSpan tickDuration = TimeSpan.FromMilliseconds(100);
         private static TimeSpan lastTick;
 
@@ -44,6 +45,7 @@ namespace TileEngine.Screens
         public AbstractScreen(Engine engine, string name)
             : base(name)
         {
+            backgroundColor = new Color(0, 0, 0, 255);
             this.engine = engine;
             firstShown = false;
         }
@@ -59,6 +61,12 @@ namespace TileEngine.Screens
             {
                 font = value;
             }
+        }
+
+        public Color BackgroundColor
+        {
+            get { return backgroundColor; }
+            protected set { backgroundColor = value; }
         }
 
         public Font TopazFont

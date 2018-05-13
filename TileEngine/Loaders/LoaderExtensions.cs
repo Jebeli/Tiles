@@ -23,6 +23,7 @@ namespace TileEngine.Loaders
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Graphics;
 
     static class LoaderExtensions
     {
@@ -35,6 +36,17 @@ namespace TileEngine.Loaders
             }
             return res;
         }
+
+        public static float ToFloatValue(this string v)
+        {
+            float res = 0;
+            if (v != null)
+            {
+                float.TryParse(v, out res);
+            }
+            return res;
+        }
+
         public static int[] ToIntValues(this string v)
         {
             List<int> list = new List<int>();
@@ -67,6 +79,27 @@ namespace TileEngine.Loaders
                 }
             }
             return list.ToArray();
+        }
+
+        public static Color ToColor(this string v)
+        {
+
+            byte r = 0;
+            byte g = 0;
+            byte b = 0;
+            byte a = 255;
+            int[] values = v.ToIntValues();
+            if (values.Length >= 3)
+            {
+                r = (byte)values[0];
+                g = (byte)values[1];
+                b = (byte)values[2];
+            }
+            if (values.Length >= 4)
+            {
+                a = (byte)values[3];
+            }
+            return new Color(r, g, b, a);
         }
     }
 }

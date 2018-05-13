@@ -59,6 +59,14 @@ namespace TileEngine.Loaders
                         {
                             type = FileType.TileSet;
                         }
+                        else
+                        {
+                            string pName = ini.ReadString("layer", "image");
+                            if (!string.IsNullOrEmpty(pName))
+                            {
+                                type = FileType.Parallax;
+                            }
+                        }
                     }
                     stream.Dispose();
                 }
@@ -97,6 +105,23 @@ namespace TileEngine.Loaders
             }
             return tileSet;
         }
+
+        public override MapParallax LoadParallax(string fileId)
+        {
+            MapParallax parallax = null;
+            if (FitsExtension(fileId))
+            {
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
+                {
+                    IniFile ini = GetIni(stream);
+                    parallax = InternalLoadParallax(ini, fileId);
+                    stream.Dispose();
+                }
+            }
+            return parallax;
+        }
+
         private Map InternalLoadMap(IniFile ini, string fileId)
         {
             Map map = null;
@@ -107,13 +132,17 @@ namespace TileEngine.Loaders
             string orientation = ini.ReadString("header", "orientation");
             string title = ini.ReadString("header", "title");
             string tileSetId = ini.ReadString("header", "tileset");
+            string parallaxId = ini.ReadString("header", "parallax_layers");
+            MapParallax parallax = engine.LoadParallax(parallaxId);
             TileSet tileSet = engine.LoadTileSet(tileSetId);
             if (tileSet != null)
             {
                 MapOrientation mapOrientation;
                 if (Enum.TryParse(orientation, true, out mapOrientation))
                 {
-                    map = new Map(fileId, width, height, tileWidth, tileHeight, mapOrientation);
+                    map = new Map(title, width, height, tileWidth, tileHeight, mapOrientation);
+                    map.BackgroundColor = ini.ReadString("header", "background_color").ToColor();
+                    map.Parallax = parallax;
                     string data = null;
                     int[] values = null;
                     foreach (var sec in ini.Sections)
@@ -206,6 +235,37 @@ namespace TileEngine.Loaders
                 }
             }
             return ts;
+        }
+
+        private MapParallax InternalLoadParallax(IniFile ini, string filename)
+        {
+            MapParallax parallax = new MapParallax();
+            ParallaxLayer layer = null;
+            foreach (var sec in ini.Sections)
+            {
+                if (sec.Name.Equals("layer"))
+                {
+
+                    string img = sec.ReadString("image");
+                    Texture tx = engine.GetTexture(img);
+                    if (tx != null)
+                    {
+                        layer = new ParallaxLayer(tx);
+                        layer.MapLayer = sec.ReadString("map_layer");
+                        layer.Speed = (float)sec.ReadDouble("speed");
+                        string[] sValues = sec.ReadString("fixed_speed").ToStrValues();
+                        if (sValues.Length >= 2)
+                        {
+                            layer.FixedSpeedX = sValues[0].ToFloatValue();
+                            layer.FixedSpeedY = sValues[1].ToFloatValue();
+                        }
+                        parallax.AddLayer(layer);
+
+                    }
+
+                }
+            }
+            return parallax;
         }
 
         private IniFile GetIni(Stream stream)

@@ -60,6 +60,14 @@ namespace TileEngine.Loaders
                             {
                                 type = FileType.TileSet;
                             }
+                            else if (root.Name.LocalName.Equals("tileset"))
+                            {
+                                string pName = root.Attribute("name").Value;
+                                if (!string.IsNullOrEmpty(pName))
+                                {
+                                    type = FileType.Parallax;
+                                }
+                            }
                         }
                     }
                     stream.Dispose();
@@ -121,10 +129,39 @@ namespace TileEngine.Loaders
             }
             return tileSet;
         }
+
+        public override MapParallax LoadParallax(string fileId)
+        {
+            MapParallax parallax = null;
+            if (FitsExtension(fileId))
+            {
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
+                {
+                    XDocument xdoc = XDocument.Load(stream);
+                    if (xdoc != null)
+                    {
+                        var root = xdoc.Root;
+                        if (root.Name.LocalName.Equals("parallax"))
+                        {
+                            string tsName = root.Attribute("name").Value;
+                            if (!string.IsNullOrEmpty(tsName))
+                            {
+                                parallax = LoadParallax(root, fileId);
+                            }
+                        }
+                    }
+                    stream.Dispose();
+                }
+            }
+            return parallax;
+        }
+
         private Map LoadMap(XElement root, string fileId)
         {
             Map map = null;
             string name = (string)root.Attribute("name");
+            string title = (string)root.Attribute("title");
             string orientation = (string)root.Attribute("orientation");
             int? width = (int?)root.Attribute("width");
             int? height = (int?)root.Attribute("height");
@@ -135,7 +172,7 @@ namespace TileEngine.Loaders
                 MapOrientation mapOrientation;
                 if (Enum.TryParse(orientation, true, out mapOrientation))
                 {
-                    map = new Map(name, (int)width, (int)height, (int)tileWidth, (int)tileHeight, mapOrientation);
+                    map = new Map(title, (int)width, (int)height, (int)tileWidth, (int)tileHeight, mapOrientation);
                     foreach (var node in from item in root.Descendants("layer") select item)
                     {
                         string layerName = (string)node.Attribute("name");
@@ -215,5 +252,10 @@ namespace TileEngine.Loaders
             return ts;
         }
 
+        private MapParallax LoadParallax(XElement root, string fileId)
+        {
+            MapParallax parallax = null;
+            return parallax;
+        }
     }
 }

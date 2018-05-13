@@ -53,6 +53,7 @@ namespace TileEngine
         private FrameCounter frameCounter;
         private List<ILoader> loaders;
         private List<ISaver> savers;
+        private bool paused;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts)
         {
@@ -133,6 +134,16 @@ namespace TileEngine
             get { return 1.0 / maxFramesPerSecond; }
         }
 
+        public bool IsRunning
+        {
+            get { return !paused; }
+        }
+
+        public bool IsPaused
+        {
+            get { return paused; }
+        }
+
         public int FPS
         {
             get { return frameCounter.FramesPerSecond; }
@@ -170,7 +181,7 @@ namespace TileEngine
         {
             frameCounter.FrameRendering(time);
             graphics.BeginFrame();
-            graphics.ClearScreen();
+            graphics.ClearScreen(currentScreen.BackgroundColor);
             currentScreen.Render(time);
             graphics.EndFrame();
         }
@@ -326,6 +337,23 @@ namespace TileEngine
                 }
             }
             return tileSet;
+        }
+
+        public MapParallax LoadParallax(string parallaxId)
+        {
+            MapParallax parallax = null;
+            foreach (ILoader loader in loaders)
+            {
+                if (loader.CanLoad(parallaxId))
+                {
+                    parallax = loader.LoadParallax(parallaxId);
+                    if (parallax != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return parallax;
         }
 
         public void SaveTileSet(TileSet tileSet, string fileId = null)

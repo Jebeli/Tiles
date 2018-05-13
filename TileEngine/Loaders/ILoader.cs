@@ -27,5 +27,6 @@ namespace TileEngine.Loaders
         bool CanLoad(string fileId);
         Map LoadMap(string fileId);
         TileSet LoadTileSet(string fileId);
+        MapParallax LoadParallax(string fileId);
     }
 }

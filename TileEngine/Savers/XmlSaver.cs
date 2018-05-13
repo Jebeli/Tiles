@@ -21,6 +21,7 @@ namespace TileEngine.Savers
     using System.Xml;
     using System.Xml.Linq;
     using System;
+    using System.IO;
 
     public class XmlSaver : AbstractSaver
     {
@@ -38,7 +39,8 @@ namespace TileEngine.Savers
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("map");
-                writer.WriteAttributeString("name", AdjustName(map.Name));
+                writer.WriteAttributeString("name", AdjustName(map.FileName));
+                writer.WriteAttributeString("title", map.Name);
                 writer.WriteAttributeString("orientation", map.Orientation.ToString().ToLowerInvariant());
                 writer.WriteAttributeString("width", map.Width.ToString());
                 writer.WriteAttributeString("height", map.Height.ToString());
@@ -117,6 +119,7 @@ namespace TileEngine.Savers
 
         protected override string AdjustName(string fileId)
         {
+            fileId = Path.GetFileName(fileId);
             return fileId.Replace(".txt", ".xml");
         }
     }

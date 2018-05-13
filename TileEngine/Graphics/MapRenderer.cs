@@ -19,6 +19,7 @@ namespace TileEngine.Graphics
 {
     using Core;
     using Maps;
+    using System;
     using System.Collections.Generic;
     using TileEngine.Fonts;
 
@@ -61,6 +62,7 @@ namespace TileEngine.Graphics
         public void RenderMap(Map map)
         {
             InitRenderMap();
+            RenderBaseParallax(map);
             batch.Begin();
             int index = 0;
             foreach (Layer layer in map.Layers)
@@ -79,9 +81,11 @@ namespace TileEngine.Graphics
                 index++;
             }
             batch.End();
+            RenderTopParallax(map);
             if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
             if (gfx.DebugOptions.ShowHighlight) RenderSelected(map);
         }
+
         private void RenderTile(Layer layer, Tile tile, int screenX, int screenY, int width, int height)
         {
             if (tile.TileId >= 0)
@@ -129,7 +133,7 @@ namespace TileEngine.Graphics
                             TextureRegion tex = layer.TileSet.GetTile(tile.TileId);
                             if (tex != null)
                             {
-                                list.Add(new RenderTextureRegion(tex, x, y, sX, sY));
+                                list.Add(new RenderTextureRegion(tile.TileId, tex, x, y, sX, sY, layer.TileSet.IsAnimTile(tile.TileId)));
                             }
                         }
                         tileCounter++;
@@ -139,7 +143,23 @@ namespace TileEngine.Graphics
                 }
                 layer.RenderList = list;
             }
+            else
+            {
+                UpdateRenderList(layer);
+            }
             return list;
+        }
+
+        private void UpdateRenderList(Layer layer)
+        {
+            foreach(var rtr in layer.RenderList)
+            {
+                if (rtr.IsAnimTile)
+                {
+                    TextureRegion tex = layer.TileSet.GetTile(rtr.Id);
+                    rtr.TextureRegion = tex;
+                }
+            }
         }
 
         private void TileLoop(Layer layer, PerTileFunction function)
@@ -204,6 +224,62 @@ namespace TileEngine.Graphics
             int y = engine.Camera.HoverTileY;
             engine.Camera.MapToScreen(x, y, out int sX, out int sY, map.Orientation);
             gfx.DrawTileSelected(sX, sY, tileWidth, tileHeight, map.Orientation);
+        }
+
+        private void RenderBaseParallax(Map map)
+        {
+            if (map.Parallax != null)
+            {
+                foreach (var p in map.Parallax.Layers)
+                {
+                    if (string.IsNullOrEmpty(p.MapLayer))
+                    {
+                        RenderParallax(map, p);
+                    }
+                }
+            }
+        }
+
+        private void RenderTopParallax(Map map)
+        {
+            if (map.Parallax != null)
+            {
+                foreach (var p in map.Parallax.Layers)
+                {
+                    if (!string.IsNullOrEmpty(p.MapLayer))
+                    {
+                        RenderParallax(map, p);
+                    }
+                }
+            }
+        }
+
+        private void RenderParallax(Map map, ParallaxLayer parallax)
+        {
+            int width = parallax.Texture.Width;
+            int height = parallax.Texture.Height;
+            float mapCenterX = map.Width / 2;
+            float mapCenterY = map.Height / 2;
+            float dpX = mapCenterX + (mapCenterX * parallax.Speed) + parallax.FixedOffsetX;
+            float dpY = mapCenterY + (mapCenterY * parallax.Speed) + parallax.FixedOffsetY;
+            engine.Camera.MapToScreen(dpX, dpY, out int sX, out int sY);
+            float cX = sX - width / 2.0f;
+            float cY = sY - height / 2.0f;
+            int startX = (int)(cX - (int)(Math.Ceiling(engine.Graphics.ViewWidth / 2.0f + cX) / (float)width) * width);
+            int startY = (int)(cY - (int)(Math.Ceiling(engine.Graphics.ViewHeight / 2.0f + cY) / (float)height) * height);
+            while (startX > 0) startX -= width;
+            while (startY > 0) startY -= height;
+            int x = startX;
+            while (x < engine.Graphics.ViewWidth)
+            {
+                int y = startY;
+                while (y < engine.Graphics.ViewHeight)
+                {
+                    engine.Graphics.Render(parallax.Texture, x, y);
+                    y += height;
+                }
+                x += width;
+            }
         }
 
     }

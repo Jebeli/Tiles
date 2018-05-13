@@ -256,9 +256,20 @@ namespace TileEngine.YGUI
                 cFrame.Inflate(-2, -2);
                 int x = cFrame.X;
                 int y = cFrame.Y;
+                bool selected = false;
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     var c = buffer[i];
+
+                    selected = (i >= gadget.BufferSelStart && i < gadget.BufferSelEnd);
+                    if (selected)
+                    {
+                        gfx.RenderText(gadget.Font, "" + c, x, y, SelectedTextPen, GadgetSelectedPen, HorizontalTextAlign.Left, VerticalTextAlign.Top);
+                    }
+                    else
+                    {
+                        gfx.RenderText(gadget.Font, "" + c, x, y, TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Top);
+                    }
                     if (i == gadget.BufferPos) // drawCursor
                     {
                         if (gadget.Focused)
@@ -266,7 +277,6 @@ namespace TileEngine.YGUI
                             gfx.DrawLine(x, y, x, y + lineSkip - 1, TextPen);
                         }
                     }
-                    gfx.RenderText(gadget.Font, "" + c, x, y, TextPen, HorizontalTextAlign.Left, VerticalTextAlign.Top);
                     int ax = gfx.MeasureTextWidth(gadget.Font, "" + c);
                     x += ax;
                 }

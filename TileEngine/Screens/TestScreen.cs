@@ -234,7 +234,9 @@
                 var tabs = new TabPanelGadget(basicWindow);
                 var tab1 = tabs.AddTab("Tab 1", Orientation.Vertical);
                 new LabelGadget(tab1, "First Tab");
-                var cg = new ChooserGadget(tab1)
+                var boxL = new BoxGadget(tab1, Orientation.Horizontal);
+                new LabelGadget(boxL, "Selection:");
+                var cg = new ChooserGadget(boxL)
                 {
                     Items = new string[] { "Rows", "Cells", "Cols" }
                 };
@@ -256,7 +258,7 @@
                 table1.AddRow("Last", "The very last row!", "Ultimo");
                 var tab2 = tabs.AddTab("Tab 2", Orientation.Vertical);
                 new LabelGadget(tab2, "Second Tab");
-                var hbox =new BoxGadget(tab2, Orientation.Horizontal);
+                var hbox = new BoxGadget(tab2, Orientation.Horizontal);
                 new LabelGadget(hbox, "Lab");
                 var table2 = new TableGadget(hbox)
                 {
