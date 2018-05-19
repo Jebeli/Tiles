@@ -22,22 +22,37 @@ namespace TileEngine.Maps
     using Core;
     using TileEngine.Graphics;
 
+
+    public enum BlockType
+    {
+        None,
+        All,
+        Movement,
+        AllHidden,
+        MovementHidden,
+        MapOnly,
+        MapOnlyAlt,
+        Entities,
+        Enemies
+    }
+
     public class Map : NamedObject
     {
         private string fileName;
         private int width;
         private int height;
         private IList<Layer> layers;
+        private IList<ParallaxLayer> parallaxLayers;
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
         private Color backgroundColor;
-        private MapParallax parallax;
 
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
         {
             backgroundColor = new Color(0, 0, 0, 255);
+            parallaxLayers = new List<ParallaxLayer>();
             this.width = width;
             this.height = height;
             this.tileWidth = tileWidth;
@@ -62,16 +77,45 @@ namespace TileEngine.Maps
             set { fileName = value; }
         }
 
-        public MapParallax Parallax
-        {
-            get { return parallax; }
-            set { parallax = value; }
-        }
-
         public Color BackgroundColor
         {
             get { return backgroundColor; }
             set { backgroundColor = value; }
+        }
+
+        public void AddMapParallax(MapParallax parallax)
+        {
+            parallaxLayers.Clear();
+            foreach (var layer in layers)
+            {
+                layer.ParallaxLayers.Clear();
+            }
+            if (parallax != null)
+            {
+                foreach (var pl in parallax.Layers)
+                {
+                    var layer = GetLayer(pl.MapLayer);
+                    if (layer != null)
+                    {
+                        layer.ParallaxLayers.Add(pl);
+                    }
+                    else
+                    {
+                        parallaxLayers.Add(pl);
+                    }
+                }
+            }
+        }
+
+        public IList<ParallaxLayer> GetAllParallaxLayers()
+        {
+            List<ParallaxLayer> list = new List<ParallaxLayer>();
+            list.AddRange(parallaxLayers);
+            foreach (var l in layers)
+            {
+                list.AddRange(l.ParallaxLayers);
+            }
+            return list;
         }
 
         public void InvalidateRenderLists()
@@ -102,20 +146,13 @@ namespace TileEngine.Maps
 
         public void Update(TimeInfo time)
         {
-            foreach(var l in layers)
+            foreach (var pl in parallaxLayers)
+            {
+                pl.Update();
+            }
+            foreach (var l in layers)
             {
                 l.Update(time);
-            }
-            if (parallax != null)
-            {
-                //if (time.GetElapsedTimeSince(lastParallaxTime).TotalSeconds > 1)
-                //{
-                //    lastParallaxTime = time.TotalGameTime;
-                    foreach (var p in parallax.Layers)
-                    {
-                        p.Update();
-                    }
-                //}
             }
         }
 
@@ -145,6 +182,33 @@ namespace TileEngine.Maps
             return layers[index];
         }
 
+        public Layer GetBottomLayer()
+        {
+            Layer layer = null;
+            foreach (Layer l in layers)
+            {
+                if (l.Visible)
+                {
+                    layer = l;
+                    break;
+                }
+            }
+            return layer;
+        }
+
+        public Layer GetTopLayer()
+        {
+            Layer layer = null;
+            foreach (Layer l in layers)
+            {
+                if (l.Visible)
+                {
+                    layer = l;
+                }
+            }
+            return layer;
+        }
+
         public int LayerCount
         {
             get { return layers.Count; }
@@ -153,6 +217,11 @@ namespace TileEngine.Maps
         public IEnumerable<Layer> Layers
         {
             get { return layers; }
+        }
+
+        public IEnumerable<ParallaxLayer> ParallaxLayers
+        {
+            get { return parallaxLayers; }
         }
     }
 }

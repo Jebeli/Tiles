@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SDL2;
 using TileEngine;
+using TileEngine.Graphics;
 using TileEngine.Input;
 using TileEngine.Logging;
 
@@ -25,7 +26,7 @@ namespace SDLTiles
         private Engine engine;
         private int mouseX;
         private int mouseY;
-        
+
         public SDLGame()
         {
             Logger.AddLogger(new ConsoleLogger());
@@ -38,7 +39,14 @@ namespace SDLTiles
             win = SDL.SDL_CreateWindow("SDL Tiles", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE | SDL.SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI);
             ren = SDL.SDL_CreateRenderer(win, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
             fontEngine = new SDLFontEngine();
-            graphics = new SDLGraphics(this, 800, 600, fontEngine);
+            graphics = new SDLGraphics(this, 800, 600, fontEngine, new DebugOptions()
+            {
+                ShowGrid = false,
+                ShowHighlight = false,
+                ShowSelected = true,
+                ShowTileCounter = false,
+                ShowCoordinates = false
+            });
             engine = new Engine(fileResolver, graphics, fontEngine);
         }
 
@@ -69,7 +77,7 @@ namespace SDLTiles
                         engine.Input.KeyDown(ScanCode2Key(systemEvent.key.keysym.scancode));
                         break;
                     case SDL.SDL_EventType.SDL_KEYUP:
-                        engine.Input.KeyUp(ScanCode2Key(systemEvent.key.keysym.scancode));                        
+                        engine.Input.KeyUp(ScanCode2Key(systemEvent.key.keysym.scancode));
                         break;
                     case SDL.SDL_EventType.SDL_WINDOWEVENT:
                         switch (systemEvent.window.windowEvent)
@@ -165,6 +173,8 @@ namespace SDLTiles
                     return Key.Oemplus;
                 case SDL.SDL_Scancode.SDL_SCANCODE_KP_MINUS:
                     return Key.OemMinus;
+                case SDL.SDL_Scancode.SDL_SCANCODE_KP_COLON:
+                    return Key.Decimal;
                 case SDL.SDL_Scancode.SDL_SCANCODE_A:
                     return Key.A;
                 case SDL.SDL_Scancode.SDL_SCANCODE_B:

@@ -110,6 +110,7 @@
     <Compile Include="YGUI\ItemGadget.cs" />
     <Compile Include="YGUI\LabelGadget.cs" />
     <Compile Include="YGUI\Layout.cs" />
+    <Compile Include="YGUI\NumericalGadget.cs" />
     <Compile Include="YGUI\PopupWindow.cs" />
     <Compile Include="YGUI\ProgressbarGadget.cs" />
     <Compile Include="YGUI\PropGadget.cs" />

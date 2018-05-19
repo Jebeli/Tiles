@@ -26,6 +26,14 @@ namespace TileEngine.YGUI
     using TileEngine.Graphics;
     using TileEngine.Input;
 
+    [Flags]
+    public enum StrFlags
+    {
+        None = 0,
+        Integer = 1,
+        Double = 2
+    }
+
     public class StrGadget : Gadget
     {
         private string buffer;
@@ -36,12 +44,22 @@ namespace TileEngine.YGUI
         private int lineSkip;
         private int bufferSelStart;
         private int bufferSelEnd;
+        private int intValue;
+        private double doubleValue;
+        private StrFlags flags;
 
         public StrGadget(Gadget parent, string label = "")
             : base(parent, label)
         {
+            buffer = "";
             textTabWidth = 4 * 24;
             lineSkip = 24;
+        }
+
+        public StrFlags Flags
+        {
+            get { return flags; }
+            set { flags = value; }
         }
 
         public string Buffer
@@ -62,6 +80,33 @@ namespace TileEngine.YGUI
                 bufferSelEnd = 0;
                 bufferPos = value;
                 NormSelection();
+            }
+        }
+
+        public int IntValue
+        {
+            get
+            {
+                return intValue;
+            }
+            set
+            {
+                intValue = value;
+                buffer = value.ToString();
+                flags |= StrFlags.Integer;
+                flags &= ~StrFlags.Double;
+            }
+        }
+
+        public double DoubleValue
+        {
+            get { return doubleValue; }
+            set
+            {
+                doubleValue = value;
+                buffer = value.ToString("F");
+                flags |= StrFlags.Double;
+                flags &= ~StrFlags.Integer;
             }
         }
 
@@ -262,6 +307,7 @@ namespace TileEngine.YGUI
                     if (bufferPos < buffer.Length)
                     {
                         buffer = buffer.Remove(bufferPos, 1);
+                        UpdateValue();
                     }
                     break;
                 case Key.Back:
@@ -269,13 +315,15 @@ namespace TileEngine.YGUI
                     {
                         buffer = buffer.Remove(bufferPos - 1, 1);
                         bufferPos--;
+                        UpdateValue();
                     }
                     break;
             }
-            if (char.IsLetterOrDigit(code) || char.IsPunctuation(code) || code == ' ')
+            if (IsValidChar(code))
             {
                 buffer = buffer.Insert(bufferPos, "" + code);
                 bufferPos++;
+                UpdateValue();
             }
         }
 
@@ -285,6 +333,44 @@ namespace TileEngine.YGUI
             {
                 OnGadgetUp();
                 UnFocus();
+            }
+        }
+
+        private bool IsValidChar(char code)
+        {
+            if (flags.HasFlag(StrFlags.Double))
+            {
+                if (char.IsDigit(code) || code == '+' || code == '-' || code == '.')
+                {
+                    return true;
+                }
+            }
+            else if (flags.HasFlag(StrFlags.Integer))
+            {
+                if (char.IsDigit(code) || code == '+' || code == '-')
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (char.IsLetterOrDigit(code) || char.IsPunctuation(code) || code == ' ')
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void UpdateValue()
+        {
+            if (flags.HasFlag(StrFlags.Double))
+            {
+                double.TryParse(buffer, out doubleValue);
+            }
+            else if (flags.HasFlag(StrFlags.Integer))
+            {
+                int.TryParse(buffer, out intValue);
             }
         }
     }

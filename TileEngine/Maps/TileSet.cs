@@ -32,7 +32,8 @@ namespace TileEngine.Maps
         private int tileHeight;
         private int oversizeX;
         private int oversizeY;
-        private float speed = 0.5f;
+        private float speed = 0.5f;        
+
         public TileSet(string name, Texture texture)
             : base(name)
         {
@@ -40,6 +41,17 @@ namespace TileEngine.Maps
             tiles = new List<TextureRegion>();
             tileNames = new List<string>();
             anims = new Dictionary<int, TileAnim>();
+        }      
+
+        public static TileSet GetCollisionTileSet(Texture tex)
+        {
+            
+            TileSet cts = new TileSet("Collision", tex);
+            foreach (BlockType bt in Enum.GetValues(typeof(BlockType)))
+            {
+                cts.AddTile((int)bt, 0, 0, tex.Width, tex.Height, 0, 0, bt.ToString());
+            }
+            return cts;
         }
 
         public int TileWidth
@@ -96,7 +108,7 @@ namespace TileEngine.Maps
             get
             {
                 List<int> list = new List<int>();
-                foreach(int i in anims.Keys)
+                foreach (int i in anims.Keys)
                 {
                     list.Add(i);
                 }
@@ -136,7 +148,7 @@ namespace TileEngine.Maps
             }
         }
 
-        public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY, string name="")
+        public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY, string name = "")
         {
             if (texture != null)
             {
@@ -160,7 +172,6 @@ namespace TileEngine.Maps
                     {
                         anim = new TileAnim(index);
                         anims[index] = anim;
-                        //anim.AddFrame(texture, (int)(duration * speed), tile.X, tile.Y, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
                     }
                     anim.AddFrame(texture, (int)(duration * speed), posX, posY, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
                 }
@@ -192,7 +203,7 @@ namespace TileEngine.Maps
         public TileAnim GetTileAnim(int id)
         {
             TileAnim anim;
-            if (anims.TryGetValue(id,out anim))
+            if (anims.TryGetValue(id, out anim))
             {
                 return anim;
             }

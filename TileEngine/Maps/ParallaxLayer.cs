@@ -85,36 +85,29 @@ namespace TileEngine.Maps
             int width = texture.Width;
             int height = texture.Height;
 
-            float sX = speed * 0.001f;
-            float sY = speed * 0.001f;
-            if (fixedSpeedX != 0)
-            {
-                sX = fixedSpeedX * sX;
-            }
-            if (fixedSpeedY != 0)
-            {
-                sY = fixedSpeedY * sY;
-            }
-            
+            fixedOffsetX += fixedSpeedX;
+            fixedOffsetY += fixedSpeedY;
 
-            fixedOffsetX += sX;
-            fixedOffsetY += sY;
-            if (fixedOffsetX > width)
-            {
-                fixedOffsetX -= width;
-            }
-            if (fixedOffsetX < -width)
-            {
-                fixedOffsetX += width;
-            }
-            if (fixedOffsetY > height)
-            {
-                fixedOffsetY -= height;
-            }
-            if (fixedOffsetY < -height)
-            {
-                fixedOffsetY += height;
-            }
+            //float sX = speed;
+            //float sY = speed;
+
+            //if (fixedSpeedX != 0)
+            //{
+            //    sX = fixedSpeedX * sX;
+            //}
+            //if (fixedSpeedY != 0)
+            //{
+            //    sY = fixedSpeedY * sY;
+            //}
+
+
+            //fixedOffsetX += sX;
+            //fixedOffsetY += sY;
+
+            if (fixedOffsetX > width) { fixedOffsetX -= width; }
+            if (fixedOffsetX < -width) { fixedOffsetX += width; }
+            if (fixedOffsetY > height) { fixedOffsetY -= height; }
+            if (fixedOffsetY < -height) { fixedOffsetY += height; }
         }
     }
 }

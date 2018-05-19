@@ -23,6 +23,8 @@ namespace TileEngine.Graphics
         private bool showTileCounter;
         private bool showCoordinates;
         private bool showHighlight;
+        private bool showSelected;
+
         public bool ShowGrid
         {
             get { return showGrid; }
@@ -33,6 +35,12 @@ namespace TileEngine.Graphics
         {
             get { return showHighlight; }
             set { showHighlight = value; }
+        }
+
+        public bool ShowSelected
+        {
+            get { return showSelected; }
+            set { showSelected = value; }
         }
 
         public bool ShowTileCounter

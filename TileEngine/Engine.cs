@@ -426,6 +426,7 @@ namespace TileEngine
             if (screen != null)
                 ScreenHidden?.Invoke(null, new ScreenEventArgs(screen));
         }
+
         private void OnScreenShown(IScreen screen)
         {
             if (screen != null)

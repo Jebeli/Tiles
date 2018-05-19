@@ -125,6 +125,10 @@
                 {
                     Buffer = "Hello Buffer"
                 };
+                new NumericalGadget(buttonWindow)
+                {
+
+                };
             }
             screen.ShowWindow(buttonWindow);
             screen.WindowToFront(buttonWindow);

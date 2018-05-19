@@ -24,6 +24,7 @@ namespace TileEngine.Maps
     public static class MapFactory
     {
         private static Random rnd = new Random();
+
         public static Map MakeNullMap(Engine engine)
         {
             Map map = new Map("null", 1, 1, 64, 32);

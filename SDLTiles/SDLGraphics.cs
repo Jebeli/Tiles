@@ -172,12 +172,46 @@ namespace SDLTiles
 
         public override void DrawTileGrid(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
-            //throw new NotImplementedException();
+            x += transX;
+            y += transY;
+            DrawTile(x, y, width, height, new Color(245, 222, 179, 128), oriention);
         }
 
         public override void DrawTileSelected(int x, int y, int width, int height, MapOrientation oriention = MapOrientation.Isometric)
         {
-            //throw new NotImplementedException();
+            x += transX;
+            y += transY;
+            DrawTile(x, y, width, height, new Color(255, 215, 0, 128), oriention);
+        }
+
+        private void DrawTile(int x, int y, int width, int height, Color color, MapOrientation orientation = MapOrientation.Isometric)
+        {
+            if (orientation == MapOrientation.Orthogonal)
+            {
+                SDL.SDL_Rect rect = new SDL.SDL_Rect();
+                rect.x = x;
+                rect.y = y;
+                rect.w = width;
+                rect.h = height;
+                SDL.SDL_SetRenderDrawBlendMode(game.ren, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
+                SDL.SDL_SetRenderDrawColor(game.ren, color.R, color.G, color.B, color.Alpha);
+                SDL.SDL_RenderDrawRect(game.ren, ref rect);
+            }
+            else
+            {
+                SDL.SDL_SetRenderDrawBlendMode(game.ren, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
+                SDL.SDL_SetRenderDrawColor(game.ren, color.R, color.G, color.B, color.Alpha);
+                int x1 = x;
+                int x2 = x + width / 2;
+                int x3 = x + width;
+                int y1 = y;
+                int y2 = y + height / 2;
+                int y3 = y + height;
+                SDL.SDL_RenderDrawLine(game.ren, x1, y2, x2, y1);
+                SDL.SDL_RenderDrawLine(game.ren, x2, y1, x3, y2);
+                SDL.SDL_RenderDrawLine(game.ren, x3, y2, x2, y3);
+                SDL.SDL_RenderDrawLine(game.ren, x2, y3, x1, y2);
+            }
         }
 
         public override void ExitRequested()

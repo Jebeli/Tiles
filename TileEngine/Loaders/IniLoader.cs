@@ -132,8 +132,6 @@ namespace TileEngine.Loaders
             string orientation = ini.ReadString("header", "orientation");
             string title = ini.ReadString("header", "title");
             string tileSetId = ini.ReadString("header", "tileset");
-            string parallaxId = ini.ReadString("header", "parallax_layers");
-            MapParallax parallax = engine.LoadParallax(parallaxId);
             TileSet tileSet = engine.LoadTileSet(tileSetId);
             if (tileSet != null)
             {
@@ -141,8 +139,6 @@ namespace TileEngine.Loaders
                 if (Enum.TryParse(orientation, true, out mapOrientation))
                 {
                     map = new Map(title, width, height, tileWidth, tileHeight, mapOrientation);
-                    map.BackgroundColor = ini.ReadString("header", "background_color").ToColor();
-                    map.Parallax = parallax;
                     string data = null;
                     int[] values = null;
                     foreach (var sec in ini.Sections)
@@ -165,6 +161,8 @@ namespace TileEngine.Loaders
                                 layer.TileSet = tileSet;
                                 if (layerType.Equals("collision", StringComparison.OrdinalIgnoreCase))
                                 {
+                                    Texture colTex = engine.Graphics.CreateTexture("Collision", tileWidth, tileHeight);
+                                    layer.TileSet = TileSet.GetCollisionTileSet(colTex);
                                     layer.Visible = false;
                                 }
                                 for (int i = 0; i < values.Length; i++)
@@ -177,6 +175,8 @@ namespace TileEngine.Loaders
                                 break;
                         }
                     }
+                    map.BackgroundColor = ini.ReadString("header", "background_color").ToColor();
+                    map.AddMapParallax(engine.LoadParallax(ini.ReadString("header", "parallax_layers")));
                 }
             }
             return map;

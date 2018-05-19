@@ -39,6 +39,7 @@ namespace TileEngine.Screens
         private bool mousePanning;
         private bool panning;
         private bool hasPanned;
+        private MapOptions mapOptions;
         private TileEditor editor;
         private FileGadget fileDialog;
 
@@ -82,6 +83,13 @@ namespace TileEngine.Screens
                     }
                 }
             };
+            new ButtonGadget(window, "Options")
+            {
+                GadgetDownEvent = (o, i) =>
+                {
+                    ShowOptions();
+                }
+            };
         }
 
         private void LoadFileEvent(object sender, EventArgs args)
@@ -92,12 +100,18 @@ namespace TileEngine.Screens
             engine.SwitchToLoadScreen();
         }
 
-        public override void Update(TimeInfo time)
+        public override void Show()
         {
             if (engine.Map != null)
             {
                 BackgroundColor = engine.Map.BackgroundColor;
             }
+            HideEditor();
+            base.Show();
+        }
+
+        public override void Update(TimeInfo time)
+        {
             base.Update(time);
         }
 
@@ -153,7 +167,7 @@ namespace TileEngine.Screens
             }
             return ret;
         }
-     
+
         private void Pan(float dx, float dy)
         {
             engine.Camera.Shift(dx, dy);
@@ -188,8 +202,34 @@ namespace TileEngine.Screens
             }
         }
 
+        private void ShowOptions()
+        {
+            if (mapOptions == null)
+            {
+                MakeMapOptions();
+            }
+            if (mapOptions != null)
+            {
+                screen.ShowWindow(mapOptions);
+                screen.WindowToFront(mapOptions);
+                screen.ActivateWindow(mapOptions);
+
+            }
+        }
+
+        private void HideOptions()
+        {
+            if (mapOptions != null)
+            {
+                mapOptions.Cancel();
+                mapOptions = null;
+            }
+        }
+
         private void HideEditor()
         {
+            engine.Camera.SelectedTileX = -1;
+            engine.Camera.SelectedTileY = -1;
             if (editor != null)
             {
                 editor.Cancel();
@@ -213,11 +253,24 @@ namespace TileEngine.Screens
             }
             if (editor != null)
             {
+                engine.Camera.SelectedTileX = x;
+                engine.Camera.SelectedTileY = y;
                 editor.SetTile(engine.Map, x, y);
                 screen.ShowWindow(editor);
                 screen.WindowToFront(editor);
                 screen.ActivateWindow(editor);
             }
+        }
+
+        private void MakeMapOptions()
+        {
+            HideOptions();
+            mapOptions = new MapOptions(this, screen, engine.Map)
+            {
+                CloseGadget = true,
+                DepthGadget = true,
+                WindowCloseEvent = (o, i) => { HideOptions(); }
+            };
         }
 
         private void MakeEditor(int x, int y)
@@ -229,6 +282,77 @@ namespace TileEngine.Screens
                 DepthGadget = true,
                 WindowCloseEvent = (o, i) => { HideEditor(); }
             };
+        }
+
+        private class MapOptions : Window
+        {
+            private MapScreen mapScreen;
+            private Map map;
+            public MapOptions(MapScreen mapScreen, Screen screen, Map map)
+                : base(screen, "Map Options")
+            {
+                this.mapScreen = mapScreen;
+                Init(map);
+            }
+
+            public void Cancel()
+            {
+                CloseWindow();
+            }
+
+            private void Init(Map map)
+            {
+                this.map = map;
+                foreach (var pl in map.GetAllParallaxLayers())
+                {
+                    new LabelGadget(this, "Parallax " + pl.Texture.Name);
+                    var bl = new BoxGadget(this, Orientation.Horizontal);
+                    new LabelGadget(bl, "Speed:")
+                    {
+                        FixedWidth = 100
+                    };
+                    new NumericalGadget(bl)
+                    {
+                        Increment = 0.01,
+                        DoubleValue = pl.Speed,
+                        FixedWidth = 100,
+                        GadgetUpEvent = (o,i) => 
+                        {
+                            pl.Speed = (float)((NumericalGadget)o).DoubleValue;
+                        }
+                    };
+                    var blX = new BoxGadget(this, Orientation.Horizontal);
+                    new LabelGadget(blX, "Fixed Speed X:")
+                    {
+                        FixedWidth = 100
+                    };
+                    new NumericalGadget(blX)
+                    {
+                        Increment = 0.01,
+                        DoubleValue = pl.FixedSpeedX,
+                        FixedWidth = 100,
+                        GadgetUpEvent = (o, i) =>
+                        {
+                            pl.FixedSpeedX = (float)((NumericalGadget)o).DoubleValue;
+                        }
+                    };
+                    var blY = new BoxGadget(this, Orientation.Horizontal);
+                    new LabelGadget(blY, "Fixed Speed Y:")
+                    {
+                        FixedWidth = 100
+                    };
+                    new NumericalGadget(blY)
+                    {
+                        Increment = 0.01,
+                        DoubleValue = pl.FixedSpeedY,
+                        FixedWidth = 100,
+                        GadgetUpEvent = (o, i) =>
+                        {
+                            pl.FixedSpeedY = (float)((NumericalGadget)o).DoubleValue;
+                        }
+                    };
+                }
+            }
         }
 
         private class TileEditor : Window
@@ -252,6 +376,48 @@ namespace TileEngine.Screens
                 Init();
                 SetTile(map, mapX, mapY);
             }
+
+            private void Init()
+            {
+                labelInfo = new LabelGadget(this, $"Tile {mapX}/{mapY}");
+                layerBox = new BoxGadget(this, Orientation.Horizontal);
+                var tileBox = new BoxGadget(this, Orientation.Horizontal);
+                image = new ImageGadget(tileBox)
+                {
+                    FixedHeight = 200,
+                    FixedWidth = 200
+                };
+                table = new TableGadget(tileBox)
+                {
+                    RowHeight = 64,
+                    EvenColumns = false,
+                    SelectedCellChangedEvent = (o, i) =>
+                    {
+                        ChangeTile();
+                    }
+                };
+                var colImg = table.AddColumn("Img", 64);
+                var colIdx = table.AddColumn("Id", 64);
+                var colName = table.AddColumn("Name", 200);
+
+                var butBox = new BoxGadget(this, Orientation.Horizontal, Alignment.Fill, 10, 10);
+                new ButtonGadget(butBox, "Ok")
+                {
+                    GadgetUpEvent = (o, i) =>
+                    {
+                        Apply();
+                        mapScreen.HideEditor();
+                    }
+                };
+                new ButtonGadget(butBox, "Cancel")
+                {
+                    GadgetUpEvent = (o, i) =>
+                    {
+                        mapScreen.HideEditor();
+                    }
+                };
+            }
+
 
             private void RememberTile()
             {
@@ -371,47 +537,6 @@ namespace TileEngine.Screens
                         GadgetUpEvent = (o, i) => { SetLayer(layer); }
                     };
                 }
-            }
-
-            private void Init()
-            {
-                labelInfo = new LabelGadget(this, $"Tile {mapX}/{mapY}");
-                layerBox = new BoxGadget(this, Orientation.Horizontal);
-                var tileBox = new BoxGadget(this, Orientation.Horizontal);
-                image = new ImageGadget(tileBox)
-                {
-                    FixedHeight = 200,
-                    FixedWidth = 200
-                };
-                table = new TableGadget(tileBox)
-                {
-                    RowHeight = 64,
-                    EvenColumns = false,
-                    SelectedCellChangedEvent = (o, i) =>
-                    {
-                        ChangeTile();
-                    }
-                };
-                var colImg = table.AddColumn("Img", 64);
-                var colIdx = table.AddColumn("Id", 64);
-                var colName = table.AddColumn("Name", 200);
-
-                var butBox = new BoxGadget(this, Orientation.Horizontal, Alignment.Fill, 10, 10);
-                new ButtonGadget(butBox, "Ok")
-                {
-                    GadgetUpEvent = (o, i) =>
-                    {
-                        Apply();
-                        mapScreen.HideEditor();
-                    }
-                };
-                new ButtonGadget(butBox, "Cancel")
-                {
-                    GadgetUpEvent = (o, i) =>
-                    {
-                        mapScreen.HideEditor();
-                    }
-                };
             }
 
             public void Apply()

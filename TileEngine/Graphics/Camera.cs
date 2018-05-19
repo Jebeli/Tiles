@@ -36,12 +36,16 @@ namespace TileEngine.Graphics
         private int hoverTileY;
         private int clickTileX;
         private int clickTileY;
+        private int selectedTileX;
+        private int selectedTileY;
         private Map map;
         private MapOrientation orientation;
 
         public Camera(Map map, int posX = -1, int posY = -1)
         {
             this.map = map;
+            selectedTileX = -1;
+            selectedTileY = -1;
             orientation = map.Orientation;
             tileWidth = map.TileWidth;
             tileHeight = map.TileHeight;
@@ -118,6 +122,18 @@ namespace TileEngine.Graphics
         {
             get { return hoverTileY; }
             set { hoverTileY = value; }
+        }
+
+        public int SelectedTileX
+        {
+            get { return selectedTileX; }
+            set { selectedTileX = value; }
+        }
+
+        public int SelectedTileY
+        {
+            get { return selectedTileY; }
+            set { selectedTileY = value; }
         }
 
         public int ClickTileX

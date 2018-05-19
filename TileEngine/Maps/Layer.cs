@@ -33,10 +33,12 @@ namespace TileEngine.Maps
         private int oversizeX;
         private int oversizeY;
         private IList<RenderTextureRegion> renderList;
+        private IList<ParallaxLayer> parallaxLayers;
 
         internal Layer(string name, Map map, int width, int height)
             : base(name)
         {
+            parallaxLayers = new List<ParallaxLayer>();
             this.width = width;
             this.height = height;
             this.map = map;
@@ -55,6 +57,11 @@ namespace TileEngine.Maps
         {
             get { return renderList; }
             set { renderList = value; }
+        }
+
+        public IList<ParallaxLayer> ParallaxLayers
+        {
+            get { return parallaxLayers; }
         }
 
         public bool Visible
@@ -107,6 +114,10 @@ namespace TileEngine.Maps
         public void Update(TimeInfo time)
         {
             tileSet?.Update();
+            foreach(var pl in parallaxLayers)
+            {
+                pl.Update();
+            }
         }
 
         public void Fill(int tileId)

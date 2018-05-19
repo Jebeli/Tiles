@@ -183,7 +183,8 @@ namespace TileEngine.Loaders
                         var data = node.Descendants().FirstOrDefault();
                         if (layerName != null && layerWidth != null && layerHeight != null && data != null && tileSetName != null)
                         {
-                            TileSet tileSet = engine.GetTileSet(tileSetName);
+                            TileSet tileSet = null;
+                            tileSet = engine.GetTileSet(tileSetName);
                             string encoding = (string)data.Attribute("encoding");
                             if (encoding != null && tileSet != null)
                             {
