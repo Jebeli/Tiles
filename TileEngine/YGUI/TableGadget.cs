@@ -504,7 +504,7 @@ namespace TileEngine.YGUI
             }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
             int w = 20;
             if (columns.Count > 0)
@@ -525,7 +525,7 @@ namespace TileEngine.YGUI
             {
                 w += 180;
             }
-            return new Vector2(w, 200);
+            return new Point(w, 200);
         }
 
         protected override void OnEndUpdate()
@@ -657,7 +657,7 @@ namespace TileEngine.YGUI
             return y;
         }
 
-        private TableCell XY2Cell(Vector2 p)
+        private TableCell XY2Cell(Point p)
         {
             int x = X2Col(p.X);
             int y = Y2Row(p.Y);
@@ -680,13 +680,13 @@ namespace TileEngine.YGUI
             return null;
         }
 
-        protected override void HandleSelectDown(Vector2 p)
+        protected override void HandleSelectDown(Point p)
         {
             SetMouseSelectedCell(XY2Cell(p));
             base.HandleSelectDown(p);
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             TableCell tc = XY2Cell(p);
             if (tc == mouseSelectedCell)
@@ -749,7 +749,7 @@ namespace TileEngine.YGUI
             }
         }
 
-        protected override void HandleSelectMove(Vector2 p)
+        protected override void HandleSelectMove(Point p)
         {
             SetHoverCell(XY2Cell(p));
             base.HandleSelectMove(p);

@@ -34,10 +34,10 @@ namespace TileEngine.YGUI
 
         private Gadget parent;
         private List<Gadget> children;
-        private Vector2 position;
-        private Vector2 size;
-        private Vector2 fixedSize;
-        private Vector2 minSize;
+        private Point position;
+        private Point size;
+        private Point fixedSize;
+        private Point minSize;
         private bool transparentBackground;
         private bool visible;
         private bool hover;
@@ -284,28 +284,28 @@ namespace TileEngine.YGUI
             get { return new Rect(BorderLeft, BorderTop, Width - BorderLeft - BorderRight, Height - BorderTop - BorderBottom); }
         }
 
-        public Vector2 AbsolutePosition
+        public Point AbsolutePosition
         {
             get { return parent != null ? parent.AbsolutePosition + position : position; }
         }
 
-        public Vector2 Position
+        public Point Position
         {
             get { return position; }
             set { position = value; }
         }
 
-        public Vector2 ScreenToGadget(Vector2 p)
+        public Point ScreenToGadget(Point p)
         {
             return p - AbsolutePosition;
         }
 
-        public Vector2 GadgetToScreen(Vector2 p)
+        public Point GadgetToScreen(Point p)
         {
             return p + AbsolutePosition;
         }
 
-        public Vector2 Size
+        public Point Size
         {
             get { return size; }
             set
@@ -316,13 +316,13 @@ namespace TileEngine.YGUI
             }
         }
 
-        public Vector2 FixedSize
+        public Point FixedSize
         {
             get { return fixedSize; }
             set { fixedSize = value; }
         }
 
-        public Vector2 MinSize
+        public Point MinSize
         {
             get { return minSize; }
             set { minSize = value; }
@@ -406,19 +406,19 @@ namespace TileEngine.YGUI
             set { borderBottom = value; }
         }
 
-        public bool Contains(Vector2 p)
+        public bool Contains(Point p)
         {
             
             var d = p - position;
             return d.X >= 0 && d.Y >= 0 && d.X < size.X && d.Y < size.Y;
         }
 
-        public bool ContainsRel(Vector2 p)
+        public bool ContainsRel(Point p)
         {
             return p.X >= 0 && p.Y >= 0 && p.X < size.X && p.Y < size.Y;
         }
 
-        public Gadget FindGadget(Vector2 pos)
+        public Gadget FindGadget(Point pos)
         {            
             foreach (var g in children)
             {
@@ -497,33 +497,33 @@ namespace TileEngine.YGUI
 
         }
 
-        public virtual void HandleTimer(Vector2 p, MouseButton button)
+        public virtual void HandleTimer(Point p, MouseButton button)
         {
 
         }
 
-        public virtual bool HandleMouseDrag(Vector2 p, Vector2 rel, MouseButton button)
+        public virtual bool HandleMouseDrag(Point p, Point rel, MouseButton button)
         {
             return false;
         }
 
-        protected virtual void HandleSelectDown(Vector2 p)
+        protected virtual void HandleSelectDown(Point p)
         {
             OnGadgetDown();
 
         }
 
-        protected virtual void HandleSelectUp(Vector2 p)
+        protected virtual void HandleSelectUp(Point p)
         {
             OnGadgetUp();
         }
 
-        protected virtual void HandleSelectMove(Vector2 p)
+        protected virtual void HandleSelectMove(Point p)
         {
 
         }
 
-        public bool HandleMouseButtonDown(Vector2 p, MouseButton button)
+        public bool HandleMouseButtonDown(Point p, MouseButton button)
         {
             Logger.Detail("GUI", $"Mouse Down @{p} {this}");
             if (visible && enabled && button == MouseButton.Left && ContainsRel(p))
@@ -535,7 +535,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        public bool HandleMouseButtonUp(Vector2 p, MouseButton button)
+        public bool HandleMouseButtonUp(Point p, MouseButton button)
         {
             Logger.Detail("GUI", $"Mouse Up @{p} {this}");
             if (visible && enabled && button == MouseButton.Left)
@@ -547,7 +547,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        public bool HandleMouseMove(Vector2 p, MouseButton button)
+        public bool HandleMouseMove(Point p, MouseButton button)
         {
             Logger.Detail("GUI", $"Mouse Move @{p} {this}");
             if (visible && enabled && button == MouseButton.Left)
@@ -559,7 +559,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        public virtual Vector2 GetPreferredSize(IGraphics gfx)
+        public virtual Point GetPreferredSize(IGraphics gfx)
         {
             if (layout != null) return layout.GetPreferredSize(gfx, this);
             return size;

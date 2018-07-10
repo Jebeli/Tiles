@@ -32,7 +32,7 @@ namespace TileEngine.YGUI
         public CheckBoxGadget(Gadget parent, string label)
             : base(parent, label)
         {
-            Size = new Vector2(64, 24);
+            Size = new Point(64, 24);
         }
 
         public bool Checked
@@ -41,10 +41,10 @@ namespace TileEngine.YGUI
             set { _checked = value; }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
             int textWidth = gfx.MeasureTextWidth(Font, Label);
-            return new Vector2(textWidth + 24 + 2 * 4, 24);            
+            return new Point(textWidth + 24 + 2 * 4, 24);            
         }
 
         protected override void RenderGadget(IGraphics gfx)
@@ -52,7 +52,7 @@ namespace TileEngine.YGUI
             theme.RenderGadget(gfx, this);
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             _checked = !_checked;
             base.HandleSelectUp(p);

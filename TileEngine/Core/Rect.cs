@@ -20,7 +20,7 @@
             this.height = height;
         }
 
-        public Rect(Vector2 location, Vector2 size)
+        public Rect(Point location, Point size)
         {
             x = location.X;
             y = location.Y;
@@ -33,11 +33,11 @@
             return new Rect(left, top, right - left, bottom - top);
         }
 
-        public Vector2 Location
+        public Point Location
         {
             get
             {
-                return new Vector2(X, Y);
+                return new Point(X, Y);
             }
             set
             {
@@ -46,11 +46,11 @@
             }
         }
 
-        public Vector2 Size
+        public Point Size
         {
             get
             {
-                return new Vector2(width, height);
+                return new Point(width, height);
             }
             set
             {
@@ -143,7 +143,7 @@
             return this.x <= x && x < this.x + width && this.y <= y && y < this.y + height;
         }
 
-        public bool Contains(Vector2 pt)
+        public bool Contains(Point pt)
         {
             return Contains(pt.X, pt.Y);
         }
@@ -173,7 +173,7 @@
             this.height += 2 * height;
         }
 
-        public void Inflate(Vector2 size)
+        public void Inflate(Point size)
         {
             Inflate(size.X, size.Y);
         }
@@ -221,7 +221,7 @@
             return new Rect(x1, y1, x2 - x1, y2 - y1);
         }
 
-        public void Offset(Vector2 pos)
+        public void Offset(Point pos)
         {
             Offset(pos.X, pos.Y);
         }

@@ -49,14 +49,14 @@ namespace TileEngine.YGUI
             set { orientation = value; }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
             switch (orientation)
             {
                 case Orientation.Horizontal:
-                    return new Vector2(1, padding);
+                    return new Point(1, padding);
                 default:
-                    return new Vector2(padding, 1);
+                    return new Point(padding, 1);
             }
         }
 

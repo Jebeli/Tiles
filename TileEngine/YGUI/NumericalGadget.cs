@@ -97,9 +97,9 @@ namespace TileEngine.YGUI
             }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 ps = strGadget.GetPreferredSize(gfx);
+            Point ps = strGadget.GetPreferredSize(gfx);
             ps.X += upGadget.Width;
             ps.Y = Math.Max(ps.Y, upGadget.Height +downGadget.Height);
             return ps;

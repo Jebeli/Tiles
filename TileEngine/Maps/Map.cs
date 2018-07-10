@@ -20,6 +20,7 @@ namespace TileEngine.Maps
     using System;
     using System.Collections.Generic;
     using Core;
+    using TileEngine.Events;
     using TileEngine.Graphics;
 
 
@@ -43,10 +44,12 @@ namespace TileEngine.Maps
         private int height;
         private IList<Layer> layers;
         private IList<ParallaxLayer> parallaxLayers;
+        private EventLayer eventLayer;
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
         private Color backgroundColor;
+        private List<Event> loadEvents;
 
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
@@ -59,6 +62,8 @@ namespace TileEngine.Maps
             this.tileHeight = tileHeight;
             layers = new List<Layer>();
             this.orientation = orientation;
+            eventLayer = new EventLayer(width, height);
+            loadEvents = new List<Event>();
         }
 
         public int Width
@@ -81,6 +86,21 @@ namespace TileEngine.Maps
         {
             get { return backgroundColor; }
             set { backgroundColor = value; }
+        }
+
+        public void AddLoadEvent(Event evt)
+        {
+            loadEvents.Add(evt);
+        }
+
+        public IEnumerable<Event> LoadEvents
+        {
+            get { return loadEvents; }
+        }
+
+        public void ClearLoadEvents()
+        {
+            loadEvents.Clear();
         }
 
         public void AddMapParallax(MapParallax parallax)
@@ -130,6 +150,11 @@ namespace TileEngine.Maps
         {
             get { return orientation; }
             set { orientation = value; }
+        }
+
+        public EventLayer EventLayer
+        {
+            get { return eventLayer; }
         }
 
         public int TileWidth
@@ -222,6 +247,15 @@ namespace TileEngine.Maps
         public IEnumerable<ParallaxLayer> ParallaxLayers
         {
             get { return parallaxLayers; }
+        }
+
+        public IList<Event> GetEventsAt(int x, int y)
+        {
+            if ((x >= 0) && (y >= 0) && (x < width) && (y < height))
+            {
+                return eventLayer[x, y].Events;
+            }
+            return new Event[0];
         }
     }
 }

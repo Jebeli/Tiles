@@ -39,7 +39,7 @@ namespace TileEngine.YGUI
         private Gadget dragGadget;
         private Window dragWindow;
         private bool dragging;
-        private Vector2 mousePos;
+        private Point mousePos;
         private MouseButton mouseButton;
         private bool focusedToTop;
 
@@ -181,7 +181,7 @@ namespace TileEngine.YGUI
             }
         }
 
-        private Window FindWindow(Vector2 pos)
+        private Window FindWindow(Point pos)
         {
             Window win = null;
             foreach (var w in Children)
@@ -294,7 +294,7 @@ namespace TileEngine.YGUI
             ActivateMouse();
         }
 
-        public void MoveWindow(Window window, Vector2 rel)
+        public void MoveWindow(Window window, Point rel)
         {
             window.Position += rel;
             foreach (var p in GetPopupWindows(window))
@@ -353,7 +353,7 @@ namespace TileEngine.YGUI
         public bool MouseButtonDown(int x, int y, MouseButton button)
         {
             bool result = false;
-            Vector2 pos = new Vector2(x, y);
+            Point pos = new Point(x, y);
             Gadget gadget = null;
             Window window = FindWindow(pos);
             if (window != null)
@@ -395,7 +395,7 @@ namespace TileEngine.YGUI
         public bool MouseButtonUp(int x, int y, MouseButton button)
         {
             bool result = false;
-            Vector2 pos = new Vector2(x, y);
+            Point pos = new Point(x, y);
             Gadget gadget = null;
             Window window = FindWindow(pos);
             if (window != null)
@@ -423,7 +423,7 @@ namespace TileEngine.YGUI
         public bool MouseMove(int x, int y)
         {
             bool result = false;
-            Vector2 pos = new Vector2(x, y);
+            Point pos = new Point(x, y);
             Gadget gadget = null;
             Window window = FindWindow(pos);
             if (dragging && dragGadget != null)

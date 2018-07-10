@@ -221,36 +221,36 @@ namespace TileEngine.YGUI
             {
                 AddChild(0, closeButton);
                 closeButton.Visible = closeGadget;
-                closeButton.Size = new Vector2(25, 25);
-                closeButton.Position = new Vector2(0, 0);
+                closeButton.Size = new Point(25, 25);
+                closeButton.Position = new Point(0, 0);
             }
             if (sizeGadget)
             {
                 AddChild(0, sizeButton);
                 sizeButton.Visible = sizeGadget;
-                sizeButton.Size = new Vector2(25, 25);
-                sizeButton.Position = new Vector2(Width - 25, Height - 25);
+                sizeButton.Size = new Point(25, 25);
+                sizeButton.Position = new Point(Width - 25, Height - 25);
             }
             if (depthGadget)
             {
                 AddChild(0, depthButton);
                 depthButton.Visible = depthGadget;
-                depthButton.Size = new Vector2(25, 25);
-                depthButton.Position = new Vector2(Width - 25, 0);
+                depthButton.Size = new Point(25, 25);
+                depthButton.Position = new Point(Width - 25, 0);
             }
         }
 
         private void InitBorderPanels()
         {
             closeButton = new ButtonGadget(this, theme.CloseIcon);
-            closeButton.FixedSize = new Vector2(25, 25);
+            closeButton.FixedSize = new Point(25, 25);
             closeButton.TransparentBackground = true;
             closeButton.Visible = closeGadget;
             closeButton.Borderless = true;
             closeButton.GadgetUp += (o, i) => { OnWindowClose(); };
 
             sizeButton = new ButtonGadget(this, theme.SizeIcon);
-            sizeButton.FixedSize = new Vector2(25, 25);
+            sizeButton.FixedSize = new Point(25, 25);
             sizeButton.TransparentBackground = true;
             sizeButton.Visible = sizeGadget;
             sizeButton.Borderless = true;
@@ -258,7 +258,7 @@ namespace TileEngine.YGUI
             sizeButton.GadgetUp += SizeButton_GadgetUp;
 
             depthButton = new ButtonGadget(this, theme.DepthIcon);
-            depthButton.FixedSize = new Vector2(25, 25);
+            depthButton.FixedSize = new Point(25, 25);
             depthButton.TransparentBackground = true;
             depthButton.Visible = depthGadget;
             depthButton.Borderless = true;
@@ -276,10 +276,10 @@ namespace TileEngine.YGUI
             sizing = true;
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
             HideBorder();
-            Vector2 result = base.GetPreferredSize(gfx);
+            Point result = base.GetPreferredSize(gfx);
             int minX = gfx.MeasureTextWidth(Font, Label);
             if (closeGadget) minX += 25;
             if (depthGadget) minX += 25;
@@ -316,12 +316,12 @@ namespace TileEngine.YGUI
             ShowBorder();
         }
 
-        public void Move(Vector2 rel)
+        public void Move(Point rel)
         {
             Screen.MoveWindow(this, rel);
         }
 
-        public override bool HandleMouseDrag(Vector2 p, Vector2 rel, MouseButton button)
+        public override bool HandleMouseDrag(Point p, Point rel, MouseButton button)
         {
             if (Enabled && dragging && button == MouseButton.Left)
             {
@@ -338,7 +338,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        protected override void HandleSelectDown(Vector2 p)
+        protected override void HandleSelectDown(Point p)
         {
             dragging = false;
             sizing = false;
@@ -349,7 +349,7 @@ namespace TileEngine.YGUI
             }
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             dragging = false;
             sizing = false;

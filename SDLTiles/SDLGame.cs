@@ -13,7 +13,8 @@ namespace SDLTiles
 {
     public class SDLGame
     {
-        private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        //private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        private const string MAPNAME1 = "maps/frontier_outpost.txt";
         private const string MAPNAME2 = "maps/ancient_temple.txt";
 
         public bool running = true;

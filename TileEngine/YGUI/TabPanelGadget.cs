@@ -130,12 +130,12 @@ namespace TileEngine.YGUI
             }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 pSize = new Vector2(tabs.Count * 64, 0);
+            Point pSize = new Point(tabs.Count * 64, 0);
             foreach (var tab in tabs)
             {
-                Vector2 tSize = tab.GetPreferredSize(gfx);
+                Point tSize = tab.GetPreferredSize(gfx);
                 pSize.X = Math.Max(pSize.X, tSize.X);
                 pSize.Y = Math.Max(pSize.Y, tSize.Y);
             }

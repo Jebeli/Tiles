@@ -23,6 +23,7 @@ namespace TileEngine.Maps
         private int y;
         private Layer layer;
         private int tileId;
+
         internal Tile(Layer layer, int x, int y)
         {
             this.layer = layer;

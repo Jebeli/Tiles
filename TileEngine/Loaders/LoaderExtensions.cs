@@ -23,6 +23,7 @@ namespace TileEngine.Loaders
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Events;
     using TileEngine.Graphics;
 
     static class LoaderExtensions
@@ -100,6 +101,57 @@ namespace TileEngine.Loaders
                 a = (byte)values[3];
             }
             return new Color(r, g, b, a);
+        }
+
+        public static EventType ToEventType(this string str)
+        {
+            if (str != null)
+            {
+                switch (str)
+                {
+                    case "on_trigger":
+                        return EventType.Trigger;
+                    case "on_load":
+                        return EventType.Load;
+                    case "on_mapexit":
+                        return EventType.Exit;
+                    case "on_leave":
+                        return EventType.Leave;
+                    case "on_clear":
+                        return EventType.Clear;
+                    case "static":
+                        return EventType.Static;
+                }
+            }
+            return EventType.None;
+        }
+
+        public static int ToDuration(this string v, int maxFramesPerSecond = 60)
+        {
+            int val = 0;
+            float div = 1;
+            if (v != null)
+            {
+                if (v.EndsWith("ms", StringComparison.OrdinalIgnoreCase))
+                {
+                    val = ToIntValue(v.Substring(0, v.Length - 2));
+                    div = 1000;
+                }
+                else if (v.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+                {
+                    val = ToIntValue(v.Substring(0, v.Length - 1));
+                    div = 1;
+                }
+                else
+                {
+                    val = ToIntValue(v);
+                    div = 1;
+                }
+            }
+            if (val == 0) return 0;
+            val = (int)(val * maxFramesPerSecond / div + 0.5f);
+            if (val < 1) val = 1;
+            return val;
         }
     }
 }

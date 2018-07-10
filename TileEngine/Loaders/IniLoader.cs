@@ -25,6 +25,7 @@ namespace TileEngine.Loaders
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Core;
+    using TileEngine.Events;
     using TileEngine.Maps;
 
     public class IniLoader : AbstractLoader
@@ -141,6 +142,7 @@ namespace TileEngine.Loaders
                     map = new Map(title, width, height, tileWidth, tileHeight, mapOrientation);
                     string data = null;
                     int[] values = null;
+                    string[] sValues = null;
                     foreach (var sec in ini.Sections)
                     {
                         switch (sec.Name)
@@ -171,6 +173,104 @@ namespace TileEngine.Loaders
                                     {
                                         layer[i].TileId = values[i];
                                     }
+                                }
+                                break;
+                            case "event":
+                                string evtType = sec.ReadString("type");
+                                EventType evtActivate = sec.ReadString("activate").ToEventType();
+                                string evtLocation = sec.ReadString("location");
+                                values = evtLocation.ToIntValues();
+                                if (values.Length >= 4 && evtType.Equals("event") && evtActivate != EventType.None)
+                                {
+                                    Event evt = new Event(evtActivate, evtType);
+                                    evt.PosX = values[0];
+                                    evt.PosY = values[1];
+                                    evt.Width = values[2];
+                                    evt.Height = values[3];
+                                    foreach (var k in sec.KeyList)
+                                    {
+                                        switch (k.Ident)
+                                        {
+                                            case "hotspot":
+                                                if (k.Value.Equals("location", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    evt.HotSpotFromLocation();
+                                                    evt.HotSpot = true;
+                                                }
+                                                else
+                                                {
+                                                    values = k.Value.ToIntValues();
+                                                    if (values.Length >= 4)
+                                                    {
+                                                        evt.HotPosX = values[0];
+                                                        evt.HotPosY = values[1];
+                                                        evt.HotWidth = values[2];
+                                                        evt.HotHeight = values[3];
+                                                        evt.HotSpot = true;
+                                                    }
+                                                }
+                                                break;
+                                            case "mapmod":
+                                                var mmEc = evt.AddComponent(EventComponentType.MapMod, 0);
+                                                mmEc.MapMods = ParseMapMods(k.Value);
+                                                break;
+                                            case "spawn":
+                                                var spEc = evt.AddComponent(EventComponentType.Spawn, 0);
+                                                spEc.MapSpawns = ParseMapSpawns(k.Value);
+                                                break;
+                                            case "msg":
+                                                evt.AddComponent(EventComponentType.Msg, k.Value);
+                                                break;
+                                            case "repeat":
+                                                if (k.Value.Equals("false", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    evt.Repeat = false;
+                                                }
+                                                break;
+                                            case "shakycam":
+                                                evt.AddComponent(EventComponentType.ShakyCam, k.Value.ToDuration());
+                                                break;
+                                            case "intermap":
+                                                sValues = k.Value.ToStrValues();
+                                                if (sValues.Length >= 3)
+                                                {
+                                                    var imEc = evt.AddComponent(EventComponentType.InterMap, sValues[0]);
+                                                    imEc.MapX = sValues[1].ToIntValue();
+                                                    imEc.MapY = sValues[2].ToIntValue();
+                                                }
+                                                break;
+                                            case "intramap":
+                                                values = k.Value.ToIntValues();
+                                                if (values.Length >= 2)
+                                                {
+                                                    var imEc = evt.AddComponent(EventComponentType.IntraMap, 0);
+                                                    imEc.MapX = values[0];
+                                                    imEc.MapY = values[1];
+                                                }
+                                                break;
+                                            case "tooltip":
+                                                evt.AddComponent(EventComponentType.Tooltip, k.Value);
+                                                break;
+                                            case "soundfx":
+                                                sValues = k.Value.ToStrValues();
+                                                if (sValues.Length >= 1)
+                                                {
+                                                    var fxEc = evt.AddComponent(EventComponentType.SoundFX, sValues[0]);
+                                                    if (sValues.Length >= 3)
+                                                    {
+                                                        fxEc.MapX = sValues[0].ToIntValue();
+                                                        fxEc.MapY = sValues[1].ToIntValue();
+                                                    }
+                                                    else
+                                                    {
+                                                        fxEc.MapX = (int)evt.CenterX;
+                                                        fxEc.MapY = (int)evt.CenterY;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    map.AddLoadEvent(evt);
                                 }
                                 break;
                         }
@@ -290,6 +390,63 @@ namespace TileEngine.Loaders
                     }
                 }
             }
+        }
+
+        private static List<MapMod> ParseMapMods(string value)
+        {
+            var list = new List<MapMod>();
+            foreach (string s in value.Split(';'))
+            {
+                var mod = ParseMapMod(s);
+                if (mod != null)
+                {
+                    list.Add(mod);
+                }
+            }
+            return list;
+        }
+
+        private static MapMod ParseMapMod(string value)
+        {
+            string[] values = value.ToStrValues();
+            if (values.Length >= 4)
+            {
+                MapMod mod = new MapMod();
+                mod.Layer = values[0];
+                mod.MapX = values[1].ToIntValue();
+                mod.MapY = values[2].ToIntValue();
+                mod.Value = values[3].ToIntValue();
+                return mod;
+            }
+            return null;
+        }
+
+        private static List<MapSpawn> ParseMapSpawns(string value)
+        {
+            var list = new List<MapSpawn>();
+            foreach (string s in value.Split(';'))
+            {
+                var spawn = ParseMapSpawn(s);
+                if (spawn != null)
+                {
+                    list.Add(spawn);
+                }
+            }
+            return list;
+        }
+
+        private static MapSpawn ParseMapSpawn(string value)
+        {
+            string[] values = value.ToStrValues();
+            if (values.Length >= 3)
+            {
+                MapSpawn spawn = new MapSpawn();
+                spawn.Type = values[0];
+                spawn.MapX = values[1].ToIntValue();
+                spawn.MapY = values[2].ToIntValue();
+                return spawn;
+            }
+            return null;
         }
     }
 }

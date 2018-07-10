@@ -42,11 +42,11 @@ namespace TileEngine.YGUI
     public abstract class Layout
     {
         public abstract void PerformLayout(IGraphics gfx, Gadget gadget);
-        public abstract Vector2 GetPreferredSize(IGraphics gfx, Gadget gadget);
+        public abstract Point GetPreferredSize(IGraphics gfx, Gadget gadget);
 
-        protected internal static Vector2 GetValidSize(Vector2 pref, Vector2 fix)
+        protected internal static Point GetValidSize(Point pref, Point fix)
         {
-            return new Vector2(fix.X != 0 ? fix.X : pref.X, fix.Y != 0 ? fix.Y : pref.Y);
+            return new Point(fix.X != 0 ? fix.X : pref.X, fix.Y != 0 ? fix.Y : pref.Y);
         }
     }
 
@@ -89,9 +89,9 @@ namespace TileEngine.YGUI
             set { spacing = value; }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx, Gadget gadget)
+        public override Point GetPreferredSize(IGraphics gfx, Gadget gadget)
         {
-            Vector2 size = new Vector2(2 * margin, 2 * margin);
+            Point size = new Point(2 * margin, 2 * margin);
             int xOffset = gadget.BorderLeft + gadget.BorderRight;
             int yOffset = gadget.BorderTop + gadget.BorderBottom;
             bool first = true;
@@ -105,21 +105,21 @@ namespace TileEngine.YGUI
                 else
                     size[axis1] += spacing;
 
-                Vector2 ps = w.GetPreferredSize(gfx);
-                Vector2 fs = w.FixedSize;
-                Vector2 targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
+                Point ps = w.GetPreferredSize(gfx);
+                Point fs = w.FixedSize;
+                Point targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
                 size[axis1] += targetSize[axis1];
                 size[axis2] = Math.Max(size[axis2], targetSize[axis2] + 2 * margin);
                 first = false;
             }
-            return size + new Vector2(xOffset, yOffset);
+            return size + new Point(xOffset, yOffset);
         }
 
         public override void PerformLayout(IGraphics gfx, Gadget gadget)
         {
-            Vector2 fs_w = gadget.FixedSize;
-            Vector2 s_w = gadget.Size;
-            Vector2 containerSize = GetValidSize(s_w, fs_w);// new Vector2(fs_w.X != 0 ? fs_w.X : widget.Width, fs_w.Y != 0 ? fs_w.Y : widget.Height);
+            Point fs_w = gadget.FixedSize;
+            Point s_w = gadget.Size;
+            Point containerSize = GetValidSize(s_w, fs_w);// new Vector2(fs_w.X != 0 ? fs_w.X : widget.Width, fs_w.Y != 0 ? fs_w.Y : widget.Height);
             containerSize.X -= gadget.BorderLeft;
             containerSize.X -= gadget.BorderRight;
             containerSize.Y -= gadget.BorderTop;
@@ -145,10 +145,10 @@ namespace TileEngine.YGUI
                     first = false;
                 else
                     position += spacing;
-                Vector2 ps = w.GetPreferredSize(gfx);
-                Vector2 fs = w.FixedSize;
-                Vector2 targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
-                Vector2 pos = new Vector2(xOffset, yOffset);
+                Point ps = w.GetPreferredSize(gfx);
+                Point fs = w.FixedSize;
+                Point targetSize = GetValidSize(ps, fs);// new Vector2(fs.X != 0 ? fs.X : ps.X, fs.Y != 0 ? fs.Y : ps.Y);
+                Point pos = new Point(xOffset, yOffset);
                 pos[axis1] = position;
                 switch (alignment)
                 {

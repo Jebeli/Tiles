@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace TileEngine.Core
 {
-    public struct Vector2
+    public struct Point
     {
         public int X;
         public int Y;
 
-        public Vector2(int x, int y)
+        public Point(int x, int y)
         {
             X = x;
             Y = y;
@@ -50,32 +50,32 @@ namespace TileEngine.Core
             get { return X == 0 && Y == 0; }
         }
 
-        public static Vector2 operator +(Vector2 v1, Vector2 v2)
+        public static Point operator +(Point v1, Point v2)
         {
-            return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
+            return new Point(v1.X + v2.X, v1.Y + v2.Y);
         }
 
-        public static Vector2 operator -(Vector2 v1, Vector2 v2)
+        public static Point operator -(Point v1, Point v2)
         {
-            return new Vector2(v1.X - v2.X, v1.Y - v2.Y);
+            return new Point(v1.X - v2.X, v1.Y - v2.Y);
         }
 
-        public static Vector2 operator *(Vector2 v1, double m)
+        public static Point operator *(Point v1, double m)
         {
-            return new Vector2((int)(v1.X * m), (int)(v1.Y * m));
+            return new Point((int)(v1.X * m), (int)(v1.Y * m));
         }
 
-        public static float operator *(Vector2 v1, Vector2 v2)
+        public static float operator *(Point v1, Point v2)
         {
             return v1.X * v2.X + v1.Y * v2.Y;
         }
 
-        public static Vector2 operator /(Vector2 v1, double m)
+        public static Point operator /(Point v1, double m)
         {
-            return new Vector2((int)(v1.X / m), (int)(v1.Y / m));
+            return new Point((int)(v1.X / m), (int)(v1.Y / m));
         }
 
-        public static double Distance(Vector2 v1, Vector2 v2)
+        public static double Distance(Point v1, Point v2)
         {
             return Math.Sqrt(Math.Pow(v1.X - v2.X, 2) + Math.Pow(v1.Y - v2.Y, 2));
         }

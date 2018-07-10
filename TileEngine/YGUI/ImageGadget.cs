@@ -49,12 +49,12 @@ namespace TileEngine.YGUI
             set { image = value; }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 res = new Vector2();
+            Point res = new Point();
             if (image != null)
             {
-                res = new Vector2(image.Width, image.Height);
+                res = new Point(image.Width, image.Height);
             }
             if (!frame)
             {

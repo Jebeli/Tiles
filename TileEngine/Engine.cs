@@ -29,6 +29,8 @@ namespace TileEngine
     using System.Collections.Generic;
     using Savers;
     using TileEngine.Fonts;
+    using TileEngine.Events;
+    using System.Text;
 
     public class Engine : ITimeInfoProvider
     {
@@ -40,6 +42,7 @@ namespace TileEngine
         private IFontEngine fonts;
         private ResourceManager<Texture> textureManager;
         private ResourceManager<TileSet> tileSetManager;
+        private EventManager eventManager;
         private IScreen currentScreen;
         private SplashScreen splashScreen;
         private TitleScreen titleScreen;
@@ -64,6 +67,7 @@ namespace TileEngine
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
+            eventManager = new EventManager(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
@@ -84,6 +88,7 @@ namespace TileEngine
         public event EventHandler<MapEventArgs> MapLoaded;
         public event EventHandler<ScreenEventArgs> ScreenHidden;
         public event EventHandler<ScreenEventArgs> ScreenShown;
+
         public IFileResolver FileResolver
         {
             get { return fileResolver; }
@@ -108,6 +113,7 @@ namespace TileEngine
         {
             get { return fonts; }
         }
+
         public IScreen Screen
         {
             get { return currentScreen; }
@@ -121,6 +127,11 @@ namespace TileEngine
         public Camera Camera
         {
             get { return camera; }
+        }
+
+        public EventManager EventManager
+        {
+            get { return eventManager; }
         }
 
         public int MaxFramesPerSecond
@@ -153,9 +164,41 @@ namespace TileEngine
         {
             get
             {
-                return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY}) CAM: ({camera.CameraX}/{camera.CameraY}) SIZE: {graphics.ViewWidth}/{graphics.ViewHeight} ZOOM: {graphics.ViewScale}";
+                StringBuilder sb = new StringBuilder();
+                sb.Append("FPS: ");
+                sb.Append(FPS);
+                sb.Append(" ");
+                sb.Append(map.Name);
+                sb.Append(" (");
+                sb.Append(map.Width);
+                sb.Append("/");
+                sb.Append(map.Height);
+                sb.Append(") POS: (");
+                sb.Append(camera.HoverTileX);
+                sb.Append("/");
+                sb.Append(camera.HoverTileY);
+                sb.Append(") CAM: (");
+                sb.Append(camera.CameraX);
+                sb.Append("/");
+                sb.Append(camera.CameraY);
+                sb.Append(") SIZE: (");
+                sb.Append(graphics.ViewWidth);
+                sb.Append("/");
+                sb.Append(graphics.ViewHeight);
+                sb.Append(") ZOOM: ");
+                sb.Append(graphics.ViewScale);
+                var events = map.GetEventsAt(camera.HoverTileX, camera.HoverTileY);
+                foreach(var evt in events)
+                {
+                    sb.Append(" ");
+                    sb.Append(evt.ToString());
+                }
+                return sb.ToString();
+
+                //return $"FPS: {FPS} MAP: {map.Name}({map.Width}/{map.Height}) POS: ({camera.HoverTileX}/{camera.HoverTileY}) CAM: ({camera.CameraX}/{camera.CameraY}) SIZE: {graphics.ViewWidth}/{graphics.ViewHeight} ZOOM: {graphics.ViewScale}";
             }
         }
+
         public bool Update()
         {
             return Update(GetUpdateTimeInfo());
@@ -195,6 +238,7 @@ namespace TileEngine
         {
             return timeProvider.GetUpdateTimeInfo();
         }
+
         public TimeSpan GetCurrentTime()
         {
             return timeProvider.GetCurrentTime();
@@ -291,10 +335,12 @@ namespace TileEngine
         {
             nextMap = new MapLoadInfo(name, posX, posY);
         }
+
         public void SetMap(Map map, int posX = -1, int posY = -1)
         {
             this.map = map;
             camera = new Camera(map, posX, posY);
+            TransferEvents(map);
         }
 
         public Map LoadMap(string mapId, int posX = -1, int posY = -1)
@@ -406,6 +452,11 @@ namespace TileEngine
             }
         }
 
+        public void ExecuteEvent(Event evt, TimeInfo time = null)
+        {
+            if (evt.IsInCooldown(time)) return;
+        }
+
         internal void SetScreen(IScreen screen)
         {
             currentScreen.Hide();
@@ -431,6 +482,27 @@ namespace TileEngine
         {
             if (screen != null)
                 ScreenShown?.Invoke(null, new ScreenEventArgs(screen));
+        }
+
+        private void TransferEvents(Map map)
+        {
+            foreach (var info in map.LoadEvents)
+            {
+                switch (info.Type)
+                {
+                    case EventType.Trigger:
+                        eventManager.AddEvent(info);
+                        break;
+                    case EventType.Load:
+                        ExecuteEvent(info);
+                        break;
+                    default:
+                        eventManager.AddEvent(info);
+                        break;
+                }
+
+            }
+            map.ClearLoadEvents();
         }
     }
 }

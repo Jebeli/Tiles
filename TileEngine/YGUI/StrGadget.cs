@@ -229,7 +229,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
             int labelW = 0;
             if (!string.IsNullOrEmpty(Label))
@@ -240,7 +240,7 @@ namespace TileEngine.YGUI
             }
             int buffW = gfx.MeasureTextWidth(Font, buffer);
             buffW += 4;
-            return new Vector2(labelW + buffW, 24);
+            return new Point(labelW + buffW, 24);
         }
 
         protected override void RenderGadget(IGraphics gfx)
@@ -248,7 +248,7 @@ namespace TileEngine.YGUI
             theme.RenderGadget(gfx, this);
         }
 
-        protected override void HandleSelectDown(Vector2 p)
+        protected override void HandleSelectDown(Point p)
         {
             var gfx = Screen?.Engine?.Graphics;
             if (gfx != null)
@@ -261,7 +261,7 @@ namespace TileEngine.YGUI
             base.HandleSelectDown(p);
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             var gfx = Screen?.Engine?.Graphics;
             if (gfx != null)
@@ -274,7 +274,7 @@ namespace TileEngine.YGUI
             base.HandleSelectUp(p);
         }
 
-        protected override void HandleSelectMove(Vector2 p)
+        protected override void HandleSelectMove(Point p)
         {
             var gfx = Screen?.Engine?.Graphics;
             if (gfx != null)

@@ -211,9 +211,9 @@ namespace TileEngine.YGUI
 
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 pSize = prop.GetPreferredSize(gfx);
+            Point pSize = prop.GetPreferredSize(gfx);
             if (arrowPlace != ArrowPlace.None)
             {
                 if (orientation == Orientation.Horizontal)

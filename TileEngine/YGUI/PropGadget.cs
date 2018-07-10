@@ -236,9 +236,9 @@ namespace TileEngine.YGUI
         }
 
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 result = new Vector2(PROP_SIZE, PROP_SIZE);
+            Point result = new Point(PROP_SIZE, PROP_SIZE);
             if (freeHoriz) result.X += 75;
             if (freeVert) result.Y += 75;
             return result;
@@ -255,7 +255,7 @@ namespace TileEngine.YGUI
             theme.RenderGadget(gfx, this);
         }
 
-        protected override void HandleSelectDown(Vector2 p)
+        protected override void HandleSelectDown(Point p)
         {
             CalcKnobSize();
             p += Position;
@@ -276,13 +276,13 @@ namespace TileEngine.YGUI
             base.HandleSelectDown(p);
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             knobHit = false;
             base.HandleSelectUp(p);
         }
 
-        protected override void HandleSelectMove(Vector2 p)
+        protected override void HandleSelectMove(Point p)
         {
             if (knobHit)
             {
@@ -291,7 +291,7 @@ namespace TileEngine.YGUI
             base.HandleSelectMove(p);
         }
 
-        private void HandleKnobMove(Vector2 p)
+        private void HandleKnobMove(Point p)
         {
             p += Position;
 
@@ -317,7 +317,7 @@ namespace TileEngine.YGUI
             }
         }
 
-        public override bool HandleMouseDrag(Vector2 p, Vector2 rel, MouseButton button)
+        public override bool HandleMouseDrag(Point p, Point rel, MouseButton button)
         {
             if (Enabled && knobHit)
             {
@@ -327,7 +327,7 @@ namespace TileEngine.YGUI
             return false;
         }
 
-        public override void HandleTimer(Vector2 p, MouseButton button)
+        public override void HandleTimer(Point p, MouseButton button)
         {
             timerDelay--;
             if (timerDelay <= 0)

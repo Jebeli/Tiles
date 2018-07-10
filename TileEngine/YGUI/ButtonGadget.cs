@@ -35,13 +35,13 @@ namespace TileEngine.YGUI
         public ButtonGadget(Gadget parent, Icons icon = Icons.NONE)
             : base(parent, "", icon)
         {
-            Size = new Vector2(24, 24);
+            Size = new Point(24, 24);
         }
 
         public ButtonGadget(Gadget parent, string label, Icons icon = Icons.NONE)
             : base(parent, label, icon)
         {
-            Size = new Vector2(64, 24);
+            Size = new Point(64, 24);
         }
 
         public bool Repeat
@@ -50,9 +50,9 @@ namespace TileEngine.YGUI
             set { repeat = value; }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            Vector2 res = new Vector2(24, 24);
+            Point res = new Point(24, 24);
             res.X = Math.Max(gfx.MeasureTextWidth(Font, Label) + 8, res.X);
             return res;
         }
@@ -62,13 +62,13 @@ namespace TileEngine.YGUI
             theme.RenderGadget(gfx, this);
         }
 
-        protected override void HandleSelectDown(Vector2 p)
+        protected override void HandleSelectDown(Point p)
         {
             timerDelay = 2;
             base.HandleSelectDown(p);
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             if (Sticky)
             {
@@ -77,7 +77,7 @@ namespace TileEngine.YGUI
             base.HandleSelectUp(p);
         }
 
-        public override void HandleTimer(Vector2 p, MouseButton button)
+        public override void HandleTimer(Point p, MouseButton button)
         {
             timerDelay--;
             if (timerDelay <= 0)

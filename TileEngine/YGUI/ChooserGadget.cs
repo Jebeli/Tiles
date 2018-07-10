@@ -38,7 +38,7 @@ namespace TileEngine.YGUI
             RelVerify = false;
             selectedIndex = -1;
             items = new List<object>();
-            Size = new Vector2(64 + 24, 24);
+            Size = new Point(64 + 24, 24);
         }
 
         public event EventHandler<EventArgs> SelectedIndexChanged;
@@ -139,7 +139,7 @@ namespace TileEngine.YGUI
             SelectedIndex = index;
         }
 
-        protected override void HandleSelectUp(Vector2 p)
+        protected override void HandleSelectUp(Point p)
         {
             base.HandleSelectUp(p);
             TogglePopup();

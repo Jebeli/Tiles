@@ -44,6 +44,14 @@
     <Compile Include="Core\TimeInfo.cs" />
     <Compile Include="Core\Vector2.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="Events\Enums.cs" />
+    <Compile Include="Events\Event.cs" />
+    <Compile Include="Events\EventComponent.cs" />
+    <Compile Include="Events\EventLayer.cs" />
+    <Compile Include="Events\EventManager.cs" />
+    <Compile Include="Events\EventTile.cs" />
+    <Compile Include="Events\MapMod.cs" />
+    <Compile Include="Events\MapSpawn.cs" />
     <Compile Include="Files\AbstractFileResolver.cs" />
     <Compile Include="Files\FileInfo.cs" />
     <Compile Include="Files\IFileResolver.cs" />

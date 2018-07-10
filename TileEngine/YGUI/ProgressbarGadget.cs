@@ -115,9 +115,9 @@ namespace TileEngine.YGUI
             }
         }
 
-        public override Vector2 GetPreferredSize(IGraphics gfx)
+        public override Point GetPreferredSize(IGraphics gfx)
         {
-            return new Vector2(75, 24);
+            return new Point(75, 24);
         }
 
         protected override void RenderGadget(IGraphics gfx)
