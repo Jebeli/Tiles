@@ -126,6 +126,23 @@ namespace TileEngine.Loaders
             return EventType.None;
         }
 
+        public static AnimationType ToAnimationType(this string str)
+        {
+            if (str != null)
+            {
+                switch (str.ToLowerInvariant())
+                {
+                    case "looped":
+                        return AnimationType.Looped;
+                    case "back_forth":
+                        return AnimationType.BackForth;
+                    case "play_once":
+                        return AnimationType.PlayOnce;
+                }
+            }
+            return AnimationType.None;
+        }
+
         public static int ToDuration(this string v, int maxFramesPerSecond = 60)
         {
             int val = 0;

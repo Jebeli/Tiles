@@ -19,6 +19,8 @@ namespace TileEngine.Loaders
 {
     using Core;
     using Maps;
+    using Graphics;
+    using Entities;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -45,6 +47,10 @@ namespace TileEngine.Loaders
         public abstract TileSet LoadTileSet(string fileId);
 
         public abstract MapParallax LoadParallax(string fileId);
+
+        public abstract AnimationSet LoadAnimation(string fileId);
+
+        public abstract Entity LoadEntity(string fileId);
 
         protected void AddExtension(string ext)
         {

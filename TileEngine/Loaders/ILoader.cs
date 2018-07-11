@@ -20,6 +20,8 @@ namespace TileEngine.Loaders
 {
     using Core;
     using Maps;
+    using Graphics;
+    using Entities;
 
     public interface ILoader
     {
@@ -28,5 +30,7 @@ namespace TileEngine.Loaders
         Map LoadMap(string fileId);
         TileSet LoadTileSet(string fileId);
         MapParallax LoadParallax(string fileId);
+        AnimationSet LoadAnimation(string fileId);
+        Entity LoadEntity(string fileId);
     }
 }

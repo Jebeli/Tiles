@@ -30,11 +30,14 @@ namespace MONOTiles
 
     public class MONOGame : Game
     {
-        private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        private const string MAPNAME1 = "maps/frontier_outpost.txt";
         private const string MAPNAME2 = "maps/part2_map.xml";
         private const string MAPNAME3 = "maps/part4_map.xml";
         private const string MAPNAME4 = "maps/frontier_outpost.txt";
         private const string MAPNAME5 = "maps/ancient_temple.txt";
+        private const string PLAYERNAME1 = "enemies/lvl10_minotaur.txt";
+        private const string PLAYERNAME2 = "npcs/male.txt";
+
         private GraphicsDeviceManager graphics;
         private ExtendedSpriteBatch spriteBatch;
         private Engine engine;
@@ -89,7 +92,8 @@ namespace MONOTiles
             spriteBatch = new ExtendedSpriteBatch(GraphicsDevice);
             smallFont = Content.Load<BitmapFont>("fonts/Small");
             iconFont = Content.Load<BitmapFont>("fonts/Icons");
-            engine.SetNextMap(MAPNAME1, 25, 25);
+            engine.SetNextMap(MAPNAME1);
+            engine.SetNextPlayer("Hugentobler", PLAYERNAME2);
             engine.Start();
         }
 

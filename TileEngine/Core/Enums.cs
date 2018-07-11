@@ -22,7 +22,9 @@ namespace TileEngine.Core
         None,
         Map,
         TileSet,
-        Parallax
+        Parallax,
+        AnimationSet,
+        Entity
     }
 
     public enum MapOrientation

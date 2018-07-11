@@ -21,6 +21,7 @@ namespace TileEngine.Graphics
     using Maps;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using TileEngine.Fonts;
 
     internal class MapRenderer
@@ -50,7 +51,7 @@ namespace TileEngine.Graphics
             set { useRenderLists = value; }
         }
 
-        public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY, int width, int height);
+        public delegate void PerTileFunction(Layer layer, Tile tile, int screenX, int screenY);
 
         private void InitRenderMap()
         {
@@ -60,7 +61,352 @@ namespace TileEngine.Graphics
             tileHeight = engine.Camera.TileHeight;
         }
 
-        public void RenderMap(Map map)
+        private bool InitMapValues(Map map)
+        {
+            if (map != null)
+            {
+                viewWidth = gfx.ViewWidth;
+                viewHeight = gfx.ViewHeight;
+                tileWidth = engine.Camera.TileWidth;
+                tileHeight = engine.Camera.TileHeight;
+                return true;
+            }
+            return false;
+        }
+
+        private void CalculatePriosIso(IList<RenderTextureRegion> r)
+        {
+            foreach (var it in r)
+            {
+                uint tilex = (uint)(Math.Floor(it.MapX));
+                uint tiley = (uint)(Math.Floor(it.MapY));
+                int commax = (int)((it.MapX - tilex) * (2 << 16));
+                int commay = (int)((it.MapY - tiley) * (2 << 16));
+                long p1 = tilex + tiley;
+                p1 <<= 54;
+                long p2 = tilex;
+                p2 <<= 42;
+                long p3 = commax + commay;
+                p3 <<= 16;
+                it.Prio += (p1 + p2 + p3);
+            }
+        }
+
+        public void RenderMap(Map map, List<RenderTextureRegion> renderList, List<RenderTextureRegion> deadRenderList)
+        {
+            if (InitMapValues(map))
+            {
+                CalculatePriosIso(renderList);
+                CalculatePriosIso(deadRenderList);
+                renderList.Sort();
+                deadRenderList.Sort();
+                RenderIso(map, renderList, deadRenderList);
+
+            }
+        }
+
+        private void RenderIso(Map map, IList<RenderTextureRegion> r, IList<RenderTextureRegion> rDead)
+        {
+            foreach (var pLayer in map.ParallaxLayers)
+            {
+                RenderParallax(map, pLayer);
+            }
+            foreach (var layer in map.Layers)
+            {
+                if (layer.ObjectLayer)
+                {
+                    RenderIsoBackObjects(rDead);
+                    RenderIsoFrontObjects(layer, r);
+                }
+                else if (layer.Visible)
+                {
+                    RenderIsoLayer(layer);
+                }
+                foreach(var pLayer in layer.ParallaxLayers)
+                {
+                    RenderParallax(map, pLayer);
+                }
+            }
+        }
+
+        private void RenderIsoBackObjects(IList<RenderTextureRegion> r)
+        {
+            RenderList(r);
+        }
+
+        private void RenderIsoFrontObjects(Layer layer, IList<RenderTextureRegion> r)
+        {
+            batch.Begin();
+            int w = layer.Width;
+            int h = layer.Height;
+            TileSet tset = layer.TileSet;
+            Point upperLeft = engine.Camera.GetUpperLeft();
+            int maxTilesWidth = (viewWidth / tileWidth) + 2 * tset.OversizeX;
+            int maxTilesHeight = ((viewHeight / tileHeight) + 2 * (tset.OversizeY)) * 2;
+            int j = upperLeft.Y - tset.OversizeY / 2 + tset.OversizeX;
+            int i = upperLeft.X - tset.OversizeY / 2 - tset.OversizeX;
+            int rCursor = 0;
+            int rEnd = r.Count;
+            while (rCursor != rEnd && ((int)r[rCursor].MapX + (int)r[rCursor].MapY < i + j || (int)r[rCursor].MapX < i))
+            {
+                ++rCursor;
+            }
+            List<int> renderBehindSW = new List<int>();
+            List<int> renderBehindNE = new List<int>();
+            List<int> renderBehindNone = new List<int>();
+            int[,] drawnTiles = new int[w, h];
+            for (uint y = (uint)maxTilesHeight; y != 0; --y)
+            {
+                int tilesWidth = 0;
+                if (i < -1)
+                {
+                    j = j + i + 1;
+                    tilesWidth = tilesWidth - (i + 1);
+                    i = -1;
+                }
+
+                int d = j - h;
+                if (d >= 0)
+                {
+                    j = j - d;
+                    tilesWidth = tilesWidth + d;
+                    i = i + d;
+                }
+
+                int jEnd = Math.Max(j + i - w + 1, Math.Max(j - maxTilesWidth, 0));
+                engine.Camera.MapToScreen(i, j, out int pX, out int pY);
+                Point p = engine.Camera.CenterTile(pX, pY);
+                bool isLastNeTile = false;
+                while (j > jEnd)
+                {
+                    --j;
+                    ++i;
+                    ++tilesWidth;
+                    p.X += tileWidth;
+                    bool drawTile = true;
+                    int rPreCursor = rCursor;
+                    while (rPreCursor != rEnd)
+                    {
+                        int rCursorX = (int)r[rPreCursor].MapX;
+                        int rCursorY = (int)r[rPreCursor].MapY;
+                        if ((rCursorX - 1 == i && rCursorY + 1 == j) || (rCursorX + 1 == i && rCursorY - 1 == j))
+                        {
+                            drawTile = false;
+                            break;
+                        }
+                        else if ((rCursorX + 1 > i) || (rCursorY + 1 > j))
+                        {
+                            break;
+                        }
+                        ++rPreCursor;
+                    }
+                    if (drawTile && drawnTiles[i, j] == 0)
+                    {
+                        RenderTile(layer, layer[i, j], p.X, p.Y);
+                        drawnTiles[i, j] = 1;
+                    }
+                    if (rCursor == rEnd)
+                    {
+                        continue;
+                    }
+                    doLastNETile:
+                    GetTileBounds(i - 2, j + 2, layer, out Rect tileSWBounds, out Point tileSWCenter);
+                    GetTileBounds(i - 1, j + 2, layer, out Rect tileSBounds, out Point tileSCenter);
+                    GetTileBounds(i, j, layer, out Rect tileNEBounds, out Point tileNECenter);
+                    GetTileBounds(i, j + 1, layer, out Rect tileEBounds, out Point tileECenter);
+                    bool drawSWTile = false;
+                    bool drawNETile = false;
+                    while (rCursor != rEnd)
+                    {
+                        int rCursorX = (int)r[rCursor].MapX;
+                        int rCursorY = (int)r[rCursor].MapY;
+                        if ((rCursorX + 1 == i) && (rCursorY - 1 == j))
+                        {
+                            drawSWTile = true;
+                            drawNETile = !isLastNeTile;
+                            engine.Camera.MapToScreen(r[rCursor].MapX, r[rCursor].MapY, out pX, out pY);
+                            Point rCursorLeft = new Point(pX, pY);
+                            rCursorLeft.Y -= r[rCursor].TextureRegion.OffsetY;
+                            Point rCursorRight = new Point(rCursorLeft.X, rCursorLeft.Y);
+                            rCursorLeft.X -= r[rCursor].TextureRegion.OffsetX;
+                            rCursorRight.X += r[rCursor].TextureRegion.Width - r[rCursor].TextureRegion.OffsetX;
+                            bool isBehindSW = false;
+                            bool isBehindNE = false;
+                            if (IsWithinRect(tileSBounds, rCursorRight) && IsWithinRect(tileSWBounds, rCursorLeft))
+                            {
+                                isBehindSW = true;
+                            }
+                            if (drawNETile && IsWithinRect(tileEBounds, rCursorLeft) && IsWithinRect(tileNEBounds, rCursorRight))
+                            {
+                                isBehindNE = true;
+                            }
+                            if (isBehindSW)
+                            {
+                                renderBehindSW.Add(rCursor);
+                            }
+                            else if (!isBehindSW && isBehindNE)
+                            {
+                                renderBehindNE.Add(rCursor);
+                            }
+                            else
+                            {
+                                renderBehindNone.Add(rCursor);
+                            }
+                            ++rCursor;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    while (renderBehindSW.Count > 0)
+                    {
+                        RenderRenderable(r[renderBehindSW[0]]);
+                        renderBehindSW.RemoveAt(0);
+                    }
+
+                    if (drawSWTile && i - 2 >= 0 && j + 2 < h && drawnTiles[i - 2, j + 2] == 0)
+                    {
+                        RenderTile(layer, layer[i - 2, j + 2], tileSWCenter.X, tileSWCenter.Y);
+                        drawnTiles[i - 2, j + 2] = 1;
+                    }
+
+                    while (renderBehindNE.Count > 0)
+                    {
+                        RenderRenderable(r[renderBehindNE[0]]);
+                        renderBehindNE.RemoveAt(0);
+                    }
+
+                    if (drawNETile && !drawTile && drawnTiles[i, j] == 0)
+                    {
+                        RenderTile(layer, layer[i , j ], tileNECenter.X, tileNECenter.Y);
+                        drawnTiles[i, j] = 1;
+                    }
+
+                    while (renderBehindNone.Count > 0)
+                    {
+                        RenderRenderable(r[renderBehindNone[0]]);
+                        renderBehindNone.RemoveAt(0);
+                    }
+
+                    if (isLastNeTile)
+                    {
+                        ++j;
+                        --i;
+                        isLastNeTile = false;
+                    }
+                    else if (i == w - 1 || j == 0)
+                    {
+                        --j;
+                        ++i;
+                        isLastNeTile = true;
+                        goto doLastNETile;
+                    }
+
+                }
+                j = j + tilesWidth;
+                i = i - tilesWidth;
+                if ((y % 2) != 0)
+                {
+                    i++;
+                }
+                else
+                {
+                    j++;
+                }
+                while (rCursor != rEnd && ((int)r[rCursor].MapX + (int)r[rCursor].MapY < i + j || (int)r[rCursor].MapX <= i))
+                {
+                    ++rCursor;
+                }
+            }
+            batch.End();
+        }
+
+        private void GetTileBounds(int x, int y, Layer layer, out Rect bounds, out Point center)
+        {
+            bounds = new Rect();
+            center = new Point();
+            if ((x >= 0) && (y >= 0) && (x < layer.Width) && (y < layer.Height))
+            {
+                var tileIndex = layer[x, y];
+                if (tileIndex != null && tileIndex.TileId > 0)
+                {
+                    var tile = layer.TileSet.GetTile(tileIndex.TileId);
+                    if (tile == null || tile.Texture == null)
+                    {
+                        return;
+                    }
+                    engine.Camera.MapToScreen(x, y, out int pX, out int pY);
+                    center = engine.Camera.CenterTile(pX, pY);
+                    bounds.X = center.X;
+                    bounds.Y = center.Y;
+                    bounds.Width = tile.Texture.Width;
+                    bounds.Height = tile.Texture.Height;
+                }
+            }
+        }
+
+        private static bool IsWithinRect(Rect r, Point target)
+        {
+            return target.X >= r.X && target.Y >= r.Y && target.X < r.X + r.Width && target.Y < r.Y + r.Height;
+        }
+
+        private void RenderIsoLayer(Layer layer)
+        {
+            batch.Begin();
+            int w = layer.Width;
+            int h = layer.Height;
+            TileSet tset = layer.TileSet;
+            Point upperLeft = engine.Camera.GetUpperLeft();
+            int maxTilesWidth = (viewWidth / tileWidth) + 2 * tset.OversizeX;
+            int maxTilesHeight = (2 * viewHeight / tileHeight) + 2 * (tset.OversizeY + 1);
+            int j = upperLeft.Y - tset.OversizeY / 2 + tset.OversizeX;
+            int i = upperLeft.X - tset.OversizeY / 2 - tset.OversizeX;
+            for (int y = maxTilesHeight; y >= 0; --y)
+            {
+                int tilesWidth = 0;
+                if (i < -1)
+                {
+                    j = j + i + 1;
+                    tilesWidth = tilesWidth - (i + 1);
+                    i = -1;
+                }
+
+                int d = j - h;
+                if (d >= 0)
+                {
+                    j = j - d;
+                    tilesWidth = tilesWidth + d;
+                    i = i + d;
+                }
+
+                int jEnd = Math.Max(j + i - w + 1, Math.Max(j - maxTilesWidth, 0));
+                engine.Camera.MapToScreen(i, j, out int pX, out int pY);
+                Point p = engine.Camera.CenterTile(pX, pY);
+                while (j > jEnd)
+                {
+                    --j;
+                    ++i;
+                    ++tilesWidth;
+                    p.X += tileWidth;
+                    RenderTile(layer, layer[i, j], p.X, p.Y);
+                }
+                j = j + tilesWidth;
+                i = i - tilesWidth;
+                if ((y % 2) != 0)
+                {
+                    i++;
+                }
+                else
+                {
+                    j++;
+                }
+            }
+            batch.End();
+        }
+
+        public void OldRenderMap(Map map, IList<RenderTextureRegion> renderList, IList<RenderTextureRegion> deadRenderList)
         {
             InitRenderMap();
             foreach (var pl in map.ParallaxLayers)
@@ -74,7 +420,14 @@ namespace TileEngine.Graphics
                 {
                     if (useRenderLists)
                     {
-                        RenderList(GetRenderList(layer));
+                        if (layer.ObjectLayer)
+                        {
+                            RenderList(GetRenderList(layer), renderList, deadRenderList);
+                        }
+                        else
+                        {
+                            RenderList(GetRenderList(layer));
+                        }
                     }
                     else
                     {
@@ -92,7 +445,7 @@ namespace TileEngine.Graphics
             if (gfx.DebugOptions.ShowSelected) RenderSelected(map);
         }
 
-        private void RenderTile(Layer layer, Tile tile, int screenX, int screenY, int width, int height)
+        private void RenderTile(Layer layer, Tile tile, int screenX, int screenY)
         {
             if (tile.TileId >= 0)
             {
@@ -112,6 +465,21 @@ namespace TileEngine.Graphics
                 batch.Draw(r.TextureRegion, r.ScreenX, r.ScreenY);
             }
             batch.End();
+        }
+
+        private void RenderRenderable(RenderTextureRegion r)
+        {
+            engine.Camera.MapToScreen(r.MapX, r.MapY, out int sX, out int sY);
+            r.ScreenX = sX;
+            r.ScreenY = sY;
+            batch.Draw(r.TextureRegion, r.ScreenX, r.ScreenY);
+        }
+
+        private void RenderList(IEnumerable<RenderTextureRegion> list, IList<RenderTextureRegion> rLive, IList<RenderTextureRegion> rDead)
+        {
+            RenderList(rDead);
+            RenderList(list);
+            RenderList(rLive);
         }
 
         private IList<RenderTextureRegion> GetRenderList(Layer layer)
@@ -188,7 +556,7 @@ namespace TileEngine.Graphics
                     engine.Camera.MapToScreen(x, y, out int sX, out int sY);
                     if (sX >= maxScreenX || sY >= maxScreenY) break;
                     if (sX <= minScreenX || sY <= minScreenY) continue;
-                    function(layer, layer[x, y], sX, sY, tileWidth, tileHeight);
+                    function(layer, layer[x, y], sX, sY);
                     tileCounter++;
                     columnCounter++;
                 }

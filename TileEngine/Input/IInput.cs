@@ -818,6 +818,9 @@ namespace TileEngine.Input
         float ViewScale { get; set; }
         int MouseX { get; }
         int MouseY { get; }
+        float ScaledMouseX { get; }
+        float ScaledMouseY { get; }
+        MouseButton MouseButtons { get; }
 
         event EventHandler<MouseEventArgs> OnMouseWheel;
 
@@ -836,6 +839,9 @@ namespace TileEngine.Input
         void MouseMove(int screenX, int screenY, MouseButton button);
         void KeyDown(Key key);
         void KeyUp(Key key);
+
+        bool IsDown(MouseButton button);
+        bool IsUp(MouseButton button);
 
     }
 }

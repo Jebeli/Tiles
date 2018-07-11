@@ -25,6 +25,8 @@ namespace TileEngine.Input
         private bool handleScale = true;
         private int mouseX;
         private int mouseY;
+        private MouseButton mouseButtons;
+
         public bool HandleScale
         {
             get { return handleScale; }
@@ -39,6 +41,35 @@ namespace TileEngine.Input
 
         public int MouseX { get { return mouseX; } }
         public int MouseY { get { return mouseY; } }
+        public float ScaledMouseX
+        {
+            get
+            {
+                if (handleScale)
+                {
+                    return mouseX * viewScale;
+                }
+                else
+                {
+                    return mouseX;
+                }
+            }
+        }
+        public float ScaledMouseY
+        {
+            get
+            {
+                if (handleScale)
+                {
+                    return mouseY * viewScale;
+                }
+                else
+                {
+                    return mouseY;
+                }
+            }
+        }
+        public MouseButton MouseButtons { get { return mouseButtons; } }
 
 
         public event EventHandler<MouseEventArgs> OnMouseWheel;
@@ -57,6 +88,7 @@ namespace TileEngine.Input
         {
             mouseX = screenX;
             mouseY = screenY;
+            mouseButtons |= button;
             OnMouseDown?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
         }
 
@@ -71,6 +103,7 @@ namespace TileEngine.Input
         {
             mouseX = screenX;
             mouseY = screenY;
+            mouseButtons &= ~button;
             OnMouseUp?.Invoke(this, CreateMouseEventArgs(screenX, screenY, button));
         }
 
@@ -85,16 +118,27 @@ namespace TileEngine.Input
         {
             OnKeyDown?.Invoke(this, CreateKeyEventArgs(key, (char)0));
         }
+
         public void KeyUp(Key key)
         {
             OnKeyUp?.Invoke(this, CreateKeyEventArgs(key, (char)0));
         }
 
+        public bool IsDown(MouseButton button)
+        {
+            return mouseButtons.HasFlag(button);
+        }
+
+        public bool IsUp(MouseButton button)
+        {
+            return !mouseButtons.HasFlag(button);
+        }
+
+
         private KeyEventArgs CreateKeyEventArgs(Key data, char code)
         {
             return new KeyEventArgs(data, code);
         }
-
 
         private MouseEventArgs CreateMouseEventArgs(int screenX, int screenY, MouseButton button)
         {

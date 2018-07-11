@@ -26,9 +26,12 @@ namespace GDITiles
 
     public partial class GDIForm : Form
     {
-        private const string MAPNAME1 = "maps/frontier_outpost.xml";
+        private const string MAPNAME1 = "maps/frontier_outpost.txt";
         private const string MAPNAME2 = "maps/part2_map.xml";
         private const string MAPNAME3 = "maps/part4_map.xml";
+        private const string PLAYERNAME1 = "enemies/lvl10_minotaur.txt";
+        private const string PLAYERNAME2 = "npcs/male.txt";
+
         private GDIFileResolver gdiFileResolver;
         private GDIGraphics gdiGraphics;
         private GDIFontEngine gdiFonts;
@@ -56,7 +59,8 @@ namespace GDITiles
 
         protected override void OnLoad(EventArgs e)
         {
-            engine.SetNextMap(MAPNAME1, 25, 25);
+            engine.SetNextMap(MAPNAME1);
+            engine.SetNextPlayer("Hugentobler", PLAYERNAME2);
             engine.Start();
             base.OnLoad(e);
         }
@@ -113,6 +117,7 @@ namespace GDITiles
             }
             base.OnKeyDown(e);
         }
+
         protected override void OnKeyUp(KeyEventArgs e)
         {
             switch (e.KeyCode)

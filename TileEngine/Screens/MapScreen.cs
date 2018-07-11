@@ -74,7 +74,7 @@ namespace TileEngine.Screens
             };
             new ButtonGadget(window, "Save")
             {
-                GadgetDownEvent = (o, i) =>
+                GadgetUpEvent = (o, i) =>
                 {
                     engine.SaveMap(engine.Map);
                     foreach (var layer in engine.Map.Layers)
@@ -85,7 +85,7 @@ namespace TileEngine.Screens
             };
             new ButtonGadget(window, "Options")
             {
-                GadgetDownEvent = (o, i) =>
+                GadgetUpEvent = (o, i) =>
                 {
                     ShowOptions();
                 }
@@ -97,6 +97,7 @@ namespace TileEngine.Screens
             var fg = (FileGadget)sender;
             string map = fg.SelectedFile.Path;
             engine.SetNextMap(map, -1, -1);
+            engine.ResetNextPlayer();
             engine.SwitchToLoadScreen();
         }
 
@@ -105,19 +106,33 @@ namespace TileEngine.Screens
             if (engine.Map != null)
             {
                 BackgroundColor = engine.Map.BackgroundColor;
+                engine.EventManager.ExecuteOnMapLoadEvents();
             }
             HideEditor();
             base.Show();
         }
 
+        public override void Hide()
+        {
+            base.Hide();
+            if (engine.Map != null)
+            {
+                engine.EventManager.ExecuteOnMapExitEvents();
+            }
+        }
         public override void Update(TimeInfo time)
         {
             base.Update(time);
+            engine.EventManager.Update(time);
+            engine.EntityManager.Update(time);
         }
 
         public override void Render(TimeInfo time)
         {
-            renderer.RenderMap(engine.Map);
+            List<RenderTextureRegion> r = new List<RenderTextureRegion>();
+            List<RenderTextureRegion> deadR = new List<RenderTextureRegion>();
+            engine.EntityManager.AddRenderables(r, deadR);
+            renderer.RenderMap(engine.Map, r, deadR);
             base.Render(time);
         }
 
@@ -199,6 +214,10 @@ namespace TileEngine.Screens
             if (button == MouseButton.Right && !hasPanned)
             {
                 ShowEditor(tileX, tileY);
+            }
+            else if (button == MouseButton.Left)
+            {
+                engine.EventManager.CheckHotSpotClick(mapX, mapY);
             }
         }
 
@@ -316,7 +335,7 @@ namespace TileEngine.Screens
                         Increment = 0.01,
                         DoubleValue = pl.Speed,
                         FixedWidth = 100,
-                        GadgetUpEvent = (o,i) => 
+                        GadgetUpEvent = (o, i) =>
                         {
                             pl.Speed = (float)((NumericalGadget)o).DoubleValue;
                         }

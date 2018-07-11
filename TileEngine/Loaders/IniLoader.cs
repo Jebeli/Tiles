@@ -25,6 +25,7 @@ namespace TileEngine.Loaders
     using System.Text;
     using System.Threading.Tasks;
     using TileEngine.Core;
+    using TileEngine.Entities;
     using TileEngine.Events;
     using TileEngine.Maps;
 
@@ -66,6 +67,39 @@ namespace TileEngine.Loaders
                             if (!string.IsNullOrEmpty(pName))
                             {
                                 type = FileType.Parallax;
+                            }
+                            else
+                            {
+                                string aname = ini.ReadString("", "name");
+                                string anims = ini.ReadString("", "animations");
+                                if (!string.IsNullOrEmpty(aname) && !string.IsNullOrEmpty(anims))
+                                {
+                                    type = FileType.Entity;
+                                }
+                                else
+                                {
+                                    string level = ini.ReadString("", "level");
+                                    if (!string.IsNullOrEmpty(aname) && !string.IsNullOrEmpty(level))
+                                    {
+                                        type = FileType.Entity;
+                                    }
+                                    else
+                                    {
+                                        string aImg = ini.ReadString("", "image");
+                                        if (!string.IsNullOrEmpty(aImg))
+                                        {
+                                            foreach (var sec in ini.Sections)
+                                            {
+                                                string frames = sec.ReadString("frames");
+                                                if (!string.IsNullOrEmpty(frames))
+                                                {
+                                                    type = FileType.AnimationSet;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -123,6 +157,38 @@ namespace TileEngine.Loaders
             return parallax;
         }
 
+        public override AnimationSet LoadAnimation(string fileId)
+        {
+            AnimationSet animationSet = null;
+            if (FitsExtension(fileId))
+            {
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
+                {
+                    IniFile ini = GetIni(stream);
+                    animationSet = InternalLoadAnimationSet(ini, fileId);
+                    stream.Dispose();
+                }
+            }
+            return animationSet;
+        }
+
+        public override Entity LoadEntity(string fileId)
+        {
+            Entity entity = null;
+            if (FitsExtension(fileId))
+            {
+                Stream stream = engine.FileResolver.OpenFile(fileId);
+                if (stream != null)
+                {
+                    IniFile ini = GetIni(stream);
+                    entity = InternalLoadEntity(ini, fileId);
+                    stream.Dispose();
+                }
+            }
+            return entity;
+        }
+
         private Map InternalLoadMap(IniFile ini, string fileId)
         {
             Map map = null;
@@ -133,6 +199,7 @@ namespace TileEngine.Loaders
             string orientation = ini.ReadString("header", "orientation");
             string title = ini.ReadString("header", "title");
             string tileSetId = ini.ReadString("header", "tileset");
+            int[] startPos = ini.ReadString("header", "hero_pos").ToIntValues();
             TileSet tileSet = engine.LoadTileSet(tileSetId);
             if (tileSet != null)
             {
@@ -143,6 +210,11 @@ namespace TileEngine.Loaders
                     string data = null;
                     int[] values = null;
                     string[] sValues = null;
+                    if (startPos.Length >= 2)
+                    {
+                        map.StartX = startPos[0];
+                        map.StartY = startPos[1];
+                    }
                     foreach (var sec in ini.Sections)
                     {
                         switch (sec.Name)
@@ -167,9 +239,13 @@ namespace TileEngine.Loaders
                                     layer.TileSet = TileSet.GetCollisionTileSet(colTex);
                                     layer.Visible = false;
                                 }
+                                else if (layerType.Equals("object", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    layer.ObjectLayer = true;
+                                }
                                 for (int i = 0; i < values.Length; i++)
                                 {
-                                    if (values[i] > 0)
+                                    if (values[i] >= 0)
                                     {
                                         layer[i].TileId = values[i];
                                     }
@@ -182,7 +258,7 @@ namespace TileEngine.Loaders
                                 values = evtLocation.ToIntValues();
                                 if (values.Length >= 4 && evtType.Equals("event") && evtActivate != EventType.None)
                                 {
-                                    Event evt = new Event(evtActivate, evtType);
+                                    Event evt = new Event(engine, evtActivate, evtType);
                                     evt.PosX = values[0];
                                     evt.PosY = values[1];
                                     evt.Width = values[2];
@@ -309,8 +385,11 @@ namespace TileEngine.Loaders
                                         int clipY = values[2];
                                         int clipW = values[3];
                                         int clipH = values[4];
-                                        int offsetX = 32 - values[5];
-                                        int offsetY = 16 - values[6];
+                                        int offsetX = values[5];
+                                        int offsetY = values[6];
+
+                                        //int offsetX = 32 - values[5];
+                                        //int offsetY = 16 - values[6];
 
                                         ts.AddTile(index, clipX, clipY, clipW, clipH, offsetX, offsetY);
                                     }
@@ -366,6 +445,127 @@ namespace TileEngine.Loaders
                 }
             }
             return parallax;
+        }
+
+        private AnimationSet InternalLoadAnimationSet(IniFile ini, string fileId)
+        {
+            AnimationSet animationSet = null;
+            string img = ini.ReadString("", "image");
+            if (!string.IsNullOrEmpty(img))
+            {
+                Texture tex = engine.GetTexture(img);
+                if (tex != null)
+                {
+                    animationSet = new AnimationSet(fileId, tex);
+                    int renderSizeX = 0;
+                    int renderSizeY = 0;
+                    int renderOffsetX = 0;
+                    int renderOffsetY = 0;
+                    int[] renderSize = ini.ReadString("", "render_size").ToIntValues();
+                    if (renderSize.Length >= 2)
+                    {
+                        renderSizeX = renderSize[0];
+                        renderSizeY = renderSize[1];
+                    }
+                    int[] offsetSize = ini.ReadString("", "render_offset").ToIntValues();
+                    if (offsetSize.Length >= 2)
+                    {
+                        renderOffsetX = offsetSize[0];
+                        renderOffsetY = offsetSize[1];
+                    }
+                    foreach (var sec in ini.Sections)
+                    {
+                        if (!string.IsNullOrEmpty(sec.Name))
+                        {
+                            AnimationType type = sec.ReadString("type").ToAnimationType();
+                            Animation anim = animationSet.AddAnimation(sec.Name, type);
+                            int frames = sec.ReadInt("frames");
+                            int duration = sec.ReadString("duration").ToDuration(engine.MaxFramesPerSecond);
+                            int position = sec.ReadInt("position");
+                            bool firstFrame = true;
+                            bool noFrame = true;
+                            foreach (var key in sec.KeyList)
+                            {
+                                if (key.Ident.Equals("frame"))
+                                {
+                                    if (firstFrame)
+                                    {
+                                        anim.Setup(frames, duration);
+                                        firstFrame = false;
+                                    }
+                                    noFrame = false;
+                                    int[] values = key.Value.ToIntValues();
+                                    int index = values[0];
+                                    int direction = values[1];
+                                    int x = values[2];
+                                    int y = values[3];
+                                    int w = values[4];
+                                    int h = values[5];
+                                    int ox = values[6];
+                                    int oy = values[7];
+                                    anim.AddFrame(index, direction, x, y, w, h, ox, oy);
+                                }
+                            }
+                            if (noFrame && renderSizeX > 0 && renderSizeY > 0)
+                            {
+                                anim.Setup(frames, duration);
+                                anim.SetUncompressed(renderSizeX, renderSizeY, renderOffsetX, renderOffsetY, position, frames, duration);
+                            }
+                        }
+                    }
+                }
+            }
+            return animationSet;
+        }
+
+        private Entity InternalLoadEntity(IniFile ini, string fileId)
+        {
+            Entity ent = null;
+            string name = ini.ReadString("", "name");
+            if (!string.IsNullOrEmpty(name))
+            {
+                ent = new Entity(engine, name);
+                string animId = ini.ReadString("", "animations");
+                if (string.IsNullOrEmpty(animId)) animId = ini.ReadString("", "gfx");
+
+                if (!string.IsNullOrEmpty(animId))
+                {
+                    ent.AnimationName = animId;
+                }
+                else
+                {
+                    animId = ini.ReadString("", "gfxpart");
+                    if (!string.IsNullOrEmpty(animId))
+                    {
+                        var sec = ini.Sections.FirstOrDefault(sn => sn.Name.Equals(""));
+                        if (sec != null)
+                        {
+                            foreach (var k in sec.KeyList)
+                            {
+                                if (k.Ident.Equals("gfxpart"))
+                                {
+                                    var sValues = k.Value.ToStrValues();
+                                    string part = sValues[0];
+                                    string partAnimId = sValues[1];
+                                    if (!string.IsNullOrEmpty(partAnimId))
+                                    {
+                                        ent.AddAnimationSetName(part, partAnimId);
+                                    }
+                                }
+                                else if (k.Ident.Equals("layer"))
+                                {
+                                    var sValues = k.Value.ToStrValues();
+                                    int layer = sValues[0].ToIntValue();
+                                    var order = sValues.ToList();
+                                    order.RemoveAt(0);
+                                    ent.SetLayerOrder(layer, order);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return ent;
         }
 
         private IniFile GetIni(Stream stream)

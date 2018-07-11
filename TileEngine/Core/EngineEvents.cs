@@ -24,6 +24,8 @@ namespace TileEngine.Core
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Entities;
+    using TileEngine.Events;
 
     public class MapEventArgs : EventArgs
     {
@@ -37,6 +39,41 @@ namespace TileEngine.Core
         public Map Map
         {
             get { return map; }
+        }
+    }
+
+    public class EntityEventArgs : EventArgs
+    {
+        private readonly Entity ent;
+
+        public EntityEventArgs(Entity ent)
+        {
+            this.ent = ent;
+        }
+
+        public Entity Entity { get { return ent; } }
+    }
+
+
+    public class EventEventArgs : EventArgs
+    {
+        private readonly Event evt;
+        private bool cancel;
+
+        public EventEventArgs(Event evt)
+        {
+            this.evt = evt;
+        }
+
+        public Event Event
+        {
+            get { return evt; }
+        }
+
+        public bool Cancel
+        {
+            get { return cancel; }
+            set { cancel = value; }
         }
     }
 

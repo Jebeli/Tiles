@@ -182,8 +182,11 @@ namespace TileEngine.Maps
         {
             if (tileWidth == 0) tileWidth = clipW;
             if (tileHeight == 0) tileHeight = clipH;
-            oversizeX = Math.Max(oversizeX, 1 + (clipW - offsetX) / tileWidth);
-            oversizeY = Math.Max(oversizeY, 1 + (clipH - offsetY) / tileHeight);
+            oversizeX = Math.Max(oversizeX, clipW / tileWidth + 1);
+            oversizeY = Math.Max(oversizeY, clipH / tileHeight + 1);
+
+            //oversizeX = Math.Max(oversizeX, 1 + (clipW - offsetX) / tileWidth);
+            //oversizeY = Math.Max(oversizeY, 1 + (clipH - offsetY) / tileHeight);
         }
 
         public TextureRegion GetTile(int id)

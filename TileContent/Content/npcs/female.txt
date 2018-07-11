@@ -1,0 +1,35 @@
+name=Female
+level=1
+speed=3
+humanoid=true
+power=melee,1,5
+# power=ranged,35,5
+
+portrait=images/portraits/female01.png
+
+sfx_attack=swing,soundfx/melee_attack.ogg
+sfx_attack=shoot,soundfx/melee_attack.ogg
+sfx_attack=cast,soundfx/melee_attack.ogg
+sfx_hit=soundfx/female_hit.ogg
+sfx_die=soundfx/female_die.ogg
+sfx_critdie=soundfx/female_die.ogg
+
+# animation info
+gfxpart=chest,animations/avatar/female/plate_cuirass.txt
+gfxpart=feet,animations/avatar/female/plate_boots.txt
+gfxpart=hands,animations/avatar/female/plate_gauntlets.txt
+gfxpart=legs,animations/avatar/female/plate_greaves.txt
+gfxpart=head,animations/avatar/female/plate_helm.txt
+gfxpart=main,animations/avatar/female/war_hammer.txt
+gfxpart=off,animations/avatar/female/shield.txt
+
+# layer=direction, list of types in order of appearance, first item will be printed on screen first
+layer=0,main,feet,legs,hands,chest,head,off
+layer=1,main,feet,legs,hands,chest,head,off
+layer=2,off,feet,legs,hands,chest,head,main
+layer=3,off,feet,legs,hands,chest,head,main
+layer=4,off,feet,legs,hands,chest,head,main
+layer=5,off,feet,legs,hands,chest,head,main
+layer=6,main,feet,legs,hands,chest,head,off
+layer=7,main,feet,legs,hands,chest,head,off
+

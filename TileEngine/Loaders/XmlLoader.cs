@@ -25,6 +25,7 @@ namespace TileEngine.Loaders
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
+    using TileEngine.Entities;
 
     public class XmlLoader : AbstractLoader
     {
@@ -155,6 +156,26 @@ namespace TileEngine.Loaders
                 }
             }
             return parallax;
+        }
+
+        public override AnimationSet LoadAnimation(string fileId)
+        {
+            AnimationSet animationSet = null;
+            if (FitsExtension(fileId))
+            {
+
+            }
+            return animationSet;
+        }
+
+        public override Entity LoadEntity(string fileId)
+        {
+            Entity entity = null;
+            if (FitsExtension(fileId))
+            {
+
+            }
+            return entity;
         }
 
         private Map LoadMap(XElement root, string fileId)

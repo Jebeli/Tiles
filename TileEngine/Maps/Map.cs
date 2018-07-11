@@ -45,9 +45,12 @@ namespace TileEngine.Maps
         private IList<Layer> layers;
         private IList<ParallaxLayer> parallaxLayers;
         private EventLayer eventLayer;
+        private MapCollision collision;
         private MapOrientation orientation;
         private int tileWidth;
         private int tileHeight;
+        private int startX;
+        private int startY;
         private Color backgroundColor;
         private List<Event> loadEvents;
 
@@ -60,6 +63,8 @@ namespace TileEngine.Maps
             this.height = height;
             this.tileWidth = tileWidth;
             this.tileHeight = tileHeight;
+            startX = -1;
+            startY = -1;
             layers = new List<Layer>();
             this.orientation = orientation;
             eventLayer = new EventLayer(width, height);
@@ -86,6 +91,18 @@ namespace TileEngine.Maps
         {
             get { return backgroundColor; }
             set { backgroundColor = value; }
+        }
+
+        public int StartX
+        {
+            get { return startX; }
+            set { startX = value; }
+        }
+
+        public int StartY
+        {
+            get { return startY; }
+            set { startY = value; }
         }
 
         public void AddLoadEvent(Event evt)
@@ -155,6 +172,11 @@ namespace TileEngine.Maps
         public EventLayer EventLayer
         {
             get { return eventLayer; }
+        }
+
+        public MapCollision Collision
+        {
+            get { return collision; }
         }
 
         public int TileWidth
@@ -256,6 +278,32 @@ namespace TileEngine.Maps
                 return eventLayer[x, y].Events;
             }
             return new Event[0];
+        }
+
+        public void InitCollision()
+        {
+            Layer collisionLayer = Find(layers, "collision");
+            if (collisionLayer != null)
+            {
+                collision = new MapCollision(collisionLayer);
+            }
+            else
+            {
+                collision = new MapCollision(width, height);
+            }
+        }
+
+        public void DoMapMod(MapMod mod)
+        {
+            var layer = GetLayer(mod.Layer);
+            if (layer != null)
+            {
+                layer[mod.MapX, mod.MapY].TileId = mod.Value;
+            }
+            if (mod.Layer.Equals("collision"))
+            {
+                collision.ColMap[mod.MapX, mod.MapY] = mod.Value;
+            }
         }
     }
 }

@@ -36,14 +36,21 @@
   <ItemGroup>
     <Compile Include="Core\EngineEvents.cs" />
     <Compile Include="Core\Enums.cs" />
+    <Compile Include="Core\FPoint.cs" />
     <Compile Include="Core\FrameCounter.cs" />
     <Compile Include="Core\ITimeInfoProvider.cs" />
     <Compile Include="Core\NamedObject.cs" />
     <Compile Include="Core\Rect.cs" />
     <Compile Include="Core\StopWatchTimeInfoProvider.cs" />
     <Compile Include="Core\TimeInfo.cs" />
-    <Compile Include="Core\Vector2.cs" />
+    <Compile Include="Core\Point.cs" />
+    <Compile Include="Core\Utils.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityLoadInfo.cs" />
+    <Compile Include="Entities\EntityManager.cs" />
+    <Compile Include="Entities\EntityVisual.cs" />
+    <Compile Include="Entities\MultiPartEntityVisual.cs" />
     <Compile Include="Events\Enums.cs" />
     <Compile Include="Events\Event.cs" />
     <Compile Include="Events\EventComponent.cs" />
@@ -59,6 +66,8 @@
     <Compile Include="Fonts\Font.cs" />
     <Compile Include="Fonts\IFontEngine.cs" />
     <Compile Include="Graphics\AbstractGraphics.cs" />
+    <Compile Include="Graphics\Animation.cs" />
+    <Compile Include="Graphics\AnimationSet.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\DebugOptions.cs" />
@@ -82,8 +91,12 @@
     <Compile Include="Loaders\XmlLoader.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Maps\AStarCloseContainer.cs" />
+    <Compile Include="Maps\AStarContainer.cs" />
+    <Compile Include="Maps\AStarNode.cs" />
     <Compile Include="Maps\Layer.cs" />
     <Compile Include="Maps\Map.cs" />
+    <Compile Include="Maps\MapCollision.cs" />
     <Compile Include="Maps\MapFactory.cs" />
     <Compile Include="Maps\MapLoadInfo.cs" />
     <Compile Include="Maps\MapParallax.cs" />

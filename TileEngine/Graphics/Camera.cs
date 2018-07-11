@@ -22,6 +22,7 @@ namespace TileEngine.Graphics
     using System;
     public class Camera
     {
+        private Engine engine;
         private int tileWidth;
         private int tileHeight;
         private int halfTileWidth;
@@ -30,20 +31,27 @@ namespace TileEngine.Graphics
         private int viewHeight;
         private int halfViewWidth;
         private int halfViewHeight;
-        private int cameraX;
-        private int cameraY;
+        private float unitsPerPixelX;
+        private float unitsPerPixelY;
+        private float cameraX;
+        private float cameraY;
         private int hoverTileX;
         private int hoverTileY;
         private int clickTileX;
         private int clickTileY;
         private int selectedTileX;
         private int selectedTileY;
+        private float cameraSpeed;
+        private bool immediateCamera;
         private Map map;
         private MapOrientation orientation;
 
-        public Camera(Map map, int posX = -1, int posY = -1)
+        public Camera(Engine engine, Map map, int posX = -1, int posY = -1)
         {
+            this.engine = engine;
             this.map = map;
+            cameraSpeed = 10.0f;
+            immediateCamera = false;
             selectedTileX = -1;
             selectedTileY = -1;
             orientation = map.Orientation;
@@ -51,15 +59,34 @@ namespace TileEngine.Graphics
             tileHeight = map.TileHeight;
             halfTileWidth = tileWidth / 2;
             halfTileHeight = tileHeight / 2;
-            if (posX >= 0 && posY >= 0)
+            if (orientation == MapOrientation.Isometric)
             {
-                SetMapPosition(posX, posY);
+                unitsPerPixelX = 2.0f / tileWidth;
+                unitsPerPixelY = 2.0f / tileHeight;
             }
             else
             {
-                SetMapPosition(map.Width / 2, map.Height / 2);
+                unitsPerPixelX = 1.0f / tileWidth;
+                unitsPerPixelY = 1.0f / tileHeight;
+            }
+            viewWidth = engine.Graphics.ViewWidth;
+            halfViewWidth = viewWidth / 2;
+            viewHeight = engine.Graphics.ViewHeight;
+            halfViewHeight = viewHeight / 2;
+            if (posX >= 0 && posY >= 0)
+            {
+                SetPosition(posX, posY);
+            }
+            else if (map.StartX >= 0 && map.StartY >= 0)
+            {
+                SetPosition(map.StartX, map.StartY);
+            }
+            else
+            {
+                SetPosition(map.Width / 2.0f, map.Height / 2.0f);
             }
         }
+
         public int TileWidth
         {
             get { return tileWidth; }
@@ -100,13 +127,13 @@ namespace TileEngine.Graphics
             }
         }
 
-        public int CameraX
+        public float CameraX
         {
             get { return cameraX; }
             set { cameraX = value; }
         }
 
-        public int CameraY
+        public float CameraY
         {
             get { return cameraY; }
             set { cameraY = value; }
@@ -150,31 +177,82 @@ namespace TileEngine.Graphics
 
         public void SetPosition(float posX, float posY)
         {
-            cameraX = (int)posX;
-            cameraY = (int)posY;
-            map.InvalidateRenderLists();
+            cameraX = posX;
+            cameraY = posY;
+            Utils.CleanFloat(ref cameraX);
+            Utils.CleanFloat(ref cameraY);
         }
 
         public void SetMapPosition(float mapX, float mapY)
         {
-            float screenX = 0;
-            float screenY = 0;
-            switch (orientation)
+            if (immediateCamera)
             {
-                case MapOrientation.Orthogonal:
-                    screenX = -mapX * tileWidth;
-                    screenY = -mapY * tileHeight;
-                    break;
-                case MapOrientation.Isometric:
-                    screenX = -((mapX - mapY) * halfTileWidth);
-                    screenY = -((mapX + mapY) * halfTileHeight);
-                    break;
+                SetPosition(mapX, mapY);
             }
-            SetPosition(screenX, screenY);
+            else
+            {
+                float camDx = Utils.CalcDist(cameraX, mapX, mapX, mapY) / cameraSpeed;
+                float camDy = Utils.CalcDist(mapX, cameraY, mapX, mapY) / cameraSpeed;
+                float newX = cameraX;
+                float newY = cameraY;
+                if (newX < mapX)
+                {
+                    newX += camDx;
+                    if (newX > mapX) newX = mapX;
+                }
+                else if (newX > mapX)
+                {
+                    newX -= camDx;
+                    if (newX < mapX) newX = mapX;
+                }
+                if (newY < mapY)
+                {
+                    newY += camDy;
+                    if (newY > mapY) newY = mapY;
+                }
+                else if (newY > mapY)
+                {
+                    newY -= camDy;
+                    if (newY < mapY) newY = mapY;
+                }
+                SetPosition(newX, newY);
+            }
         }
+
         public void Shift(float dX, float dY)
         {
-            SetPosition(cameraX - dX, cameraY - dY);
+            ScreenToMap(halfViewWidth + dX, halfViewHeight + dY, out float mX, out float mY);
+            SetPosition(mX, mY);
+        }
+
+        public Point CenterTile(Point p)
+        {
+            if (orientation == MapOrientation.Orthogonal)
+            {
+                return new Point(p.X + halfTileWidth, p.Y + halfTileHeight);
+            }
+            else
+            {
+                return new Point(p.X, p.Y + halfTileHeight);
+            }
+        }
+
+        public Point CenterTile(int x, int y)
+        {
+            if (orientation == MapOrientation.Orthogonal)
+            {
+                return new Point(x + halfTileWidth, y + halfTileHeight);
+            }
+            else
+            {
+                return new Point(x, y + halfTileHeight);
+            }
+        }
+
+        public Point GetUpperLeft()
+        {
+            ScreenToMap(0, 0, out float mX, out float mY);
+            return new Point((int)mX, (int)mY);
         }
 
         public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY)
@@ -182,60 +260,106 @@ namespace TileEngine.Graphics
             MapToScreen(mapX, mapY, out screenX, out screenY, orientation);
         }
 
-        public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY, MapOrientation orientation)
+        public void MapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY)
+        {
+            MapToScreen(mapX, mapY, camX, camY, out screenX, out screenY, orientation);
+        }
+
+
+        public void MapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY, MapOrientation orientation)
         {
             if (orientation == MapOrientation.Isometric)
             {
-                IsoMapToScreen(mapX, mapY, out screenX, out screenY);
+                IsoMapToScreen(mapX, mapY, camX, camY, out screenX, out screenY);
             }
             else
             {
-                OrthoMapToScreen(mapX, mapY, out screenX, out screenY);
+                OrthoMapToScreen(mapX, mapY, camX, camY, out screenX, out screenY);
             }
+        }
+
+        public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY, MapOrientation orientation)
+        {
+            MapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY, orientation);
         }
 
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            screenX = (int)(mapX * tileWidth) + cameraX + halfViewWidth;
-            screenY = (int)(mapY * tileHeight) + cameraY + halfViewHeight;
+            OrthoMapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY);
+        }
+
+        public void OrthoMapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY)
+        {
+            float adjustX = (halfViewWidth + 0.5f) * unitsPerPixelX;
+            float adjustY = (halfViewHeight + 0.5f) * unitsPerPixelY;
+            screenX = (int)((mapX - camX + adjustX) / unitsPerPixelX);
+            screenY = (int)((mapY - camY + adjustY) / unitsPerPixelY);
         }
 
         public void OrthoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            screenX -= (cameraX + halfViewWidth);
-            screenY -= (cameraY + halfViewHeight);
-            mapX = (screenX / tileWidth);
-            mapY = (screenY / tileHeight);
+            OrthoScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY);
         }
-        public void IsoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
+
+        public void OrthoScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
         {
-            screenX = (int)((mapX - mapY) * halfTileWidth) + cameraX + halfViewWidth;
-            screenY = (int)((mapX + mapY) * halfTileHeight) + cameraY + halfViewHeight;
-        }
-        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
-        {
-            ScreenToMap(screenX, screenY, out mapX, out mapY, orientation);
-        }
-        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY, MapOrientation orientation)
-        {
-            if (orientation == MapOrientation.Isometric)
-            {
-                IsoScreenToMap(screenX, screenY, out mapX, out mapY);
-            }
-            else
-            {
-                OrthoScreenToMap(screenX, screenY, out mapX, out mapY);
-            }
+            mapX = (screenX - halfViewWidth) * unitsPerPixelX + camX;
+            mapY = (screenY - halfViewHeight) * unitsPerPixelY + camY;
         }
 
         public void IsoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            screenX -= (cameraX + halfViewWidth);
-            screenY -= (cameraY + halfViewHeight);
-            screenX -= halfTileWidth;
-            mapX = (screenX / tileWidth) + (screenY / tileHeight);
-            mapY = (screenY / tileHeight) - (screenX / tileWidth);
+            IsoScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY);
         }
+
+        public void IsoScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
+        {
+            float srcx = (screenX - halfViewWidth) * 0.5f;
+            float srcy = (screenY - halfViewHeight) * 0.5f;
+            mapX = (unitsPerPixelX * srcx) + (unitsPerPixelY * srcy) + camX;
+            mapY = (unitsPerPixelY * srcy) - (unitsPerPixelX * srcx) + camY;
+        }
+
+        public void IsoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
+        {
+            IsoMapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY);
+        }
+
+        public void IsoMapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY)
+        {
+            float adjustX = (halfViewWidth + 0.5f) * unitsPerPixelX;
+            float adjustY = (halfViewHeight + 0.5f) * unitsPerPixelY;
+            screenX = (int)(Math.Floor(((mapX - camX - mapY + camY + adjustX) / unitsPerPixelX) + 0.5f));
+            screenY = (int)(Math.Floor(((mapX - camX + mapY - camY + adjustY) / unitsPerPixelY) + 0.5f));
+        }
+
+        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
+        {
+            ScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY, orientation);
+        }
+
+        public void ScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
+        {
+            ScreenToMap(screenX, screenY, camX, camY, out mapX, out mapY, orientation);
+        }
+
+        public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY, MapOrientation orientation)
+        {
+            ScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY, orientation);
+        }
+
+        public void ScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY, MapOrientation orientation)
+        {
+            if (orientation == MapOrientation.Isometric)
+            {
+                IsoScreenToMap(screenX, screenY, camX, camY, out mapX, out mapY);
+            }
+            else
+            {
+                OrthoScreenToMap(screenX, screenY, camX, camY, out mapX, out mapY);
+            }
+        }
+
 
         public void MapToTile(float mapX, float mapY, out int tileX, out int tileY)
         {

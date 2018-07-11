@@ -332,6 +332,7 @@ namespace TileEngine.Loaders
             if (!string.IsNullOrEmpty(s)) return (s.StartsWith("INCLUDE ", StringComparison.Ordinal));
             return false;
         }
+
         private void FillInfos()
         {
             sections = new List<string>();

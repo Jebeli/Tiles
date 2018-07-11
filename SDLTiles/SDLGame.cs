@@ -16,6 +16,8 @@ namespace SDLTiles
         //private const string MAPNAME1 = "maps/frontier_outpost.xml";
         private const string MAPNAME1 = "maps/frontier_outpost.txt";
         private const string MAPNAME2 = "maps/ancient_temple.txt";
+        private const string PLAYERNAME1 = "enemies/lvl10_minotaur.txt";
+        private const string PLAYERNAME2 = "npcs/male.txt";
 
         public bool running = true;
         public IntPtr win;
@@ -110,7 +112,8 @@ namespace SDLTiles
         }
         public void Run()
         {
-            engine.SetNextMap(MAPNAME1, 25, 25);
+            engine.SetNextMap(MAPNAME1);
+            engine.SetNextPlayer("Hugentobler", PLAYERNAME2);
             engine.Start();
             while (running)
             {

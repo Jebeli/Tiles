@@ -60,6 +60,7 @@ namespace TileEngine.Graphics
             lastTexture = null;
             drawing = false;
         }
+
         public void Flush()
         {
             if (index == 0) return;
@@ -72,7 +73,7 @@ namespace TileEngine.Graphics
         }
         public void Draw(TextureRegion region, int x, int y)
         {
-            Draw(region.Texture, x + region.OffsetX, y + region.OffsetY, region.Width, region.Height, region.X, region.Y, region.Width, region.Height);
+            Draw(region.Texture, x - region.OffsetX, y - region.OffsetY, region.Width, region.Height, region.X, region.Y, region.Width, region.Height);
         }
 
         public void Draw(Texture texture, int x, int y, int width, int height, int srcX, int srcY, int srcWidth, int srcHeight)

@@ -1,14 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TileEngine.Core;
+﻿/*
+Copyright © 2018 Jean Pascal Bellot
+
+This file is part of Tiles.
+
+Tiles is free software: you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+Tiles is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+Tiles.  If not, see http://www.gnu.org/licenses/
+*/
 
 namespace TileEngine.Events
 {
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using TileEngine.Core;
+
     public class Event : NamedObject
     {
+        private Engine engine;
         private EventType type;
         private int posX;
         private int posY;
@@ -18,18 +37,21 @@ namespace TileEngine.Events
         private int hotPosY;
         private int hotWidth;
         private int hotHeight;
+        private int cooldown;
+        private int cooldownTicks;
         private bool repeat = true;
         private bool hotspot = false;
+        private bool removeNow;
         private List<EventComponent> components;
-        private double cooldown;
-        private double lastExecTime;
 
-        public Event(EventType type, string name)
+        public Event(Engine engine, EventType type, string name)
             : base(name)
         {
+            this.engine = engine;
             this.type = type;
             components = new List<EventComponent>();
-            cooldown = 0.5;
+            cooldown = 0;
+            repeat = true;
         }
 
         public EventType Type
@@ -43,10 +65,10 @@ namespace TileEngine.Events
             set { hotspot = value; }
         }
 
-        public double LastExecTime
+        public bool RemoveNow
         {
-            get { return lastExecTime; }
-            set { lastExecTime = value; }
+            get { return removeNow; }
+            set { removeNow = value; }
         }
 
         public IEnumerable<EventComponent> Components
@@ -127,10 +149,15 @@ namespace TileEngine.Events
             set { hotHeight = value; }
         }
 
-        public bool IsInCooldown(TimeInfo time)
+        public bool IsInCooldown
         {
-            if (time == null) return false;
-            return (time.TotalGameTime.TotalSeconds - lastExecTime) < cooldown;
+            get { return cooldownTicks > 0; }
+        }
+
+        public int Cooldown
+        {
+            get { return cooldown; }
+            set { cooldown = value; }
         }
 
         public bool Repeat
@@ -176,6 +203,21 @@ namespace TileEngine.Events
                 }
             }
             return list;
+        }
+
+        public void Update()
+        {
+            if (cooldownTicks > 0) cooldownTicks--;
+        }
+
+        public void Execute()
+        {
+            foreach(var ec in components)
+            {
+                engine.ExecuteEventComponent(this, ec);
+            }
+            cooldownTicks = cooldown;
+            if (!repeat) removeNow = true;
         }
 
         public override string ToString()

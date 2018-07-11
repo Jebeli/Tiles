@@ -389,6 +389,7 @@ namespace TileEngine.YGUI
             SetSelectedGadget(gadget);
             mousePos = pos;
             mouseButton |= button;
+            engine.GUIUseseMouse = result;
             return result;
         }
 
@@ -417,6 +418,7 @@ namespace TileEngine.YGUI
             SetSelectedGadget(null);
             mousePos = pos;
             mouseButton &= ~button;
+            engine.GUIUseseMouse = !result;
             return result;
         }
 

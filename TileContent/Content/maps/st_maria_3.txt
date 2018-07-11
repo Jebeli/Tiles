@@ -4,6 +4,7 @@ height=60
 tilewidth=64
 tileheight=32
 orientation=isometric
+background_color=0,0,0,255
 hero_pos=7,47
 music=music/boss_theme.ogg
 tileset=tilesetdefs/tileset_dungeon.txt
@@ -17,6 +18,7 @@ tileset=../../../tiled/dungeon/tiled_dungeon_2x2.png,128,64,0,16
 tileset=../../../tiled/dungeon/door_left.png,64,128,-16,-8
 tileset=../../../tiled/dungeon/door_right.png,64,128,16,-8
 tileset=../../../tiled/dungeon/stairs.png,256,256,0,48
+tileset=../../../tiled/common/boss_chest.png,64,64,0,0
 
 [layer]
 type=background
@@ -87,7 +89,7 @@ type=object
 data=
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,145,0,0,167,183,0,167,0,0,145,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,288,0,0,167,183,0,167,0,0,288,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,121,0,0,0,0,0,0,0,0,0,0,121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,167,0,193,0,0,193,0,0,126,123,123,123,123,123,123,123,123,123,123,125,0,0,193,0,0,193,0,167,0,0,0,0,0,0,0,0,0,
@@ -151,7 +153,7 @@ type=collision
 data=
 4,4,4,4,4,4,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,
 4,4,4,4,4,4,0,4,4,4,2,0,0,0,0,0,0,0,0,0,0,0,0,2,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,4,
-4,4,4,4,4,4,0,4,4,4,2,0,4,0,0,4,0,3,4,0,0,4,0,2,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,4,
+4,4,4,4,4,4,0,4,4,4,2,0,4,0,0,4,0,0,4,0,0,4,0,2,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,4,
 4,4,4,4,4,4,0,4,4,4,2,0,0,0,0,0,0,0,0,0,0,0,0,2,4,4,4,0,4,4,4,4,4,4,4,4,4,4,4,4,
 4,4,2,2,2,2,4,2,2,2,2,4,0,0,0,0,0,0,0,0,0,0,4,2,2,2,2,4,2,2,2,2,4,4,4,4,4,4,4,4,
 4,4,2,4,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,4,2,4,4,4,4,4,4,4,4,
@@ -211,14 +213,14 @@ data=
 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 
 [event]
-# to St. Maria: Crypt
+# to St. Maria: Catacombs
 type=event
 location=6,46,1,2
 activate=on_trigger
 hotspot=location
 intermap=maps/st_maria_2.txt,15,5
 soundfx=soundfx/environment/stairs.ogg,0,0
-tooltip=St. Maria: Prison
+tooltip=St. Maria: Catacombs
 
 [event]
 # torch set 1
@@ -324,7 +326,7 @@ activate=on_trigger
 hotspot=location
 loot=loot/level_4.txt
 loot_count=4,5
-mapmod=object,12,2,161
+mapmod=object,12,2,289
 repeat=false
 requires_not_status=emp_seagate_chest1
 set_status=emp_seagate_chest1
@@ -339,7 +341,7 @@ activate=on_trigger
 hotspot=location
 loot=loot/level_4.txt
 loot_count=4,5
-mapmod=object,21,2,161
+mapmod=object,21,2,289
 repeat=false
 requires_not_status=emp_seagate_chest2
 set_status=emp_seagate_chest2
@@ -492,7 +494,7 @@ set_status=emp_seagate_torches
 type=event
 location=0,1,1,1
 activate=on_load
-mapmod=object,12,2,161
+mapmod=object,12,2,289
 requires_not_status=emp_seagate_respawn
 requires_status=emp_seagate_chest1
 
@@ -501,9 +503,21 @@ requires_status=emp_seagate_chest1
 type=event
 location=1,1,1,1
 activate=on_load
-mapmod=object,21,2,161
+mapmod=object,21,2,289
 requires_not_status=emp_seagate_respawn
 requires_status=emp_seagate_chest2
+
+[event]
+# sparkle effect for gravebloom
+type=event
+location=25,16,1,1
+activate=static
+cooldown=1s
+power=268
+power_path=17,12
+repeat=true
+requires_not_status=emp_main_gravebloom
+requires_status=emp_main_init,emp_seagate_defeated
 
 [enemy]
 type=enemy

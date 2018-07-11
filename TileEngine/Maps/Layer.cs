@@ -30,6 +30,7 @@ namespace TileEngine.Maps
         private Tile[] tiles;
         private TileSet tileSet;
         private bool visible;
+        private bool objectLayer;
         private int oversizeX;
         private int oversizeY;
         private IList<RenderTextureRegion> renderList;
@@ -68,6 +69,12 @@ namespace TileEngine.Maps
         {
             get { return visible; }
             set { visible = value; }
+        }
+
+        public bool ObjectLayer
+        {
+            get { return objectLayer; }
+            set { objectLayer = value; }
         }
 
         public TileSet TileSet

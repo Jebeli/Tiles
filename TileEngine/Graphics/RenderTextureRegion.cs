@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TileEngine.Graphics
 {
-    public class RenderTextureRegion
+    public class RenderTextureRegion : IComparable<RenderTextureRegion>
     {
         private TextureRegion region;
         private float mapX;
@@ -15,8 +15,9 @@ namespace TileEngine.Graphics
         private int screenY;
         private bool isAnimTile;
         private int id;
+        private long prio;
 
-        public RenderTextureRegion(int id, TextureRegion region, float mapX, float mapY, int screenX, int screenY, bool isAnimTile = false)
+        public RenderTextureRegion(int id, TextureRegion region, float mapX, float mapY, int screenX = 0, int screenY = 0, bool isAnimTile = false)
         {
             this.id = id;
             this.region = region;
@@ -51,11 +52,13 @@ namespace TileEngine.Graphics
         public int ScreenX
         {
             get { return screenX; }
+            internal set { screenX = value; }
         }
 
         public int ScreenY
         {
             get { return screenY; }
+            internal set { screenY = value; }
         }
 
         public bool IsAnimTile
@@ -63,5 +66,15 @@ namespace TileEngine.Graphics
             get { return isAnimTile; }
         }
 
+        public long Prio
+        {
+            get { return prio; }
+            set { prio = value; }
+        }
+
+        public int CompareTo(RenderTextureRegion other)
+        {
+            return prio.CompareTo(other.Prio);
+        }
     }
 }

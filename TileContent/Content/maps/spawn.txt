@@ -10,4 +10,6 @@ hero_pos=0,0
 type=event
 location=0,0,1,1
 activate=on_load
-intermap=maps/frontier_outpost.txt,46,57
+#intermap=maps/arrival.txt,20,20
+intermap=maps/hyperspace.txt,-1,-1
+

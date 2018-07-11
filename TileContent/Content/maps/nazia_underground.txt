@@ -4,8 +4,9 @@ height=60
 tilewidth=64
 tileheight=32
 orientation=isometric
+background_color=0,0,0,255
 hero_pos=92,29
-music=music/dungeon_theme.ogg
+music=music/overworld_theme.ogg
 tileset=tilesetdefs/tileset_dungeon.txt
 title=Nazia Underground
 
@@ -365,6 +366,7 @@ location=57,15,2,2
 activate=on_trigger
 hotspot=location
 intermap=maps/hyperspace.txt,23,30
+requires_status=emp_waypoint_7
 soundfx=soundfx/environment/teleporter.ogg,0,0
 tooltip=Hyperspace
 

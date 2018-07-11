@@ -31,6 +31,8 @@ namespace TileEngine
     using TileEngine.Fonts;
     using TileEngine.Events;
     using System.Text;
+    using TileEngine.Entities;
+    using TileEngine.Logging;
 
     public class Engine : ITimeInfoProvider
     {
@@ -43,6 +45,7 @@ namespace TileEngine
         private ResourceManager<Texture> textureManager;
         private ResourceManager<TileSet> tileSetManager;
         private EventManager eventManager;
+        private EntityManager entityManager;
         private IScreen currentScreen;
         private SplashScreen splashScreen;
         private TitleScreen titleScreen;
@@ -51,12 +54,17 @@ namespace TileEngine
         private ExitScreen exitScreen;
         private TestScreen testScreen;
         private MapLoadInfo nextMap;
+        private EntityLoadInfo nextPlayer;
         private Map map;
         private Camera camera;
         private FrameCounter frameCounter;
         private List<ILoader> loaders;
         private List<ISaver> savers;
         private bool paused;
+        private string playerName;
+        private string playerId;
+        private Entity player;
+        private bool guiUsesMouse;
 
         public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts)
         {
@@ -68,6 +76,7 @@ namespace TileEngine
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
             eventManager = new EventManager(this);
+            entityManager = new EntityManager(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
@@ -76,7 +85,7 @@ namespace TileEngine
             exitScreen = new ExitScreen(this);
             testScreen = new TestScreen(this);
             map = MapFactory.MakeNullMap(this);
-            camera = new Camera(map);
+            camera = new Camera(this, map);
             frameCounter = new FrameCounter();
             loaders = new List<ILoader>();
             loaders.Add(new XmlLoader(this));
@@ -86,6 +95,8 @@ namespace TileEngine
         }
 
         public event EventHandler<MapEventArgs> MapLoaded;
+        public event EventHandler<EntityEventArgs> PlayerLoaded;
+        public event EventHandler<EventEventArgs> EventExecuting;
         public event EventHandler<ScreenEventArgs> ScreenHidden;
         public event EventHandler<ScreenEventArgs> ScreenShown;
 
@@ -124,6 +135,11 @@ namespace TileEngine
             get { return map; }
         }
 
+        public MapCollision Collision
+        {
+            get { return map?.Collision; }
+        }
+
         public Camera Camera
         {
             get { return camera; }
@@ -132,6 +148,11 @@ namespace TileEngine
         public EventManager EventManager
         {
             get { return eventManager; }
+        }
+
+        public EntityManager EntityManager
+        {
+            get { return entityManager; }
         }
 
         public int MaxFramesPerSecond
@@ -143,6 +164,12 @@ namespace TileEngine
         public double FrameRate
         {
             get { return 1.0 / maxFramesPerSecond; }
+        }
+
+        public bool GUIUseseMouse
+        {
+            get { return guiUsesMouse; }
+            set { guiUsesMouse = value; }
         }
 
         public bool IsRunning
@@ -188,7 +215,7 @@ namespace TileEngine
                 sb.Append(") ZOOM: ");
                 sb.Append(graphics.ViewScale);
                 var events = map.GetEventsAt(camera.HoverTileX, camera.HoverTileY);
-                foreach(var evt in events)
+                foreach (var evt in events)
                 {
                     sb.Append(" ");
                     sb.Append(evt.ToString());
@@ -323,6 +350,7 @@ namespace TileEngine
         public void SwitchToLoadScreen()
         {
             loadScreen.MapLoadInfo = nextMap;
+            loadScreen.PlayerLoadInfo = nextPlayer;
             SetScreen(loadScreen);
         }
 
@@ -331,15 +359,31 @@ namespace TileEngine
             SetScreen(testScreen);
         }
 
-        public void SetNextMap(string name, int posX, int posY)
+        public void SetNextMap(string name, int posX = -1, int posY = -1)
         {
             nextMap = new MapLoadInfo(name, posX, posY);
         }
 
+        public void SetNextPlayer(string pname, string name, int posX = -1, int posY = -1)
+        {
+            playerName = pname;
+            playerId = name;
+            nextPlayer = new EntityLoadInfo(playerName, playerId, posX, posY);
+        }
+
+        public void ResetNextPlayer()
+        {
+            SetNextPlayer(playerName, playerId, -1, -1);
+        }
+
         public void SetMap(Map map, int posX = -1, int posY = -1)
         {
+            entityManager.Clear();
+            eventManager.Clear();
+
             this.map = map;
-            camera = new Camera(map, posX, posY);
+            this.map.InitCollision();
+            camera = new Camera(this, map, posX, posY);
             TransferEvents(map);
         }
 
@@ -402,6 +446,65 @@ namespace TileEngine
             return parallax;
         }
 
+        public AnimationSet LoadAnimationSet(string animId)
+        {
+            AnimationSet animationSet = null;
+            foreach (ILoader loader in loaders)
+            {
+                if (loader.CanLoad(animId))
+                {
+                    animationSet = loader.LoadAnimation(animId);
+                    if (animationSet != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return animationSet;
+        }
+
+        public Entity LoadEntity(string fileId)
+        {
+            Entity entity = null;
+            foreach (ILoader loader in loaders)
+            {
+                if (loader.CanLoad(fileId))
+                {
+                    entity = loader.LoadEntity(fileId);
+                    if (entity != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            return entity;
+        }
+
+        public Entity LoadPlayer(string fileId, int posX = -1, int posY = -1)
+        {
+            player = LoadEntity(fileId);
+            if (player != null)
+            {
+                if (posX >= 0 && posY >= 0)
+                {
+                    player.MapPosX = posX + 0.5f;
+                    player.MapPosY = posY + 0.5f;
+                }
+                else
+                {
+                    player.MapPosX = map.StartX + 0.5f;
+                    player.MapPosY = map.StartY + 0.5f;
+                }
+                player.TrackWithCamera = true;
+                player.MoveWithMouse = true;
+                player.TriggersEvents = true;
+                entityManager.AddEntity(player);
+                OnPlayerLoaded(player);
+            }
+            return player;
+        }
+
+
         public void SaveTileSet(TileSet tileSet, string fileId = null)
         {
             if (fileId == null) fileId = tileSet.Name;
@@ -422,6 +525,53 @@ namespace TileEngine
                 saver.Save(map, fileId);
                 break;
             }
+        }
+
+        public bool CanExecuteEvent(Event evt)
+        {
+            return OnEventExecuting(evt);
+        }
+
+        public void ExecuteEventComponent(Event evt, EventComponent ec)
+        {
+            switch (ec.Type)
+            {
+                case EventComponentType.InterMap:
+                    if (TravelTo(ec.StringParam, ec.MapX, ec.MapY))
+                    {
+                        Logger.Info("Engine", $"Travelled to {ec.StringParam}");
+                    }
+                    break;
+                case EventComponentType.IntraMap:
+                    if (TeleportTo(ec.MapX, ec.MapY))
+                    {
+
+                    }
+                    break;
+                case EventComponentType.MapMod:
+                    foreach(var mod in ec.MapMods)
+                    {
+                        map.DoMapMod(mod);
+                    }
+                    break;
+            }
+        }
+
+        public bool TravelTo(string mapName, int posX, int posY)
+        {
+            SetNextMap(mapName, posX, posY);
+            SetNextPlayer(playerName, playerId, posX, posY);
+            SwitchToLoadScreen();
+            return true;
+        }
+
+        public bool TeleportTo(int posX, int posY)
+        {
+            map.Collision.Unblock(player.MapPosX, player.MapPosY);
+            player.MapPosX = posX + 0.5f;
+            player.MapPosY = posY + 0.5f;
+            map.Collision.Block(player.MapPosX, player.MapPosY, false);
+            return true;
         }
 
         public void SetViewSize(int width, int height)
@@ -452,11 +602,6 @@ namespace TileEngine
             }
         }
 
-        public void ExecuteEvent(Event evt, TimeInfo time = null)
-        {
-            if (evt.IsInCooldown(time)) return;
-        }
-
         internal void SetScreen(IScreen screen)
         {
             currentScreen.Hide();
@@ -470,6 +615,19 @@ namespace TileEngine
         {
             if (map != null)
                 MapLoaded?.Invoke(this, new MapEventArgs(map));
+        }
+
+        private void OnPlayerLoaded(Entity player)
+        {
+            if (player != null)
+                PlayerLoaded?.Invoke(this, new EntityEventArgs(player));
+        }
+
+        private bool OnEventExecuting(Event evt)
+        {
+            var args = new EventEventArgs(evt);
+            EventExecuting?.Invoke(null, args);
+            return !args.Cancel;
         }
 
         private void OnScreenHidden(IScreen screen)
@@ -488,19 +646,7 @@ namespace TileEngine
         {
             foreach (var info in map.LoadEvents)
             {
-                switch (info.Type)
-                {
-                    case EventType.Trigger:
-                        eventManager.AddEvent(info);
-                        break;
-                    case EventType.Load:
-                        ExecuteEvent(info);
-                        break;
-                    default:
-                        eventManager.AddEvent(info);
-                        break;
-                }
-
+                eventManager.AddEvent(info);
             }
             map.ClearLoadEvents();
         }

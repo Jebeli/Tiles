@@ -6,7 +6,7 @@ tileheight=32
 orientation=isometric
 background_color=0,0,0,255
 hero_pos=12,12
-music=music/dungeon_theme.ogg
+music=music/safe_room_theme.ogg
 parallax_layers=maps/parallax/space.txt
 tileset=tilesetdefs/tileset_dungeon.txt
 title=Hyperspace
@@ -185,7 +185,7 @@ soundfx=soundfx/environment/teleporter.ogg,0,0
 tooltip=Lochport Cemetery
 
 [event]
-# to St. Maria: Prison
+# to St. Maria: Catacombs
 type=event
 location=29,9,2,2
 activate=on_trigger
@@ -193,7 +193,7 @@ hotspot=location
 intermap=maps/st_maria_2.txt,44,24
 requires_status=emp_waypoint_3
 soundfx=soundfx/environment/teleporter.ogg,0,0
-tooltip=St. Maria: Prison
+tooltip=St. Maria: Catacombs
 
 [event]
 # to Blackmire Mines
@@ -273,6 +273,17 @@ soundfx=soundfx/environment/teleporter.ogg,0,0
 tooltip=Underworld Catacombs
 
 [event]
+# to Underworld Stronghold: Barracks
+type=event
+location=7,16,2,2
+activate=on_trigger
+hotspot=location
+intermap=maps/underworld_stronghold_2.txt,44,9
+requires_status=emp_waypoint_11
+soundfx=soundfx/environment/teleporter.ogg,0,0
+tooltip=Underworld Stronghold: Barracks
+
+[event]
 # Wind sound
 type=event
 location=0,0,1,1
@@ -296,7 +307,7 @@ mapmod=background,22,8,265
 requires_status=emp_waypoint_2
 
 [event]
-# unlock St. Maria: Prison
+# unlock St. Maria: Catacombs
 type=event
 location=29,7,1,1
 activate=on_load
@@ -358,4 +369,12 @@ location=5,23,1,1
 activate=on_load
 mapmod=background,7,23,265
 requires_status=emp_waypoint_10
+
+[event]
+# unlock Underworld Stronghold: Barracks
+type=event
+location=5,17,1,1
+activate=on_load
+mapmod=background,7,17,265
+requires_status=emp_waypoint_11
 

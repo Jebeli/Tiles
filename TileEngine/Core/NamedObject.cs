@@ -29,6 +29,11 @@ namespace TileEngine.Core
             this.name = name;
         }
 
+        public NamedObject(NamedObject other)
+        {
+            name = other.name;
+        }
+
         public string Name
         {
             get { return name; }
