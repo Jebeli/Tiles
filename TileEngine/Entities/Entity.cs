@@ -34,7 +34,10 @@ namespace TileEngine.Entities
         Spawning,
         Attacking,
         Shooting,
-        Casting
+        Casting,
+        Dying,
+        BeingHit,
+        Blocking
     }
 
     public class Entity : NamedObject
@@ -56,13 +59,15 @@ namespace TileEngine.Entities
         private Dictionary<string, string> animationSetNames;
         private Dictionary<int, IList<string>> layerOrder;
         private int direction;
-        private EntityStance stance;
         private float speed;
         private MovementType movementType;
         private bool trackWithCamera;
         private bool moveWithMouse;
         private bool allowedToMove;
         private bool triggersEvents;
+        private IList<string> categories;
+        private string rarity;
+        private int level;
 
         private float effectSpeed = 100.0f;
 
@@ -75,10 +80,12 @@ namespace TileEngine.Entities
             visible = true;
             dead = false;
             direction = 0;
-            stance = EntityStance.Standing;
             speed = 0.1f;
             movementType = MovementType.Normal;
             allowedToMove = true;
+            categories = new List<string>();
+            rarity = "common";
+            level = 1;
         }
 
         public Entity(Entity other)
@@ -89,11 +96,13 @@ namespace TileEngine.Entities
             layerOrder = new Dictionary<int, IList<string>>(other.layerOrder);
             visible = other.visible;
             direction = other.direction;
-            stance = other.stance;
             speed = other.speed;
             movementType = other.movementType;
             animationName = other.animationName;
             allowedToMove = other.allowedToMove;
+            categories = new List<string>(other.categories);
+            rarity = other.rarity;
+            level = other.level;
         }
 
         public bool Visible
@@ -144,6 +153,19 @@ namespace TileEngine.Entities
             set { direction = value; }
         }
 
+        public EntityStance Stance
+        {
+            get
+            {
+                if (visual != null) return visual.Stance;
+                else return EntityStance.Standing;
+            }
+            set
+            {
+                if (visual != null) visual.Stance = value;
+            }
+        }
+
         public float Speed
         {
             get { return speed; }
@@ -153,6 +175,24 @@ namespace TileEngine.Entities
         public float RealSpeed
         {
             get { return speed * speedMultiplyer[direction] * effectSpeed / 100.0f; }
+        }
+
+        public IList<string> Categories
+        {
+            get { return categories; }
+            set { categories = value; }
+        }
+
+        public string Rarity
+        {
+            get { return rarity; }
+            set { rarity = value; }
+        }
+
+        public int Level
+        {
+            get { return level; }
+            set { level = value; }
         }
 
         public string AnimationName
@@ -209,14 +249,20 @@ namespace TileEngine.Entities
             visual = new MultiPartEntityVisual(animationSets, layerOrder);
         }
 
+        public bool InitAnimation(EntityStance stance, int direction)
+        {
+            this.direction = direction;
+            return visual != null && visual.Init(stance, direction);
+        }
+
         public void Stop()
         {
-            stance = EntityStance.Standing;
+            Stance = EntityStance.Standing;
         }
 
         public void Run()
         {
-            stance = EntityStance.Running;
+            Stance = EntityStance.Running;
         }
 
         public void Update(TimeInfo time)
@@ -231,8 +277,12 @@ namespace TileEngine.Entities
             }
             if (visual != null)
             {
+                if (ShouldRevertToStanding())
+                {
+                    Stance = EntityStance.Standing;
+                }
                 visual.Direction = direction;
-                visual.Stance = stance;
+                //visual.Stance = stance;
                 visual.Update();
             }
             if (triggersEvents)
@@ -267,7 +317,7 @@ namespace TileEngine.Entities
             if (allowedToMove)
             {
                 engine.Collision.Unblock(mapPosX, mapPosY);
-                switch (stance)
+                switch (Stance)
                 {
                     case EntityStance.Standing:
                         if (PressingMove())
@@ -311,5 +361,18 @@ namespace TileEngine.Entities
             return false;
         }
 
+
+        private bool ShouldRevertToStanding()
+        {
+            if (dead) return false;
+            switch (visual.Stance)
+            {
+                case EntityStance.Standing:
+                case EntityStance.Running:
+                case EntityStance.Dying:
+                    return false;
+            }
+            return visual.AnimationFinished;
+        }
     }
 }

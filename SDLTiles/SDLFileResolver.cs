@@ -33,6 +33,33 @@
 
             }
         }
+
+        public override string ResolveDir(string fileId)
+        {
+            string fileName = null;
+            if (!cache.TryGetValue(fileId, out fileName))
+            {
+                if (Directory.Exists(fileId))
+                {
+                    fileName = Path.GetFullPath(fileId);
+                }
+                else
+                {
+                    foreach (string dir in dirs)
+                    {
+                        string testId = Path.Combine(dir, fileId);
+                        if (Directory.Exists(testId))
+                        {
+                            fileName = Path.GetFullPath(testId);
+                            break;
+                        }
+                    }
+                }
+                cache[fileId] = fileName;
+            }
+            return fileName;
+        }
+
         public override string Resolve(string fileId)
         {
             string fileName = null;

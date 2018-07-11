@@ -66,10 +66,27 @@ namespace TileEngine.Entities
             }
         }
 
+        public bool AnimationFinished
+        {
+            get { return HasFinished(); }
+        }
+
+        public string AnimationName
+        {
+            get { return GetAnimationName(); }
+        }
+
         public void Update()
         {
             SetAnimation(stance, direction);
             AdvanceAnimation();
+        }
+
+        public bool Init(EntityStance stance, int direction)
+        {
+            this.stance = stance;
+            this.direction = direction;
+            return SetAnimation(stance, direction);
         }
 
         public virtual void AddRenderables(float mapPosX, float mapPosY, IList<RenderTextureRegion> list)
@@ -87,7 +104,9 @@ namespace TileEngine.Entities
 
         private bool SetAnimation(EntityStance stance, int direction)
         {
-            return SetAnimation(GetAnimationName(stance), direction);
+            bool ok = SetAnimation(GetAnimationName(stance), direction);
+            this.stance = GetEntityStance(AnimationName);
+            return ok;
         }
 
         protected virtual bool SetAnimation(string name, int direction)
@@ -107,9 +126,56 @@ namespace TileEngine.Entities
             activeAnimation?.AdvanceFrame();
         }
 
+        protected virtual bool HasFinished()
+        {
+            if (activeAnimation != null)
+            {
+                return activeAnimation.IsFinished;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        protected virtual string GetAnimationName()
+        {
+            if (activeAnimation != null)
+            {
+                return activeAnimation.Name;
+            }
+            return "stance";
+        }
+
         public virtual void ResetActiveAnimation()
         {
             activeAnimation?.Reset();
+        }
+
+        private EntityStance GetEntityStance(string name)
+        {
+            switch (name)
+            {
+                case "run":
+                    return EntityStance.Running;
+                case "spawn":
+                    return EntityStance.Spawning;
+                case "swing":
+                    return EntityStance.Attacking;
+                case "hit":
+                    return EntityStance.BeingHit;
+                case "block":
+                    return EntityStance.Blocking;
+                case "shoot":
+                    return EntityStance.Shooting;
+                case "die":
+                    return EntityStance.Dying;
+                case "critdie":
+                    return EntityStance.Dying;
+                case "cast":
+                    return EntityStance.Casting;
+            }
+            return EntityStance.Standing;
         }
 
         private string GetAnimationName(EntityStance stance)
@@ -120,6 +186,8 @@ namespace TileEngine.Entities
                     return "stance";
                 case EntityStance.Running:
                     return "run";
+                case EntityStance.Spawning:
+                    return "spawn";
             }
             return "";
         }

@@ -96,5 +96,22 @@ namespace TileEngine.Entities
             }
         }
 
+        protected override bool HasFinished()
+        {
+            return activeAnimations.Any(a => a.IsFinished);
+        }
+
+        protected override string GetAnimationName()
+        {
+            if (activeAnimations != null)
+            {
+                foreach (var a in activeAnimations)
+                {
+                    return a.Name;
+                }
+            }
+            return "stance";
+        }
+
     }
 }

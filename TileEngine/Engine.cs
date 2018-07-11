@@ -46,6 +46,7 @@ namespace TileEngine
         private ResourceManager<TileSet> tileSetManager;
         private EventManager eventManager;
         private EntityManager entityManager;
+        private EnemyManager enemyManager;
         private IScreen currentScreen;
         private SplashScreen splashScreen;
         private TitleScreen titleScreen;
@@ -55,6 +56,7 @@ namespace TileEngine
         private TestScreen testScreen;
         private MapLoadInfo nextMap;
         private EntityLoadInfo nextPlayer;
+        private List<string> nextEnemyTemplates;
         private Map map;
         private Camera camera;
         private FrameCounter frameCounter;
@@ -77,6 +79,7 @@ namespace TileEngine
             tileSetManager = new ResourceManager<TileSet>();
             eventManager = new EventManager(this);
             entityManager = new EntityManager(this);
+            enemyManager = new EnemyManager(this);
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
@@ -92,6 +95,7 @@ namespace TileEngine
             loaders.Add(new IniLoader(this));
             savers = new List<ISaver>();
             savers.Add(new XmlSaver(this));
+            nextEnemyTemplates = new List<string>();
         }
 
         public event EventHandler<MapEventArgs> MapLoaded;
@@ -153,6 +157,11 @@ namespace TileEngine
         public EntityManager EntityManager
         {
             get { return entityManager; }
+        }
+
+        public EnemyManager EnemyManager
+        {
+            get { return enemyManager; }
         }
 
         public int MaxFramesPerSecond
@@ -378,13 +387,17 @@ namespace TileEngine
 
         public void SetMap(Map map, int posX = -1, int posY = -1)
         {
+            InitEnemyManager();
             entityManager.Clear();
             eventManager.Clear();
+            enemyManager.Clear();
 
             this.map = map;
             this.map.InitCollision();
             camera = new Camera(this, map, posX, posY);
             TransferEvents(map);
+            TransferNPCs(map);
+            TransferEnemyGroups(map);
         }
 
         public Map LoadMap(string mapId, int posX = -1, int posY = -1)
@@ -480,6 +493,27 @@ namespace TileEngine
             return entity;
         }
 
+        public Entity LoadNPC(string fileId, int posX, int posY)
+        {
+            Entity npc = LoadEntity(fileId);
+            if (npc != null)
+            {
+                npc.MapPosX = posX + 0.5f;
+                npc.MapPosY = posY + 0.5f;
+            }
+            return npc;
+        }
+
+        public Entity LoadEnemy(string fileId)
+        {
+            Entity enemy = LoadEntity(fileId);
+            if (enemy != null)
+            {
+
+            }
+            return enemy;
+        }
+
         public Entity LoadPlayer(string fileId, int posX = -1, int posY = -1)
         {
             player = LoadEntity(fileId);
@@ -549,7 +583,7 @@ namespace TileEngine
                     }
                     break;
                 case EventComponentType.MapMod:
-                    foreach(var mod in ec.MapMods)
+                    foreach (var mod in ec.MapMods)
                     {
                         map.DoMapMod(mod);
                     }
@@ -642,6 +676,41 @@ namespace TileEngine
                 ScreenShown?.Invoke(null, new ScreenEventArgs(screen));
         }
 
+        public void InitEnemyManager()
+        {
+            if (!enemyManager.Initialized)
+            {
+                var enemyDir = fileResolver.ResolveDir("enemies");
+                if (!string.IsNullOrEmpty(enemyDir))
+                {
+                    var fileList = fileResolver.GetFiles(enemyDir);
+                    List<string> shortNames = new List<string>();
+                    foreach (string s in fileList)
+                    {
+                        shortNames.Add(s.Substring(s.IndexOf("enemies")));
+                    }
+                    shortNames.Sort();
+                    AddEnemyTemplates(shortNames);
+                    TransferEnemyTemplates();
+                }
+            }
+        }
+
+        public void TransferEnemyTemplates()
+        {
+            Logger.Info("Enemy", "Adding Enemy Templates");
+            //Load();
+            enemyManager.ClearAll();
+            enemyManager.AddEnemyTemplates(nextEnemyTemplates);
+            nextEnemyTemplates.Clear();
+            //Run();
+        }
+
+        public void AddEnemyTemplates(IEnumerable<string> files)
+        {
+            nextEnemyTemplates.AddRange(files);
+        }
+
         private void TransferEvents(Map map)
         {
             foreach (var info in map.LoadEvents)
@@ -649,6 +718,29 @@ namespace TileEngine
                 eventManager.AddEvent(info);
             }
             map.ClearLoadEvents();
+        }
+
+        private void TransferNPCs(Map map)
+        {
+            foreach (var info in map.LoadNPCs)
+            {
+                Entity npc = LoadNPC(info.EntityId, info.PosX, info.PosY);
+                if (npc != null)
+                {
+                    entityManager.AddEntity(npc);
+                }
+            }
+            map.ClearLoadNPCs();
+        }
+
+        private void TransferEnemyGroups(Map map)
+        {
+            foreach (var eg in map.LoadEnemyGroups)
+            {
+                enemyManager.AddEnemyGroup(eg);
+            }
+            enemyManager.SpwanEnemies();
+            map.ClearEnemyGroups();
         }
     }
 }

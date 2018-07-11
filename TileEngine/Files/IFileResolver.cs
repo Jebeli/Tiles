@@ -22,6 +22,7 @@ namespace TileEngine.Files
 
     public interface IFileResolver
     {
+        string ResolveDir(string dirId);
         string Resolve(string fileId);
         Stream OpenFile(string fileId);
         Stream CreateFile(string fileId);

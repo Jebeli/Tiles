@@ -32,6 +32,11 @@ namespace TileEngine.Core
             return rnd.Next();
         }
 
+        internal static int RandBetween(int min, int max)
+        {
+            return rnd.Next(max - min) + min;
+        }
+
         internal static Point MapToCollision(FPoint p)
         {
             return new Point((int)p.X, (int)p.Y);

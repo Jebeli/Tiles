@@ -78,23 +78,31 @@ namespace TileEngine.Loaders
                                 }
                                 else
                                 {
-                                    string level = ini.ReadString("", "level");
-                                    if (!string.IsNullOrEmpty(aname) && !string.IsNullOrEmpty(level))
+                                    string gfx = ini.ReadString("", "gfx");
+                                    if (!string.IsNullOrEmpty(aname) && !string.IsNullOrEmpty(gfx))
                                     {
                                         type = FileType.Entity;
                                     }
                                     else
                                     {
-                                        string aImg = ini.ReadString("", "image");
-                                        if (!string.IsNullOrEmpty(aImg))
+                                        string level = ini.ReadString("", "level");
+                                        if (!string.IsNullOrEmpty(aname) && !string.IsNullOrEmpty(level))
                                         {
-                                            foreach (var sec in ini.Sections)
+                                            type = FileType.Entity;
+                                        }
+                                        else
+                                        {
+                                            string aImg = ini.ReadString("", "image");
+                                            if (!string.IsNullOrEmpty(aImg))
                                             {
-                                                string frames = sec.ReadString("frames");
-                                                if (!string.IsNullOrEmpty(frames))
+                                                foreach (var sec in ini.Sections)
                                                 {
-                                                    type = FileType.AnimationSet;
-                                                    break;
+                                                    string frames = sec.ReadString("frames");
+                                                    if (!string.IsNullOrEmpty(frames))
+                                                    {
+                                                        type = FileType.AnimationSet;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -349,6 +357,82 @@ namespace TileEngine.Loaders
                                     map.AddLoadEvent(evt);
                                 }
                                 break;
+                            case "npc":
+                                EntityLoadInfo npc = new EntityLoadInfo();
+                                string npcFilename = sec.ReadString("filename");
+                                if (!string.IsNullOrEmpty(npcFilename))
+                                {
+                                    npc.EntityId = npcFilename;
+                                    string npcLocation = sec.ReadString("location");
+                                    values = npcLocation.ToIntValues();
+                                    if (values.Length >= 2)
+                                    {
+                                        npc.PosX = values[0];
+                                        npc.PosY = values[1];
+
+                                        map.AddLoadNPC(npc);
+                                    }
+                                }
+                                break;
+                            case "enemy":
+                                string enemyName = sec.ReadString("type");
+                                if (!string.IsNullOrEmpty(enemyName))
+                                {
+                                    EnemyGroup enemy = new EnemyGroup(enemyName);
+                                    foreach (var k in sec.KeyList)
+                                    {
+                                        switch (k.Ident)
+                                        {
+                                            case "category":
+                                                enemy.Category = k.Value;
+                                                break;
+                                            case "chance":
+                                                enemy.Chance = k.Value.ToIntValue();
+                                                break;
+                                            case "location":
+                                                values = k.Value.ToIntValues();
+                                                if (values.Length >= 2)
+                                                {
+                                                    enemy.PosX = values[0];
+                                                    enemy.PosY = values[1];
+                                                }
+                                                if (values.Length >= 4)
+                                                {
+                                                    enemy.Width = values[2];
+                                                    enemy.Height = values[3];
+                                                }
+                                                break;
+                                            case "level":
+                                                values = k.Value.ToIntValues();
+                                                if (values.Length >= 2)
+                                                {
+                                                    enemy.MinLevel = values[0];
+                                                    enemy.MaxLevel = Math.Max(enemy.MinLevel, values[1]);
+                                                }
+                                                else if (values.Length >= 1)
+                                                {
+                                                    enemy.MinLevel = values[0];
+                                                    enemy.MaxLevel = values[0];
+                                                }
+                                                break;
+                                            case "number":
+                                                values = k.Value.ToIntValues();
+                                                if (values.Length >= 2)
+                                                {
+                                                    enemy.MinNumber = values[0];
+                                                    enemy.MaxNumber = Math.Max(enemy.MinNumber, values[1]);
+                                                }
+                                                else if (values.Length >= 1)
+                                                {
+                                                    enemy.MinNumber = values[0];
+                                                    enemy.MaxNumber = values[0];
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    map.AddLoadEnemyGroup(enemy);
+                                }
+                                break;
                         }
                     }
                     map.BackgroundColor = ini.ReadString("header", "background_color").ToColor();
@@ -525,6 +609,10 @@ namespace TileEngine.Loaders
             if (!string.IsNullOrEmpty(name))
             {
                 ent = new Entity(engine, name);
+                ent.Categories = ini.ReadString("", "categories").ToStrValues();
+                ent.Rarity = ini.ReadString("", "rarity", "common");
+                ent.Level = ini.ReadInt("", "level", 1);
+                ent.Speed = (float)(ini.ReadDouble("", "speed") / engine.MaxFramesPerSecond);
                 string animId = ini.ReadString("", "animations");
                 if (string.IsNullOrEmpty(animId)) animId = ini.ReadString("", "gfx");
 

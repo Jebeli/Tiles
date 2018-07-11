@@ -20,6 +20,7 @@ namespace TileEngine.Maps
     using System;
     using System.Collections.Generic;
     using Core;
+    using TileEngine.Entities;
     using TileEngine.Events;
     using TileEngine.Graphics;
 
@@ -53,6 +54,8 @@ namespace TileEngine.Maps
         private int startY;
         private Color backgroundColor;
         private List<Event> loadEvents;
+        private List<EntityLoadInfo> loadNPCs;
+        private List<EnemyGroup> loadEnemyGroups;
 
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
@@ -69,6 +72,8 @@ namespace TileEngine.Maps
             this.orientation = orientation;
             eventLayer = new EventLayer(width, height);
             loadEvents = new List<Event>();
+            loadNPCs = new List<EntityLoadInfo>();
+            loadEnemyGroups = new List<EnemyGroup>();
         }
 
         public int Width
@@ -118,6 +123,36 @@ namespace TileEngine.Maps
         public void ClearLoadEvents()
         {
             loadEvents.Clear();
+        }
+
+        public void AddLoadNPC(EntityLoadInfo npc)
+        {
+            loadNPCs.Add(npc);
+        }
+
+        public IEnumerable<EntityLoadInfo> LoadNPCs
+        {
+            get { return loadNPCs; }
+        }
+
+        public void ClearLoadNPCs()
+        {
+            loadNPCs.Clear();
+        }
+
+        public void AddLoadEnemyGroup(EnemyGroup enemy)
+        {
+            loadEnemyGroups.Add(enemy);
+        }
+
+        public IEnumerable<EnemyGroup> LoadEnemyGroups
+        {
+            get { return loadEnemyGroups; }
+        }
+
+        public void ClearEnemyGroups()
+        {
+            loadEnemyGroups.Clear();
         }
 
         public void AddMapParallax(MapParallax parallax)

@@ -22,6 +22,7 @@ namespace TileEngine.Files
 
     public abstract class AbstractFileResolver : IFileResolver
     {
+        public abstract string ResolveDir(string fileId);
         public abstract string Resolve(string fileId);
         public abstract Stream OpenFile(string fileId);
         public abstract Stream CreateFile(string fileId);

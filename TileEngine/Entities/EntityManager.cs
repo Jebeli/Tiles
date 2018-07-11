@@ -24,6 +24,7 @@ namespace TileEngine.Entities
     using System.Threading.Tasks;
     using TileEngine.Core;
     using TileEngine.Graphics;
+    using TileEngine.Logging;
 
     public class EntityManager
     {
@@ -41,6 +42,7 @@ namespace TileEngine.Entities
             entity.CreateVisual();
             engine.Collision.Block(entity.MapPosX, entity.MapPosY, false);
             entities.Add(entity);
+            Logger.Info("Entity", $"{entity} added");
         }
 
         public void Clear()

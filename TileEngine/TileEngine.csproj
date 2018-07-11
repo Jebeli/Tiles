@@ -46,6 +46,8 @@
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Utils.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="Entities\EnemyGroup.cs" />
+    <Compile Include="Entities\EnemyManager.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityLoadInfo.cs" />
     <Compile Include="Entities\EntityManager.cs" />
