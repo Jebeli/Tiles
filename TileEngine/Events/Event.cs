@@ -29,6 +29,8 @@ namespace TileEngine.Events
     {
         private Engine engine;
         private EventType type;
+        private float centerX;
+        private float centerY;
         private int posX;
         private int posY;
         private int width;
@@ -87,9 +89,19 @@ namespace TileEngine.Events
             return AddComponent(new EventComponent(ect, sp));
         }
 
-        public EventComponent AddComponent(EventComponentType ect, int ip = 0)
+        public EventComponent AddComponent(EventComponentType ect, int ip)
         {
             return AddComponent(new EventComponent(ect, ip));
+        }
+
+        public EventComponent AddComponent(EventComponentType ect)
+        {
+            return AddComponent(new EventComponent(ect, ""));
+        }
+
+        public EventComponent GetComponent(EventComponentType ect)
+        {
+            return components.FirstOrDefault(x => x.Type == ect);
         }
 
         public int PosX
@@ -106,11 +118,14 @@ namespace TileEngine.Events
 
         public float CenterX
         {
-            get { return posX + width / 2.0f; }
+            get { return centerX; }
+            set { centerX = value; }
         }
+
         public float CenterY
         {
-            get { return posY + height / 2.0f; }
+            get { return centerY; }
+            set { centerY = value; }
         }
 
         public int Width
@@ -172,6 +187,9 @@ namespace TileEngine.Events
             hotPosY = posY;
             hotWidth = width;
             hotHeight = height;
+            centerX = hotPosX + hotWidth / 2.0f;
+            centerY = hotPosY + hotHeight / 2.0f;
+            hotspot = true;
         }
 
         public IList<Point> GetMatchingPositions()
@@ -188,22 +206,22 @@ namespace TileEngine.Events
             return list;
         }
 
-        public IList<Point> GetMatchingHotSpotPositions()
-        {
-            List<Point> list = new List<Point>();
-            if (hotspot)
-            {
-                for (int x = 0; x < hotWidth; x++)
-                {
-                    for (int y = 0; y < hotHeight; y++)
-                    {
-                        Point p = new Point(hotPosX + x, hotPosY + y);
-                        list.Add(p);
-                    }
-                }
-            }
-            return list;
-        }
+        //public IList<Point> GetMatchingHotSpotPositions()
+        //{
+        //    List<Point> list = new List<Point>();
+        //    if (hotspot)
+        //    {
+        //        for (int x = 0; x < hotWidth; x++)
+        //        {
+        //            for (int y = 0; y < hotHeight; y++)
+        //            {
+        //                Point p = new Point(hotPosX + x, hotPosY + y);
+        //                list.Add(p);
+        //            }
+        //        }
+        //    }
+        //    return list;
+        //}
 
         public void Update()
         {

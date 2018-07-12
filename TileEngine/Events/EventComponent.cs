@@ -30,6 +30,8 @@ namespace TileEngine.Events
         private int intParam;
         private int mapX;
         private int mapY;
+        private int mapWidth;
+        private int mapHeight;
         private List<MapMod> mapMods;
         private List<MapSpawn> mapSpawns;
         public EventComponent()
@@ -37,16 +39,19 @@ namespace TileEngine.Events
             mapMods = new List<MapMod>();
             mapSpawns = new List<MapSpawn>();
         }
+
         public EventComponent(EventComponentType type, string sp)
         {
             this.type = type;
             stringParam = sp;
         }
+
         public EventComponent(EventComponentType type, int ip)
         {
             this.type = type;
             intParam = ip;
         }
+
         public EventComponentType Type
         {
             get { return type; }
@@ -76,6 +81,18 @@ namespace TileEngine.Events
             set { mapY = value; }
         }
 
+        public int MapWidth
+        {
+            get { return mapWidth; }
+            set { mapWidth = value; }
+        }
+
+        public int MapHeight
+        {
+            get { return mapHeight; }
+            set { mapHeight = value; }
+        }
+
         public List<MapMod> MapMods
         {
             get { return mapMods; }
@@ -87,6 +104,7 @@ namespace TileEngine.Events
             get { return mapSpawns; }
             set { mapSpawns = value; }
         }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

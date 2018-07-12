@@ -79,7 +79,7 @@
                     DepthGadget = true,
                     SizeGadget = true,
                     SizeBRight = true,
-                    WindowCloseEvent = (o, i) => { screen.CloseWindow(buttonWindow); buttonWindow = null; }
+                    WindowCloseEvent = (o, i) => { screen.CloseWindow(buttonWindow); buttonWindow = null; }                    
                 };
                 new LabelGadget(buttonWindow, "Button Gadgets")
                 {
@@ -87,7 +87,9 @@
                 };
                 new ButtonGadget(buttonWindow, "Normal")
                 {
-
+                    TooltipText = "Tooltip",
+                    TooltipPos = new Point(2, 2),
+                    ShowTooltip = true
                 };
                 new ButtonGadget(buttonWindow, "Toggle")
                 {

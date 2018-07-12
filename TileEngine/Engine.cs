@@ -37,6 +37,7 @@ namespace TileEngine
     public class Engine : ITimeInfoProvider
     {
         private int maxFramesPerSecond = 60;
+        private float interactRange = 2.5f;
         private IFileResolver fileResolver;
         private IGraphics graphics;
         private ITimeInfoProvider timeProvider;
@@ -164,6 +165,11 @@ namespace TileEngine
             get { return enemyManager; }
         }
 
+        public MapScreen MapScreen
+        {
+            get { return mapScreen; }
+        }
+
         public int MaxFramesPerSecond
         {
             get { return maxFramesPerSecond; }
@@ -173,6 +179,11 @@ namespace TileEngine
         public double FrameRate
         {
             get { return 1.0 / maxFramesPerSecond; }
+        }
+
+        public float InteractRange
+        {
+            get { return interactRange; }
         }
 
         public bool GUIUseseMouse
@@ -214,9 +225,9 @@ namespace TileEngine
                 sb.Append("/");
                 sb.Append(camera.HoverTileY);
                 sb.Append(") CAM: (");
-                sb.Append(camera.CameraX);
+                sb.Append(camera.CameraX.ToString("F"));
                 sb.Append("/");
-                sb.Append(camera.CameraY);
+                sb.Append(camera.CameraY.ToString("F"));
                 sb.Append(") SIZE: (");
                 sb.Append(graphics.ViewWidth);
                 sb.Append("/");
@@ -405,7 +416,7 @@ namespace TileEngine
             Map map = null;
             foreach (ILoader loader in loaders)
             {
-                if (loader.CanLoad(mapId))
+                if (loader.DetectFileTpye(mapId) == FileType.Map)
                 {
                     map = loader.LoadMap(mapId);
                     if (map != null)
@@ -430,7 +441,7 @@ namespace TileEngine
             TileSet tileSet = null;
             foreach (ILoader loader in loaders)
             {
-                if (loader.CanLoad(tileSetId))
+                if (loader.DetectFileTpye(tileSetId) == FileType.TileSet)
                 {
                     tileSet = loader.LoadTileSet(tileSetId);
                     if (tileSet != null)
@@ -447,7 +458,7 @@ namespace TileEngine
             MapParallax parallax = null;
             foreach (ILoader loader in loaders)
             {
-                if (loader.CanLoad(parallaxId))
+                if (loader.DetectFileTpye(parallaxId) == FileType.Parallax)
                 {
                     parallax = loader.LoadParallax(parallaxId);
                     if (parallax != null)
@@ -464,7 +475,7 @@ namespace TileEngine
             AnimationSet animationSet = null;
             foreach (ILoader loader in loaders)
             {
-                if (loader.CanLoad(animId))
+                if (loader.DetectFileTpye(animId) == FileType.AnimationSet)
                 {
                     animationSet = loader.LoadAnimation(animId);
                     if (animationSet != null)
@@ -481,7 +492,7 @@ namespace TileEngine
             Entity entity = null;
             foreach (ILoader loader in loaders)
             {
-                if (loader.CanLoad(fileId))
+                if (loader.DetectFileTpye(fileId) == FileType.Entity)
                 {
                     entity = loader.LoadEntity(fileId);
                     if (entity != null)
@@ -586,6 +597,12 @@ namespace TileEngine
                     foreach (var mod in ec.MapMods)
                     {
                         map.DoMapMod(mod);
+                    }
+                    break;
+                case EventComponentType.Spawn:
+                    foreach(var spawn in ec.MapSpawns)
+                    {
+                        enemyManager.SpawnMapSpawn(spawn);
                     }
                     break;
             }
@@ -728,6 +745,7 @@ namespace TileEngine
                 if (npc != null)
                 {
                     entityManager.AddEntity(npc);
+                    CreateNPCEvent(npc);
                 }
             }
             map.ClearLoadNPCs();
@@ -741,6 +759,24 @@ namespace TileEngine
             }
             enemyManager.SpwanEnemies();
             map.ClearEnemyGroups();
+        }
+
+        private void CreateNPCEvent(Entity npc)
+        {
+            Event evt = new Event(this, EventType.Trigger, npc.Name);
+            evt.PosX = (int)npc.MapPosX;
+            evt.PosY = (int)npc.MapPosY;
+            evt.Width = 1;
+            evt.Height = 1;
+            evt.HotSpotFromLocation();
+            evt.AddComponent(EventComponentType.Tooltip, npc.Name);
+            var npcHS = evt.AddComponent(EventComponentType.NPCHotspot);
+            Rect hs = npc.GetFrameRect();
+            npcHS.MapX = hs.X;
+            npcHS.MapY = hs.Y;
+            npcHS.MapWidth = hs.Width;
+            npcHS.MapHeight = hs.Height;
+            eventManager.AddEvent(evt);
         }
     }
 }

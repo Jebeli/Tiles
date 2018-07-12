@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TileEngine.Core;
+using TileEngine.Events;
 using TileEngine.Logging;
 using TileEngine.Maps;
 
@@ -49,6 +50,24 @@ namespace TileEngine.Entities
             {
                 SpwanEnemies(eg);
             }
+        }
+
+        public void SpawnMapSpawn(MapSpawn spawn)
+        {
+            EnemyGroup eg = new EnemyGroup(spawn.Type);
+            eg.MapSpawn = true;
+            eg.Category = spawn.Type;
+            eg.PosX = spawn.MapX;
+            eg.PosY = spawn.MapY;
+            eg.Width = 1;
+            eg.Height = 1;
+            eg.MinNumber = 1;
+            eg.MaxNumber = 1;
+            eg.MinLevel = 0;
+            eg.MaxLevel = 0;
+            //eg.Direction = spawn.Direction;
+            //eg.Summoner = spawn.Summoner;
+            SpwanEnemies(eg);
         }
 
         public void AddEnemyTemplates(IList<string> enemies)

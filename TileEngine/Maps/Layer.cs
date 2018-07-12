@@ -118,6 +118,12 @@ namespace TileEngine.Maps
             get { return tiles[XYToIndex(x, y)]; }
         }
 
+        public TextureRegion GetTileTexture(int x, int y)
+        {
+            Tile tile = this[x, y];
+            return tileSet.GetTile(tile.TileId);
+        }
+
         public void Update(TimeInfo time)
         {
             tileSet?.Update();

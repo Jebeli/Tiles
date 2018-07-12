@@ -22,11 +22,13 @@ namespace TileEngine.Entities
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Core;
     using TileEngine.Graphics;
     using TileEngine.Logging;
 
     public class EntityVisual
     {
+        private static EntityVisual nullInstance = new NullEntityVisual();
         private Animation activeAnimation;
         private AnimationSet animationSet;
         private int direction;
@@ -38,6 +40,11 @@ namespace TileEngine.Entities
             stance = EntityStance.Standing;
             this.animationSet = animationSet;
             SetAnimation(stance, direction);
+        }
+
+        public static EntityVisual Empty
+        {
+            get { return nullInstance; }
         }
 
         public int Direction
@@ -87,6 +94,25 @@ namespace TileEngine.Entities
             this.stance = stance;
             this.direction = direction;
             return SetAnimation(stance, direction);
+        }
+
+        public Rect GetFrameRect(float mapPosX, float mapPosY)
+        {
+            Rect rect = new Rect();
+            List<RenderTextureRegion> r = new List<RenderTextureRegion>();
+            AddRenderables(mapPosX, mapPosY, r);
+            for (int i = 0; i < r.Count; i++)
+            {
+                if (i == 0)
+                {
+                    rect = r[i].GetDestRect();
+                }
+                else
+                {
+                    rect.Union(r[i].GetDestRect());
+                }
+            }
+            return rect;
         }
 
         public virtual void AddRenderables(float mapPosX, float mapPosY, IList<RenderTextureRegion> list)

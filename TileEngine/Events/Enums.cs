@@ -34,7 +34,8 @@ namespace TileEngine.Events
         SoundFX,
         Msg,
         ShakyCam,
-        Spawn
+        Spawn,
+        NPCHotspot
     }
 
     public enum EventType

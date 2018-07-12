@@ -92,6 +92,16 @@ namespace TileEngine.Screens
             screen?.PerformLayout();
         }
 
+        public void HideTooltip()
+        {
+            screen?.HideTooltip();
+        }
+
+        public void ShowTooltip(string text, Point pos)
+        {
+            screen?.SetTooltip(text, pos);
+        }
+
         public virtual void FirstShow()
         {
             firstShown = true;

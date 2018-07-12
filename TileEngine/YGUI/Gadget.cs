@@ -61,6 +61,9 @@ namespace TileEngine.YGUI
         private int id;
         private object tag;
         private int updateCount;
+        private string tooltipText;
+        private Point tooltipPos;
+        private bool showTooltip;
 
 
         public Gadget(Gadget parent, string label = "", Icons icon = Icons.NONE)
@@ -233,6 +236,36 @@ namespace TileEngine.YGUI
         {
             get { return label; }
             set { label = value; }
+        }
+
+        public string TooltipText
+        {
+            get { return tooltipText; }
+            set { tooltipText = value; }
+        }
+
+        public Point TooltipPos
+        {
+            get { return tooltipPos; }
+            set { tooltipPos = value; }
+        }
+
+        public bool ShowTooltip
+        {
+            get { return showTooltip; }
+            set { showTooltip = value; }
+        }
+
+        public void SetTooltip(string text, Point pos)
+        {
+            tooltipText = text;
+            tooltipPos = pos;
+            showTooltip = !string.IsNullOrEmpty(tooltipText);
+        }
+
+        public void HideTooltip()
+        {
+            showTooltip = false;
         }
 
         public Icons Icon
@@ -587,6 +620,10 @@ namespace TileEngine.YGUI
         public virtual void Render(IGraphics gfx)
         {
             RenderGadget(gfx);
+            if (showTooltip)
+            {
+                RenderTooltip(gfx);
+            }
             if (showBounds)
             {
                 gfx.DrawRectangle(position.X - 1, position.Y - 1, size.X + 2, size.Y + 2, new Color(255, 0, 0));
@@ -611,6 +648,11 @@ namespace TileEngine.YGUI
         protected virtual void RenderGadget(IGraphics gfx)
         {
             theme.RenderGadget(gfx, this);
+        }
+
+        protected virtual void RenderTooltip(IGraphics gfx)
+        {
+            theme.RenderTooltip(gfx, this);
         }
 
         public override string ToString()

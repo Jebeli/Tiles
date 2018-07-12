@@ -39,6 +39,7 @@ namespace TileEngine.Graphics
         private int hoverTileY;
         private int clickTileX;
         private int clickTileY;
+        private bool mapClicked;
         private int selectedTileX;
         private int selectedTileY;
         private float cameraSpeed;
@@ -173,6 +174,12 @@ namespace TileEngine.Graphics
         {
             get { return clickTileY; }
             set { clickTileY = value; }
+        }
+
+        public bool MapClicked
+        {
+            get { return mapClicked; }
+            set { mapClicked = value; }
         }
 
         public void SetPosition(float posX, float posY)

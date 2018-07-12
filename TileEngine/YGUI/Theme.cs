@@ -51,6 +51,7 @@ namespace TileEngine.YGUI
         Icons SizeIcon { get; set; }
         Icons DepthIcon { get; set; }
 
+        void RenderTooltip(IGraphics gfx, Gadget gadget);
         void RenderGadget(IGraphics gfx, Gadget gadget);
         void RenderScreen(IGraphics gfx, Screen screen);
         void RenderWindow(IGraphics gfx, Window window);
@@ -128,6 +129,20 @@ namespace TileEngine.YGUI
             DepthIcon = Icons.ENTYPO_ICON_POPUP;
         }
 
+        public void RenderTooltip(IGraphics gfx, Gadget gadget)
+        {
+            if (gadget.Hover && !string.IsNullOrEmpty(gadget.TooltipText))
+            {
+                var frame = gadget.Bounds;
+                var pos = gadget.TooltipPos;
+                var color = TextPen;
+                Point tPos = new Point(frame.X, frame.Y);
+                tPos += pos;
+                gfx.RenderText(gadget.Font, gadget.TooltipText, tPos.X + 1, tPos.Y + 1, Color.Black, HorizontalTextAlign.Center, VerticalTextAlign.Bottom);
+                gfx.RenderText(gadget.Font, gadget.TooltipText, tPos.X - 1, tPos.Y - 1, Color.Black, HorizontalTextAlign.Center, VerticalTextAlign.Bottom);
+                gfx.RenderText(gadget.Font, gadget.TooltipText, tPos.X, tPos.Y, color, HorizontalTextAlign.Center, VerticalTextAlign.Bottom);
+            }
+        }
 
         public void RenderGadget(IGraphics gfx, Gadget gadget)
         {

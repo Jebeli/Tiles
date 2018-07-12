@@ -75,6 +75,7 @@ namespace TileEngine.Entities
             : base(name)
         {
             this.engine = engine;
+            visual = EntityVisual.Empty;
             animationSetNames = new Dictionary<string, string>();
             layerOrder = new Dictionary<int, IList<string>>();
             visible = true;
@@ -92,6 +93,7 @@ namespace TileEngine.Entities
             : base(other)
         {
             engine = other.engine;
+            visual = EntityVisual.Empty;
             animationSetNames = new Dictionary<string, string>(other.animationSetNames);
             layerOrder = new Dictionary<int, IList<string>>(other.layerOrder);
             visible = other.visible;
@@ -157,12 +159,11 @@ namespace TileEngine.Entities
         {
             get
             {
-                if (visual != null) return visual.Stance;
-                else return EntityStance.Standing;
+                return visual.Stance;
             }
             set
             {
-                if (visual != null) visual.Stance = value;
+                visual.Stance = value;
             }
         }
 
@@ -211,12 +212,17 @@ namespace TileEngine.Entities
             layerOrder[layer] = order;
         }
 
+        public Rect GetFrameRect()
+        {
+            return visual.GetFrameRect(mapPosX, mapPosY);
+        }
+
         public void CreateVisual()
         {
             if (animationSetNames.Count > 1)
             {
                 var animationSets = new Dictionary<string, AnimationSet>();
-                foreach(var asn in animationSetNames)
+                foreach (var asn in animationSetNames)
                 {
                     var animSet = engine.LoadAnimationSet(asn.Value);
                     if (animSet != null)
@@ -237,6 +243,10 @@ namespace TileEngine.Entities
                 var animationSet = engine.LoadAnimationSet(animationName);
                 CreateVisual(animationSet);
             }
+            else
+            {
+                visual = EntityVisual.Empty;
+            }
         }
 
         public void CreateVisual(AnimationSet animationSet)
@@ -252,7 +262,7 @@ namespace TileEngine.Entities
         public bool InitAnimation(EntityStance stance, int direction)
         {
             this.direction = direction;
-            return visual != null && visual.Init(stance, direction);
+            return visual.Init(stance, direction);
         }
 
         public void Stop()
@@ -275,25 +285,22 @@ namespace TileEngine.Entities
             {
                 engine.Camera.SetMapPosition(mapPosX, mapPosY);
             }
-            if (visual != null)
+            if (ShouldRevertToStanding())
             {
-                if (ShouldRevertToStanding())
-                {
-                    Stance = EntityStance.Standing;
-                }
-                visual.Direction = direction;
-                //visual.Stance = stance;
-                visual.Update();
+                Stance = EntityStance.Standing;
             }
+            visual.Direction = direction;
+            visual.Update();
             if (triggersEvents)
             {
+                engine.EventManager.CheckHotSpots(mapPosX, mapPosY);
                 engine.EventManager.CheckEvents(mapPosX, mapPosY);
             }
         }
 
         public void AddRenderables(IList<RenderTextureRegion> list)
         {
-            visual?.AddRenderables(mapPosX, mapPosY, list);
+            visual.AddRenderables(mapPosX, mapPosY, list);
         }
 
         public bool Move()

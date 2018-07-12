@@ -143,6 +143,7 @@ namespace TileEngine.Core
             (comp.width == width) &&
             (comp.height == height);
         }
+
         public static bool operator ==(Rect left, Rect right)
         {
             return (left.x == right.x
@@ -155,6 +156,12 @@ namespace TileEngine.Core
         {
             return !(left == right);
         }
+
+        public bool Contains(float x, float y)
+        {
+            return this.x <= x && x < this.x + width && this.y <= y && y < this.y + height;
+        }
+
         public bool Contains(int x, int y)
         {
             return this.x <= x && x < this.x + width && this.y <= y && y < this.y + height;
@@ -210,6 +217,7 @@ namespace TileEngine.Core
             width = result.width;
             height = result.height;
         }
+
         public static Rect Intersect(Rect a, Rect b)
         {
             int x1 = Math.Max(a.x, b.x);
@@ -227,6 +235,15 @@ namespace TileEngine.Core
         public bool IntersectsWith(Rect rect)
         {
             return (rect.x < x + width) && (x < (rect.x + rect.width)) && (rect.y < y + height) && (y < rect.y + rect.height);
+        }
+
+        public void Union(Rect other)
+        {
+            Rect union = Union(this, other);
+            x = union.x;
+            y = union.y;
+            width = union.width;
+            height = union.height;
         }
 
         public static Rect Union(Rect a, Rect b)

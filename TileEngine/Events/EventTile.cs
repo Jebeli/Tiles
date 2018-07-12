@@ -29,7 +29,7 @@ namespace TileEngine.Events
         private int y;
         private EventLayer eventLayer;
         private List<Event> events;
-        private List<Event> hotspotEvents;
+        //private List<Event> hotspotEvents;
 
         public EventTile(int x, int y, EventLayer layer)
         {
@@ -37,7 +37,7 @@ namespace TileEngine.Events
             this.y = y;
             eventLayer = layer;
             events = new List<Event>();
-            hotspotEvents = new List<Event>();
+            //hotspotEvents = new List<Event>();
         }
 
         public int X
@@ -60,15 +60,15 @@ namespace TileEngine.Events
             get { return events; }
         }
 
-        public IList<Event> HotSpotEvents
-        {
-            get { return hotspotEvents; }
-        }
+        //public IList<Event> HotSpotEvents
+        //{
+        //    get { return hotspotEvents; }
+        //}
 
         public void Clear()
         {
             events.Clear();
-            hotspotEvents.Clear();
+            //hotspotEvents.Clear();
         }
 
         public void AddEvent(Event evt)
@@ -81,14 +81,14 @@ namespace TileEngine.Events
             events.Remove(evt);
         }
 
-        public void AddHotSpotEvent(Event evt)
-        {
-            hotspotEvents.Add(evt);
-        }
+        //public void AddHotSpotEvent(Event evt)
+        //{
+        //    hotspotEvents.Add(evt);
+        //}
 
-        public void RemoveHotSpotEvent(Event evt)
-        {
-            hotspotEvents.Remove(evt);
-        }
+        //public void RemoveHotSpotEvent(Event evt)
+        //{
+        //    hotspotEvents.Remove(evt);
+        //}
     }
 }

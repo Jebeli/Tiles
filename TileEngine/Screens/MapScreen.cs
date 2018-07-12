@@ -140,6 +140,7 @@ namespace TileEngine.Screens
         {
             if (!base.OnMouseDown(x, y, button))
             {
+                engine.Camera.MapClicked = false;
                 mouseX = x;
                 mouseY = y;
                 hasPanned = false;
@@ -152,6 +153,7 @@ namespace TileEngine.Screens
         {
             if (!base.OnMouseUp(x, y, button))
             {
+                engine.Camera.MapClicked = false;
                 mouseX = x;
                 mouseY = y;
                 if (panning)
@@ -191,24 +193,16 @@ namespace TileEngine.Screens
 
         private void MapHover(float x, float y)
         {
-            float mapX;
-            float mapY;
-            int tileX;
-            int tileY;
-            engine.Camera.ScreenToMap(x, y, out mapX, out mapY);
-            engine.Camera.MapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.ScreenToMap(x, y, out float mapX, out float mapY);
+            engine.Camera.MapToTile(mapX, mapY, out int tileX, out int tileY);
             engine.Camera.HoverTileX = tileX;
             engine.Camera.HoverTileY = tileY;
         }
 
         private void MapClick(float x, float y, MouseButton button)
         {
-            float mapX;
-            float mapY;
-            int tileX;
-            int tileY;
-            engine.Camera.ScreenToMap(x, y, out mapX, out mapY);
-            engine.Camera.MapToTile(mapX, mapY, out tileX, out tileY);
+            engine.Camera.ScreenToMap(x, y, out float mapX, out float mapY);
+            engine.Camera.MapToTile(mapX, mapY, out int tileX, out int tileY);
             engine.Camera.ClickTileX = tileX;
             engine.Camera.ClickTileY = tileY;
             if (button == MouseButton.Right && !hasPanned)
@@ -217,7 +211,7 @@ namespace TileEngine.Screens
             }
             else if (button == MouseButton.Left)
             {
-                engine.EventManager.CheckHotSpotClick(mapX, mapY);
+                engine.Camera.MapClicked = true;
             }
         }
 

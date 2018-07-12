@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Core;
 
 namespace TileEngine.Graphics
 {
@@ -75,6 +76,11 @@ namespace TileEngine.Graphics
         public int CompareTo(RenderTextureRegion other)
         {
             return prio.CompareTo(other.Prio);
+        }
+
+        public Rect GetDestRect(int x = 0, int y = 0)
+        {
+            return new Rect(x - region.OffsetX, y - region.OffsetY, region.Width, region.Height);
         }
     }
 }

@@ -271,6 +271,11 @@ namespace TileEngine.Loaders
                                     evt.PosY = values[1];
                                     evt.Width = values[2];
                                     evt.Height = values[3];
+                                    if (evt.CenterX == -1 && evt.CenterY == -1)
+                                    {
+                                        evt.CenterX = evt.PosX + evt.Width / 2.0f;
+                                        evt.CenterY = evt.PosY + evt.Height / 2.0f;
+                                    }
                                     foreach (var k in sec.KeyList)
                                     {
                                         switch (k.Ident)
@@ -293,6 +298,8 @@ namespace TileEngine.Loaders
                                                         evt.HotSpot = true;
                                                     }
                                                 }
+                                                evt.CenterX = evt.HotPosX + evt.HotWidth / 2.0f;
+                                                evt.CenterY = evt.HotPosY + evt.HotHeight / 2.0f;
                                                 break;
                                             case "mapmod":
                                                 var mmEc = evt.AddComponent(EventComponentType.MapMod, 0);

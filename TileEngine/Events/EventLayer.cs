@@ -47,15 +47,15 @@ namespace TileEngine.Events
             this[x, y].RemoveEvent(evt);
         }
 
-        public void AddHotSpotEvent(Event evt, int x, int y)
-        {
-            this[x, y].AddHotSpotEvent(evt);
-        }
+        //public void AddHotSpotEvent(Event evt, int x, int y)
+        //{
+        //    this[x, y].AddHotSpotEvent(evt);
+        //}
 
-        public void RemoveHotSpotEvent(Event evt, int x, int y)
-        {
-            this[x, y].RemoveHotSpotEvent(evt);
-        }
+        //public void RemoveHotSpotEvent(Event evt, int x, int y)
+        //{
+        //    this[x, y].RemoveHotSpotEvent(evt);
+        //}
 
         public bool IsValidXY(int x, int y)
         {

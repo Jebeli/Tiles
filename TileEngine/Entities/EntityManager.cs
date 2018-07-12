@@ -52,7 +52,7 @@ namespace TileEngine.Entities
 
         public void Update(TimeInfo time)
         {
-            foreach (var e in entities)
+            foreach (var e in GetVisibleEntities())
             {
                 e.Update(time);
             }
@@ -60,13 +60,23 @@ namespace TileEngine.Entities
 
         public void AddRenderables(IList<RenderTextureRegion> list, IList<RenderTextureRegion> listDead)
         {
+            foreach (var e in GetVisibleEntities())
+            {
+                e.AddRenderables(e.Dead ? listDead : list);
+            }
+        }
+
+        private IEnumerable<Entity> GetVisibleEntities(bool forcePlayer = true)
+        {
+            List<Entity> list = new List<Entity>();
             foreach (var e in entities)
             {
                 if (e.Visible)
                 {
-                    e.AddRenderables(e.Dead ? listDead : list);
+                    list.Add(e);
                 }
             }
+            return list;
         }
     }
 }

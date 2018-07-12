@@ -425,6 +425,7 @@ namespace TileEngine.YGUI
         public bool MouseMove(int x, int y)
         {
             bool result = false;
+            Hover = true;
             Point pos = new Point(x, y);
             Gadget gadget = null;
             Window window = FindWindow(pos);

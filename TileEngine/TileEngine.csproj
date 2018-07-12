@@ -53,6 +53,7 @@
     <Compile Include="Entities\EntityManager.cs" />
     <Compile Include="Entities\EntityVisual.cs" />
     <Compile Include="Entities\MultiPartEntityVisual.cs" />
+    <Compile Include="Entities\NullEntityVisual.cs" />
     <Compile Include="Events\Enums.cs" />
     <Compile Include="Events\Event.cs" />
     <Compile Include="Events\EventComponent.cs" />
