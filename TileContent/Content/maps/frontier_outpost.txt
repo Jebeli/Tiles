@@ -276,7 +276,7 @@ tooltip=Frontier Plains
 type=event
 location=43,62,4,1
 activate=on_trigger
-intermap=maps/arrival.txt,32,4
+intermap=maps/arrival.txt,20,20
 tooltip=To Arrival
 
 [event]

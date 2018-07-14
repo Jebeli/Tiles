@@ -26,6 +26,7 @@ namespace TileEngine.Graphics
         private int height;
         private int offsetX;
         private int offsetY;
+
         public TextureRegion(Texture texture)
         {
             this.texture = texture;
@@ -36,6 +37,7 @@ namespace TileEngine.Graphics
             offsetX = 0;
             offsetY = 0;
         }
+
         public TextureRegion(Texture texture, int x, int y, int width, int height, int offsetX, int offsetY)
         {
             this.texture = texture;

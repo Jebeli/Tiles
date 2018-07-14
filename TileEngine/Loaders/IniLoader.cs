@@ -44,7 +44,7 @@ namespace TileEngine.Loaders
                 Stream stream = engine.FileResolver.OpenFile(fileId);
                 if (stream != null)
                 {
-                    IniFile ini = new IniFile(stream);
+                    IniFile ini = GetIni(stream);
                     int width = ini.ReadInt("header", "width");
                     int height = ini.ReadInt("header", "height");
                     string title = ini.ReadString("header", "title");
@@ -347,17 +347,20 @@ namespace TileEngine.Loaders
                                                 if (sValues.Length >= 1)
                                                 {
                                                     var fxEc = evt.AddComponent(EventComponentType.SoundFX, sValues[0]);
+                                                    fxEc.MapX = -1;
+                                                    fxEc.MapY = -1;
                                                     if (sValues.Length >= 3)
                                                     {
                                                         fxEc.MapX = sValues[0].ToIntValue();
                                                         fxEc.MapY = sValues[1].ToIntValue();
                                                     }
-                                                    else
-                                                    {
-                                                        fxEc.MapX = (int)evt.CenterX;
-                                                        fxEc.MapY = (int)evt.CenterY;
-                                                    }
                                                 }
+                                                break;
+                                            case "cooldown":
+                                                evt.Cooldown = k.Value.ToDuration();
+                                                break;
+                                            case "music":
+                                                evt.AddComponent(EventComponentType.Music, k.Value);
                                                 break;
                                         }
                                     }
@@ -394,7 +397,7 @@ namespace TileEngine.Loaders
                                                 enemy.Category = k.Value;
                                                 break;
                                             case "chance":
-                                                enemy.Chance = k.Value.ToIntValue();
+                                                enemy.Chance = k.Value.ToIntValue(100);
                                                 break;
                                             case "location":
                                                 values = k.Value.ToIntValues();
@@ -435,6 +438,25 @@ namespace TileEngine.Loaders
                                                     enemy.MaxNumber = values[0];
                                                 }
                                                 break;
+                                            case "direction":
+                                                enemy.Direction = k.Value.ToDirection();
+                                                break;
+                                            case "waypoints":
+                                                var lValues = new List<int>(k.Value.ToIntValues());
+                                                while (lValues.Count >= 2)
+                                                {
+                                                    int x = lValues[0];
+                                                    int y = lValues[1];
+                                                    lValues.RemoveAt(0);
+                                                    lValues.RemoveAt(0);
+                                                    enemy.WayPoints.Add(new FPoint(x + 0.5f, y + 0.5f));
+                                                }
+                                                enemy.WanderRadius = 0;
+                                                break;
+                                            case "wander_radius":
+                                                enemy.WanderRadius = Math.Max(0, k.Value.ToIntValue());
+                                                enemy.WayPoints.Clear();
+                                                break;
                                         }
                                     }
                                     map.AddLoadEnemyGroup(enemy);
@@ -442,6 +464,7 @@ namespace TileEngine.Loaders
                                 break;
                         }
                     }
+                    map.MusicName = ini.ReadString("header", "music");
                     map.BackgroundColor = ini.ReadString("header", "background_color").ToColor();
                     map.AddMapParallax(engine.LoadParallax(ini.ReadString("header", "parallax_layers")));
                 }
@@ -564,12 +587,21 @@ namespace TileEngine.Loaders
                         renderOffsetX = offsetSize[0];
                         renderOffsetY = offsetSize[1];
                     }
+                    BlendMode blendMode = (BlendMode)ini.ReadInt("", "blend_mode");
+                    byte alphaMod = (byte)ini.ReadInt("", "alpha_mod", 255);
+                    Color colorMod = new Color(255, 255, 255);
+                    string colorModStr = ini.ReadString("", "color_mod");
+                    if (!string.IsNullOrEmpty(colorModStr))
+                    {
+                        colorMod = colorModStr.ToColor();
+                    }
+
                     foreach (var sec in ini.Sections)
                     {
                         if (!string.IsNullOrEmpty(sec.Name))
                         {
                             AnimationType type = sec.ReadString("type").ToAnimationType();
-                            Animation anim = animationSet.AddAnimation(sec.Name, type);
+                            Animation anim = animationSet.AddAnimation(sec.Name, type, blendMode, alphaMod, colorMod);
                             int frames = sec.ReadInt("frames");
                             int duration = sec.ReadString("duration").ToDuration(engine.MaxFramesPerSecond);
                             int position = sec.ReadInt("position");
@@ -739,6 +771,7 @@ namespace TileEngine.Loaders
                 spawn.Type = values[0];
                 spawn.MapX = values[1].ToIntValue();
                 spawn.MapY = values[2].ToIntValue();
+                spawn.Direction = -1;
                 return spawn;
             }
             return null;

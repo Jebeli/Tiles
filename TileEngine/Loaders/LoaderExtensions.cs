@@ -28,24 +28,16 @@ namespace TileEngine.Loaders
 
     static class LoaderExtensions
     {
-        public static int ToIntValue(this string v)
+        public static int ToIntValue(this string v, int def = 0)
         {
-            int res = 0;
-            if (v != null)
-            {
-                int.TryParse(v, out res);
-            }
-            return res;
+            if (int.TryParse(v, out int res)) return res;
+            return def;
         }
 
-        public static float ToFloatValue(this string v)
+        public static float ToFloatValue(this string v, float def = 0.0f)
         {
-            float res = 0;
-            if (v != null)
-            {
-                float.TryParse(v, out res);
-            }
-            return res;
+            if (float.TryParse(v, out float res)) return res;
+            return def;
         }
 
         public static int[] ToIntValues(this string v)
@@ -141,6 +133,46 @@ namespace TileEngine.Loaders
                 }
             }
             return AnimationType.None;
+        }
+
+        public static int ToDirection(this string v, int def = -1)
+        {
+            int dir = def;
+            switch (v)
+            {
+                case "N":
+                    dir = 3;
+                    break;
+                case "NE":
+                    dir = 4;
+                    break;
+                case "E":
+                    dir = 5;
+                    break;
+                case "SE":
+                    dir = 6;
+                    break;
+                case "S":
+                    dir = 7;
+                    break;
+                case "SW":
+                    dir = 0;
+                    break;
+                case "W":
+                    dir = 1;
+                    break;
+                case "NW":
+                    dir = 2;
+                    break;
+                default:
+                    int.TryParse(v, out dir);
+                    break;
+            }
+            if (dir < 0 || dir > 7)
+            {
+                dir = def;
+            }
+            return dir;
         }
 
         public static int ToDuration(this string v, int maxFramesPerSecond = 60)

@@ -96,20 +96,20 @@ namespace TileEngine.Entities
             return SetAnimation(stance, direction);
         }
 
-        public Rect GetFrameRect(float mapPosX, float mapPosY)
+        public Rect GetFrameRect(int x, int y)
         {
             Rect rect = new Rect();
             List<RenderTextureRegion> r = new List<RenderTextureRegion>();
-            AddRenderables(mapPosX, mapPosY, r);
+            AddRenderables(0, 0, r);
             for (int i = 0; i < r.Count; i++)
             {
                 if (i == 0)
                 {
-                    rect = r[i].GetDestRect();
+                    rect = r[i].GetDestRect(x, y);
                 }
                 else
                 {
-                    rect.Union(r[i].GetDestRect());
+                    rect.Union(r[i].GetDestRect(x, y));
                 }
             }
             return rect;

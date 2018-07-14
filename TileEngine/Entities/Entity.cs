@@ -40,6 +40,13 @@ namespace TileEngine.Entities
         Blocking
     }
 
+    public enum EntityType
+    {
+        Player,
+        Enemy,
+        NPC
+    }
+
     public class Entity : NamedObject
     {
 
@@ -50,6 +57,7 @@ namespace TileEngine.Entities
         private static readonly float[] speedMultiplyer = { M_SQRT2INV, 1.0f, M_SQRT2INV, 1.0f, M_SQRT2INV, 1.0f, M_SQRT2INV, 1.0f };
 
         private Engine engine;
+        private EntityType type;
         private float mapPosX;
         private float mapPosY;
         private bool visible;
@@ -68,6 +76,10 @@ namespace TileEngine.Entities
         private IList<string> categories;
         private string rarity;
         private int level;
+        private bool wander;
+        private Rect wanderArea;
+        private List<FPoint> wayPoints;
+
 
         private float effectSpeed = 100.0f;
 
@@ -87,12 +99,14 @@ namespace TileEngine.Entities
             categories = new List<string>();
             rarity = "common";
             level = 1;
+            wayPoints = new List<FPoint>();
         }
 
         public Entity(Entity other)
             : base(other)
         {
             engine = other.engine;
+            type = other.type;
             visual = EntityVisual.Empty;
             animationSetNames = new Dictionary<string, string>(other.animationSetNames);
             layerOrder = new Dictionary<int, IList<string>>(other.layerOrder);
@@ -105,6 +119,15 @@ namespace TileEngine.Entities
             categories = new List<string>(other.categories);
             rarity = other.rarity;
             level = other.level;
+            wander = other.wander;
+            wayPoints = new List<FPoint>(other.wayPoints);
+            wanderArea = other.wanderArea;
+        }
+
+        public EntityType Type
+        {
+            get { return type; }
+            set { type = value; }
         }
 
         public bool Visible
@@ -196,6 +219,39 @@ namespace TileEngine.Entities
             set { level = value; }
         }
 
+        public bool Wander
+        {
+            get { return wander; }
+            set { wander = value; }
+        }
+
+        public Rect WanderArea
+        {
+            get { return wanderArea; }
+            set { wanderArea = value; }
+        }
+
+        public IList<FPoint> WayPoints
+        {
+            get { return wayPoints; }
+            set
+            {
+                wayPoints.Clear();
+                if (value != null)
+                {
+                    wayPoints.AddRange(value);
+                }
+            }
+        }
+
+        public void SetWanderArea(int radius)
+        {
+            wanderArea.X = (int)(Math.Floor(mapPosX)) - radius;
+            wanderArea.Y = (int)(Math.Floor(mapPosY)) - radius;
+            wanderArea.Width = 2 * radius + 1;
+            wanderArea.Height = 2 * radius + 1;
+        }
+
         public string AnimationName
         {
             get { return animationName; }
@@ -212,9 +268,9 @@ namespace TileEngine.Entities
             layerOrder[layer] = order;
         }
 
-        public Rect GetFrameRect()
+        public Rect GetFrameRect(int x=0, int y=0)
         {
-            return visual.GetFrameRect(mapPosX, mapPosY);
+            return visual.GetFrameRect(x, y);
         }
 
         public void CreateVisual()

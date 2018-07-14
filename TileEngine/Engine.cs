@@ -33,6 +33,7 @@ namespace TileEngine
     using System.Text;
     using TileEngine.Entities;
     using TileEngine.Logging;
+    using TileEngine.Audio;
 
     public class Engine : ITimeInfoProvider
     {
@@ -43,8 +44,11 @@ namespace TileEngine
         private ITimeInfoProvider timeProvider;
         private IInput input;
         private IFontEngine fonts;
+        private ISounds sounds;
         private ResourceManager<Texture> textureManager;
         private ResourceManager<TileSet> tileSetManager;
+        private ResourceManager<Music> musicManager;
+        private ResourceManager<Sound> soundManager;
         private EventManager eventManager;
         private EntityManager entityManager;
         private EnemyManager enemyManager;
@@ -69,15 +73,19 @@ namespace TileEngine
         private Entity player;
         private bool guiUsesMouse;
 
-        public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts)
+        public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts, ISounds sounds = null)
         {
             this.fileResolver = fileResolver;
             this.graphics = graphics;
             this.fonts = fonts;
+            this.sounds = sounds;
+            if (sounds == null) { this.sounds = new NoSounds(); }
             timeProvider = new StopWatchTimeInfoProvider();
             input = new BasicInput();
             textureManager = new ResourceManager<Texture>();
             tileSetManager = new ResourceManager<TileSet>();
+            musicManager = new ResourceManager<Music>();
+            soundManager = new ResourceManager<Sound>();
             eventManager = new EventManager(this);
             entityManager = new EntityManager(this);
             enemyManager = new EnemyManager(this);
@@ -128,6 +136,11 @@ namespace TileEngine
         public IFontEngine Fonts
         {
             get { return fonts; }
+        }
+
+        public ISounds Sounds
+        {
+            get { return sounds; }
         }
 
         public IScreen Screen
@@ -333,6 +346,37 @@ namespace TileEngine
             return tex;
         }
 
+        public Music GetMusic(string musicId)
+        {
+            Music mus = null;
+            if (musicManager.Exists(musicId))
+            {
+                mus = musicManager.Get(musicId);
+            }
+            else
+            {
+                mus = sounds.GetMusic(musicId, fileResolver);
+                if (mus != null) musicManager.Add(mus);
+            }
+            return mus;
+        }
+
+        public Sound GetSound(string soundId)
+        {
+            Sound snd = null;
+            if (soundManager.Exists(soundId))
+            {
+                snd = soundManager.Get(soundId);
+            }
+            else
+            {
+                snd = sounds.GetSound(soundId, fileResolver);
+                if (snd != null) soundManager.Add(snd);
+            }
+            return snd;
+        }
+
+
         public void Start()
         {
             string defName = fileResolver.Resolve(@"fonts/Roboto-Regular.ttf");
@@ -402,6 +446,7 @@ namespace TileEngine
             entityManager.Clear();
             eventManager.Clear();
             enemyManager.Clear();
+            sounds.Reset();
 
             this.map = map;
             this.map.InitCollision();
@@ -409,6 +454,7 @@ namespace TileEngine
             TransferEvents(map);
             TransferNPCs(map);
             TransferEnemyGroups(map);
+            PlayMusic(map.MusicName);
         }
 
         public Map LoadMap(string mapId, int posX = -1, int posY = -1)
@@ -509,6 +555,7 @@ namespace TileEngine
             Entity npc = LoadEntity(fileId);
             if (npc != null)
             {
+                npc.Type = EntityType.NPC;
                 npc.MapPosX = posX + 0.5f;
                 npc.MapPosY = posY + 0.5f;
             }
@@ -520,7 +567,7 @@ namespace TileEngine
             Entity enemy = LoadEntity(fileId);
             if (enemy != null)
             {
-
+                enemy.Type = EntityType.Enemy;
             }
             return enemy;
         }
@@ -530,6 +577,7 @@ namespace TileEngine
             player = LoadEntity(fileId);
             if (player != null)
             {
+                player.Type = EntityType.Player;
                 if (posX >= 0 && posY >= 0)
                 {
                     player.MapPosX = posX + 0.5f;
@@ -549,6 +597,11 @@ namespace TileEngine
             return player;
         }
 
+        public void PlayMusic(string name)
+        {
+            Music music = GetMusic(name);
+            sounds.PlayMusic(music);
+        }
 
         public void SaveTileSet(TileSet tileSet, string fileId = null)
         {
@@ -600,9 +653,38 @@ namespace TileEngine
                     }
                     break;
                 case EventComponentType.Spawn:
-                    foreach(var spawn in ec.MapSpawns)
+                    foreach (var spawn in ec.MapSpawns)
                     {
                         enemyManager.SpawnMapSpawn(spawn);
+                    }
+                    break;
+                case EventComponentType.Music:
+                    PlayMusic(ec.StringParam);
+                    break;
+                case EventComponentType.SoundFX:
+                    FPoint pos = new FPoint();
+                    bool loop = false;
+                    if (ec.MapX != -1 && ec.MapY != -1)
+                    {
+                        if (ec.MapX != 0 && ec.MapY != 0)
+                        {
+                            pos.X = ec.MapX + 0.5f;
+                            pos.Y = ec.MapY + 0.5f;
+                        }
+                    }
+                    else if (evt.PosX != 0 && evt.PosY != 0)
+                    {
+                        pos.X = evt.PosX + 0.5f;
+                        pos.Y = evt.PosY + 0.5f;
+                    }
+                    if (evt.Type == EventType.Load)
+                    {
+                        loop = true;
+                    }
+                    Sound sound = GetSound(ec.StringParam);
+                    if (sound != null)
+                    {
+                        sounds.PlaySound(sound, pos, loop);
                     }
                     break;
             }

@@ -71,6 +71,7 @@ namespace TileEngine.Graphics
             graphics.DrawTextures(lastTexture, vertices, 0, count);
             index = 0;
         }
+
         public void Draw(TextureRegion region, int x, int y)
         {
             Draw(region.Texture, x - region.OffsetX, y - region.OffsetY, region.Width, region.Height, region.X, region.Y, region.Width, region.Height);

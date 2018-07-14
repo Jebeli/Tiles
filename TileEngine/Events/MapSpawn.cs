@@ -23,12 +23,15 @@ namespace TileEngine.Events
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Entities;
 
     public class MapSpawn
     {
         private string type;
         private int mapX;
         private int mapY;
+        private int direction;
+        private Entity summoner;
 
         public string Type
         {
@@ -45,6 +48,18 @@ namespace TileEngine.Events
         {
             get { return mapY; }
             set { mapY = value; }
+        }
+
+        public int Direction
+        {
+            get { return direction; }
+            set { direction = value; }
+        }
+
+        public Entity Summoner
+        {
+            get { return summoner; }
+            set { summoner = value; }
         }
     }
 }

@@ -56,6 +56,7 @@ namespace TileEngine.Entities
         {
             EnemyGroup eg = new EnemyGroup(spawn.Type);
             eg.MapSpawn = true;
+            eg.Chance = 100;
             eg.Category = spawn.Type;
             eg.PosX = spawn.MapX;
             eg.PosY = spawn.MapY;
@@ -65,14 +66,14 @@ namespace TileEngine.Entities
             eg.MaxNumber = 1;
             eg.MinLevel = 0;
             eg.MaxLevel = 0;
-            //eg.Direction = spawn.Direction;
-            //eg.Summoner = spawn.Summoner;
+            eg.Direction = spawn.Direction;
+            eg.Summoner = spawn.Summoner;
             SpwanEnemies(eg);
         }
 
         public void AddEnemyTemplates(IList<string> enemies)
         {
-            foreach(var s in enemies)
+            foreach (var s in enemies)
             {
                 Entity ent = engine.LoadEnemy(s);
                 if (ent != null)
@@ -90,50 +91,52 @@ namespace TileEngine.Entities
 
         private void SpwanEnemies(EnemyGroup eg)
         {
-            int num = Utils.RandBetween(eg.MinNumber, eg.MaxNumber);
-            string eName = eg.Name + ".txt";
-            for (int i = 0; i < num; i++)
+            if (Utils.PercentChance(eg.Chance))
             {
-                Entity e = FindEnemyTemplate(eg);
-                if (e != null)
+                int num = Utils.RandBetween(eg.MinNumber, eg.MaxNumber);
+                string eName = eg.Name + ".txt";
+                for (int i = 0; i < num; i++)
                 {
-                    e = new Entity(e);
-                }
-                else
-                {
-                    e = engine.LoadEnemy(eName);
-                }
-                if (e != null)
-                {
-                    //e.MapSpawn = eg.MapSpawn;
-                    //e.Summoner = eg.Summoner;
-                    SetEnemyPosition(e, eg);
-                    //e.WayPoints = eg.WayPoints;
-                    if (eg.WanderRadius > 0)
+                    Entity e = FindEnemyTemplate(eg);
+                    if (e != null)
                     {
-                        //e.Wander = true;
-                        //e.SetWanderArea(eg.WanderRadius);
-                    }
-                    engine.EntityManager.AddEntity(e);
-                    //AnimationStance stance = e.SpawnStance;
-                    int dir = eg.Direction;
-                    if (dir < 0) dir = Utils.Rand() % 7;
-                    if (e.InitAnimation(EntityStance.Spawning, dir))
-                    {
-                        //e.Behavior = defaultEnemyBehavior;
-                        //enemies.Add(e);
-                        Logger.Info("Enemy", $"{e.Name} (Level {e.Level}) spawned at {new FPoint(e.MapPosX, e.MapPosY)}");
+                        e = new Entity(e);
                     }
                     else
                     {
-                        Logger.Warn("Enemy", $"Could not load enemy animations {eg.Name}");
+                        e = engine.LoadEnemy(eName);
+                    }
+                    if (e != null)
+                    {
+                        //e.Summoner = eg.Summoner;
+                        SetEnemyPosition(e, eg);
+                        e.WayPoints = eg.WayPoints;
+                        if (eg.WanderRadius > 0)
+                        {
+                            e.Wander = true;
+                            e.SetWanderArea(eg.WanderRadius);
+                        }
+                        engine.EntityManager.AddEntity(e);
+                        int dir = eg.Direction;
+                        if (dir < 0) dir = Utils.Rand() % 7;
+                        if (e.InitAnimation(EntityStance.Spawning, dir))
+                        {
+                            Logger.Info("Enemy", $"{e.Name} (Level {e.Level}) spawned at {new FPoint(e.MapPosX, e.MapPosY)}");
+                        }
+                        else
+                        {
+                            Logger.Warn("Enemy", $"Could not load enemy animations {e.Name}");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warn("Enemy", $"Could not load enemy {eg.Name}");
                     }
                 }
-                else
-                {
-                    Logger.Warn("Enemy", $"Could not load enemy {eg.Name}");
-                }
-
+            }
+            else
+            {
+                Logger.Info("Enemy", $"{eg.Category} not spawnd (chance was {eg.Chance}%)");
             }
         }
 

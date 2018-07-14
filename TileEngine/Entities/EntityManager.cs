@@ -30,11 +30,32 @@ namespace TileEngine.Entities
     {
         private Engine engine;
         private List<Entity> entities;
+        private Entity selectedEnemy;
 
         public EntityManager(Engine engine)
         {
             this.engine = engine;
             entities = new List<Entity>();
+        }
+
+        public Entity SelectedEnemy
+        {
+            get { return selectedEnemy; }
+            set
+            {
+                if (selectedEnemy != value)
+                {
+                    if (selectedEnemy != null)
+                    {
+
+                    }
+                    selectedEnemy = value;
+                    if (selectedEnemy != null)
+                    {
+                        Logger.Info("Entity", $"{selectedEnemy.Name} selected");
+                    }
+                }
+            }
         }
 
         public void AddEntity(Entity entity)
@@ -56,6 +77,12 @@ namespace TileEngine.Entities
             {
                 e.Update(time);
             }
+            HandleHoverSelection();
+        }
+
+        private void HandleHoverSelection()
+        {
+            SelectedEnemy = GetEnemyAt(engine.Input.ScaledMouseX, engine.Input.ScaledMouseY);
         }
 
         public void AddRenderables(IList<RenderTextureRegion> list, IList<RenderTextureRegion> listDead)
@@ -77,6 +104,38 @@ namespace TileEngine.Entities
                 }
             }
             return list;
+        }
+
+        public Entity GetEnemyAt(float mx, float my)
+        {
+            return GetEntityAt(mx, my, GetVisibleLivingEnemies());
+        }
+
+        private IEnumerable<Entity> GetVisibleLivingEnemies()
+        {
+            List<Entity> list = new List<Entity>();
+            foreach (var e in entities)
+            {
+                if (e.Visible && !e.Dead && e.Type == EntityType.Enemy)
+                {
+                    list.Add(e);
+                }
+            }
+            return list;
+        }
+
+        private Entity GetEntityAt(float mx, float my, IEnumerable<Entity> list)
+        {
+            foreach (var e in list)
+            {
+                engine.Camera.MapToScreen(e.MapPosX, e.MapPosY, out int sX, out int sY);
+                Rect sR = e.GetFrameRect(sX, sY);
+                if (mx >= sR.X && my >= sR.Y && mx < sR.X + sR.Width && my < sR.Y + sR.Height)
+                {
+                    return e;
+                }
+            }
+            return null;
         }
     }
 }

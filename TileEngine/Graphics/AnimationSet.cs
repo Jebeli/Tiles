@@ -28,9 +28,9 @@ namespace TileEngine.Graphics
         }
 
 
-        public Animation AddAnimation(string name, AnimationType type)
+        public Animation AddAnimation(string name, AnimationType type, BlendMode blendMode, byte alphaMod, Color colorMod)
         {
-            Animation anim = new Animation(name, type, image, BlendMode.Normal, 255, Color.White);
+            Animation anim = new Animation(name, type, image, blendMode, alphaMod, colorMod);
             animations.Add(anim);
             if (animations.Count == 1) { defaultAnimation = anim; }
             return anim;

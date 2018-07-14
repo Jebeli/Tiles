@@ -125,6 +125,7 @@ namespace TileEngine.Screens
             base.Update(time);
             engine.EventManager.Update(time);
             engine.EntityManager.Update(time);
+            engine.Sounds.Update(new FPoint(engine.Camera.CameraX, engine.Camera.CameraY));
         }
 
         public override void Render(TimeInfo time)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TileEngine.Audio;
 using TileEngine.Fonts;
 using TileEngine.Graphics;
 using TileEngine.Input;
@@ -11,6 +12,18 @@ namespace SDLTiles
 {
     public static class SDLExtensions
     {
+        public static IntPtr GetChunk(this Music music)
+        {
+            if (music != null) { return ((SDLMusic)music).Chunk; }
+            return IntPtr.Zero;
+        }
+
+        public static IntPtr GetChunk(this Sound sound)
+        {
+            if (sound != null) { return ((SDLSound)sound).Chunk; }
+            return IntPtr.Zero;
+        }
+
         public static IntPtr GetTexture(this Texture tex)
         {
             if (tex != null) { return ((SDLTexture)tex).Texture; }

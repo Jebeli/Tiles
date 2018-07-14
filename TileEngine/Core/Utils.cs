@@ -37,6 +37,11 @@ namespace TileEngine.Core
             return rnd.Next(max - min) + min;
         }
 
+        internal static bool PercentChance(int percent)
+        {
+            return Rand() % 100 < percent;
+        }
+
         internal static Point MapToCollision(FPoint p)
         {
             return new Point((int)p.X, (int)p.Y);

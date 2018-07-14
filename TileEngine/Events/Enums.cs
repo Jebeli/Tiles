@@ -35,6 +35,7 @@ namespace TileEngine.Events
         Msg,
         ShakyCam,
         Spawn,
+        Music,
         NPCHotspot
     }
 

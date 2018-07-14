@@ -26,6 +26,7 @@ namespace SDLTiles
         public SDLFileResolver fileResolver;
         public SDLGraphics graphics;
         public SDLFontEngine fontEngine;
+        public SDLSounds sounds;
         private Engine engine;
         private int mouseX;
         private int mouseY;
@@ -50,7 +51,8 @@ namespace SDLTiles
                 ShowTileCounter = false,
                 ShowCoordinates = false
             });
-            engine = new Engine(fileResolver, graphics, fontEngine);
+            sounds = new SDLSounds();
+            engine = new Engine(fileResolver, graphics, fontEngine, sounds);
         }
 
         public void Events()

@@ -56,6 +56,7 @@ namespace TileEngine.Maps
         private List<Event> loadEvents;
         private List<EntityLoadInfo> loadNPCs;
         private List<EnemyGroup> loadEnemyGroups;
+        private string musicName;
 
         public Map(string name, int width, int height, int tileWidth, int tileHeight, MapOrientation orientation = MapOrientation.Isometric)
             : base(name)
@@ -90,6 +91,12 @@ namespace TileEngine.Maps
         {
             get { return fileName; }
             set { fileName = value; }
+        }
+
+        public string MusicName
+        {
+            get { return musicName; }
+            set { musicName = value; }
         }
 
         public Color BackgroundColor
