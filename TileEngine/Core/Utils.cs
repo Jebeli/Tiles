@@ -62,6 +62,11 @@ namespace TileEngine.Core
             return (float)Math.Sqrt((p2.X - p1.X) * (p2.X - p1.X) + (p2.Y - p1.Y) * (p2.Y - p1.Y));
         }
 
+        internal static float CalcDist(FPoint p1, FPoint p2)
+        {
+            return (float)Math.Sqrt((p2.X - p1.X) * (p2.X - p1.X) + (p2.Y - p1.Y) * (p2.Y - p1.Y));
+        }
+
         internal static int CalcDirection(float x0, float y0, float x1, float y1)
         {
             float theta = CalcTheta(x0, y0, x1, y1);

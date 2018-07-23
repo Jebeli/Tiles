@@ -29,18 +29,20 @@ namespace TileEngine.Entities
         private string entityId;
         private int posX;
         private int posY;
+        private int direction;
 
         public EntityLoadInfo()
         {
 
         }
 
-        public EntityLoadInfo(string name, string entityId, int posX, int posY)
+        public EntityLoadInfo(string name, string entityId, int posX, int posY, int dir = -1)
         {
             this.name = name;
             this.entityId = entityId;
             this.posX = posX;
             this.posY = posY;
+            direction = dir;
         }
 
         public string Name
@@ -65,6 +67,12 @@ namespace TileEngine.Entities
         {
             get { return posY; }
             set { posY = value; }
+        }
+
+        public int Direction
+        {
+            get { return direction; }
+            set { direction = value; }
         }
     }
 }

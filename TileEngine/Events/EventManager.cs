@@ -30,15 +30,19 @@ namespace TileEngine.Events
     {
         private Engine engine;
         private List<Event> events;
+        private List<Event> delayedEvents;
+
         public EventManager(Engine engine)
         {
             this.engine = engine;
             events = new List<Event>();
+            delayedEvents = new List<Event>();
         }
 
         public void Clear()
         {
             events.Clear();
+            delayedEvents.Clear();
         }
 
         public void Update(TimeInfo time)
@@ -53,6 +57,25 @@ namespace TileEngine.Events
                 else
                 {
                     evt.Update();
+                }
+            }
+        }
+
+        public void UpdateDelayedEvents()
+        {
+            int i = delayedEvents.Count;
+            while (i > 0)
+            {
+                i--;
+                Event evt = delayedEvents[i];
+                if (evt.DelayTicks > 0)
+                {
+                    evt.DelayTicks--;
+                }
+                else
+                {
+                    delayedEvents.RemoveAt(i);
+                    ExecuteDelayedEvent(evt);
                 }
             }
         }
@@ -81,6 +104,13 @@ namespace TileEngine.Events
 
         public bool IsActive(Event evt)
         {
+            foreach(var ec in evt.Components)
+            {
+                if (!engine.CampaignManager.CheckAllRequirements(ec))
+                {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -150,7 +180,7 @@ namespace TileEngine.Events
                             {
                                 if (engine.Camera.MapClicked)
                                 {
-                                    engine.Camera.MapClicked = false;
+                                    engine.Camera.MapClickDone = true;
                                     ExecuteEvent(e);
                                 }
                             }
@@ -182,11 +212,26 @@ namespace TileEngine.Events
 
         public void ExecuteEvent(Event evt)
         {
-            if (engine.CanExecuteEvent(evt))
+            if (IsActive(evt) && engine.CanExecuteEvent(evt))
             {
-                Logger.Info("Event", $"Executing event {evt}");
-                evt.Execute();
+                if (evt.Delay > 0)
+                {
+                    evt.DelayTicks = evt.Delay;
+                    evt.CooldownTicks = evt.Cooldown + evt.Delay;
+                    delayedEvents.Add(evt);
+                }
+                else
+                {
+                    Logger.Info("Event", $"Executing event {evt}");
+                    evt.Execute();
+                }
             }
+        }
+
+        private void ExecuteDelayedEvent(Event evt)
+        {
+            Logger.Info("Event", $"Executing delayed event {evt}");
+            evt.Execute();
         }
 
         public void AddEvent(Event evt)

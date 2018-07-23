@@ -41,7 +41,8 @@ namespace TileEngine.Events
         private int hotHeight;
         private int cooldown;
         private int cooldownTicks;
-        private bool repeat = true;
+        private int delay;
+        private int delayTicks;
         private bool hotspot = false;
         private bool removeNow;
         private List<EventComponent> components;
@@ -53,7 +54,7 @@ namespace TileEngine.Events
             this.type = type;
             components = new List<EventComponent>();
             cooldown = 0;
-            repeat = true;
+            //repeat = true;
         }
 
         public EventType Type
@@ -65,6 +66,11 @@ namespace TileEngine.Events
         {
             get { return hotspot; }
             set { hotspot = value; }
+        }
+
+        public bool HotSpotIsLocation
+        {
+            get { return hotPosX == posX && hotPosY == posY && hotWidth == width && hotHeight == height; }
         }
 
         public bool RemoveNow
@@ -84,6 +90,11 @@ namespace TileEngine.Events
             return ec;
         }
 
+        public EventComponent AddComponent(EventComponentType ect, IList<string> sp)
+        {
+            return AddComponent(new EventComponent(ect, sp));
+        }
+
         public EventComponent AddComponent(EventComponentType ect, string sp = null)
         {
             return AddComponent(new EventComponent(ect, sp));
@@ -92,6 +103,11 @@ namespace TileEngine.Events
         public EventComponent AddComponent(EventComponentType ect, int ip)
         {
             return AddComponent(new EventComponent(ect, ip));
+        }
+
+        public EventComponent AddComponent(EventComponentType ect, bool bp)
+        {
+            return AddComponent(new EventComponent(ect, bp ? 1 : 0));
         }
 
         public EventComponent AddComponent(EventComponentType ect)
@@ -175,11 +191,29 @@ namespace TileEngine.Events
             set { cooldown = value; }
         }
 
-        public bool Repeat
+        public int CooldownTicks
         {
-            get { return repeat; }
-            set { repeat = value; }
+            get { return cooldownTicks; }
+            set { cooldownTicks = value; }
         }
+
+        public int Delay
+        {
+            get { return delay; }
+            set { delay = value; }
+        }
+
+        public int DelayTicks
+        {
+            get { return delayTicks; }
+            set { delayTicks = value; }
+        }
+
+        //public bool Repeat
+        //{
+        //    get { return repeat; }
+        //    set { repeat = value; }
+        //}
 
         public void HotSpotFromLocation()
         {
@@ -230,12 +264,12 @@ namespace TileEngine.Events
 
         public void Execute()
         {
-            foreach(var ec in components)
+            foreach (var ec in components)
             {
                 engine.ExecuteEventComponent(this, ec);
             }
             cooldownTicks = cooldown;
-            if (!repeat) removeNow = true;
+            //if (!repeat) removeNow = true;
         }
 
         public override string ToString()

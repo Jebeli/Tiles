@@ -24,7 +24,8 @@ namespace TileEngine.Maps
 
     public class TileSet : Resource
     {
-        private Texture texture;
+        private List<Texture> textures;
+        //private Texture texture;
         private List<TextureRegion> tiles;
         private List<string> tileNames;
         private Dictionary<int, TileAnim> anims;
@@ -32,26 +33,33 @@ namespace TileEngine.Maps
         private int tileHeight;
         private int oversizeX;
         private int oversizeY;
-        private float speed = 0.5f;        
+        private float speed = 0.5f;
 
-        public TileSet(string name, Texture texture)
+        public TileSet(string name)
             : base(name)
         {
-            this.texture = texture;
+            textures = new List<Texture>();
+            //textures.Add(texture);
             tiles = new List<TextureRegion>();
             tileNames = new List<string>();
             anims = new Dictionary<int, TileAnim>();
-        }      
+        }
 
         public static TileSet GetCollisionTileSet(Texture tex)
         {
-            
-            TileSet cts = new TileSet("Collision", tex);
+
+            TileSet cts = new TileSet("Collision");
+            cts.AddImage(tex);
             foreach (BlockType bt in Enum.GetValues(typeof(BlockType)))
             {
                 cts.AddTile((int)bt, 0, 0, tex.Width, tex.Height, 0, 0, bt.ToString());
             }
             return cts;
+        }
+
+        public void AddImage(Texture tex)
+        {
+            textures.Add(tex);
         }
 
         public int TileWidth
@@ -78,7 +86,11 @@ namespace TileEngine.Maps
 
         public Texture Texture
         {
-            get { return texture; }
+            get
+            {
+                if (textures.Count > 0) return textures[textures.Count - 1];
+                return null;
+            }
         }
 
         public int TileCount
@@ -133,12 +145,12 @@ namespace TileEngine.Maps
         {
             this.tileWidth = tileWidth;
             this.tileHeight = tileHeight;
-            int index = 0;
+            int index = 301;
             int y = 0;
-            while (y < texture.Height)
+            while (y < Texture.Height)
             {
                 int x = 0;
-                while (x < texture.Width)
+                while (x < Texture.Width)
                 {
                     AddTile(index, x, y, tileWidth, tileHeight, offsetX, offsetY);
                     x += tileWidth;
@@ -150,10 +162,10 @@ namespace TileEngine.Maps
 
         public void AddTile(int index, int clipX, int clipY, int clipW, int clipH, int offsetX, int offsetY, string name = "")
         {
-            if (texture != null)
+            if (Texture != null)
             {
                 AdjustOversizeAndTileSize(clipW, clipH, offsetX, offsetY);
-                TextureRegion region = texture.GetRegion(clipX, clipY, clipW, clipH, offsetX, offsetY);
+                TextureRegion region = Texture.GetRegion(clipX, clipY, clipW, clipH, offsetX, offsetY);
                 EnsureIndex(index);
                 tiles[index] = region;
                 tileNames[index] = name;
@@ -162,7 +174,7 @@ namespace TileEngine.Maps
 
         public void AddAnim(int index, int posX, int posY, int duration)
         {
-            if (texture != null)
+            if (Texture != null)
             {
                 TextureRegion tile = GetTile(index);
                 if (tile != null)
@@ -173,7 +185,7 @@ namespace TileEngine.Maps
                         anim = new TileAnim(index);
                         anims[index] = anim;
                     }
-                    anim.AddFrame(texture, (int)(duration * speed), posX, posY, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
+                    anim.AddFrame(Texture, (int)(duration * speed), posX, posY, tile.Width, tile.Height, tile.OffsetX, tile.OffsetY);
                 }
             }
         }
@@ -231,7 +243,10 @@ namespace TileEngine.Maps
         {
             if (disposing)
             {
-                texture.Dispose();
+                foreach (var tex in textures)
+                {
+                    tex.Dispose();
+                }
             }
         }
 

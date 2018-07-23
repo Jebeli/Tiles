@@ -34,10 +34,19 @@ namespace TileEngine.Events
         private int mapHeight;
         private List<MapMod> mapMods;
         private List<MapSpawn> mapSpawns;
+        private List<string> stringParams;
+
         public EventComponent()
         {
             mapMods = new List<MapMod>();
             mapSpawns = new List<MapSpawn>();
+            stringParams = new List<string>();
+        }
+
+        public EventComponent(EventComponentType type, IList<string> sp)
+        {
+            this.type = type;
+            stringParams = new List<string>(sp);
         }
 
         public EventComponent(EventComponentType type, string sp)
@@ -67,6 +76,29 @@ namespace TileEngine.Events
         {
             get { return intParam; }
             set { intParam = value; }
+        }
+
+        public bool BoolParam
+        {
+            get { return intParam != 0; }
+            set
+            {
+                if (value) intParam = 1;
+                else intParam = 0;
+            }
+        }
+
+        public IList<string> StringParams
+        {
+            get { return stringParams; }
+            set
+            {
+                stringParams.Clear();
+                if (value != null)
+                {
+                    stringParams.AddRange(value);
+                }
+            }
         }
 
         public int MapX
@@ -103,6 +135,83 @@ namespace TileEngine.Events
         {
             get { return mapSpawns; }
             set { mapSpawns = value; }
+        }
+
+        public string GetIniTypeString()
+        {
+            switch (type)
+            {
+                case EventComponentType.RequiresNotStatus:
+                    return "requires_not_status";
+                case EventComponentType.RequiresStatus:
+                    return "requires_status";
+                case EventComponentType.SetStatus:
+                    return "set_status";
+                case EventComponentType.UnsetStatus:
+                    return "unset_status";
+                default:
+                    return type.ToString().ToLowerInvariant();
+            }
+        }
+
+        public string ToIniString()
+        {
+            switch (type)
+            {
+                case EventComponentType.MapMod:
+                    string mm = "";
+                    foreach (var mapMod in mapMods)
+                    {
+                        mm += $"{mapMod.Layer},{mapMod.MapX},{mapMod.MapY},{mapMod.Value}";
+                        mm += ";";
+                    }
+                    mm = mm.TrimEnd(';');
+                    return mm;
+                case EventComponentType.Spawn:
+                    string sp = "";
+                    foreach (var spawn in mapSpawns)
+                    {
+                        sp += $"{spawn.Type},{spawn.MapX},{spawn.MapY}";
+                        sp += ";";
+                    }
+                    sp = sp.TrimEnd(';');
+                    return sp;
+                case EventComponentType.InterMap:
+                    return $"{stringParam},{mapX},{mapY}";
+                case EventComponentType.IntraMap:
+                    return $"{mapX},{mapY}";
+                case EventComponentType.SoundFX:
+                    if (mapX == -1 && mapY == -1)
+                    {
+                        return stringParam;
+                    }
+                    else
+                    {
+                        return $"{stringParam},{mapX},{mapY}";
+                    }
+                case EventComponentType.ShakyCam:
+                    return intParam.ToString();
+                case EventComponentType.Msg:
+                case EventComponentType.Tooltip:
+                case EventComponentType.Music:
+                    return stringParam;
+                case EventComponentType.Repeat:
+                case EventComponentType.Stash:
+                    return BoolParam ? "true" : "false";
+                case EventComponentType.RequiresStatus:
+                case EventComponentType.RequiresNotStatus:
+                case EventComponentType.SetStatus:
+                case EventComponentType.UnsetStatus:
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var s in stringParams)
+                    {
+                        sb.Append(s);
+                        sb.Append(",");
+                    }
+                    if (sb.Length > 1) sb.Length -= 1;
+                    return sb.ToString();
+            }
+            return "";
         }
 
         public override string ToString()
@@ -146,11 +255,23 @@ namespace TileEngine.Events
                 case EventComponentType.ShakyCam:
                     sb.Append(intParam);
                     break;
+                case EventComponentType.Repeat:
+                case EventComponentType.Stash:
+                    sb.Append(BoolParam ? "true" : "false");
+                    break;
                 case EventComponentType.Msg:
                 case EventComponentType.SoundFX:
                 case EventComponentType.Tooltip:
                 default:
-                    sb.Append(stringParam);
+                    if (stringParams != null && stringParams.Count > 0)
+                    {
+                        sb.Append(string.Join(",", stringParams));
+                    }
+                    else
+                    {
+                        sb.Append(stringParam);
+
+                    }
                     break;
             }
             return sb.ToString();

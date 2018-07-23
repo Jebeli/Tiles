@@ -36,6 +36,12 @@ namespace TileEngine.Events
         ShakyCam,
         Spawn,
         Music,
+        Repeat,
+        Stash,
+        RequiresStatus,
+        RequiresNotStatus,
+        SetStatus,
+        UnsetStatus,
         NPCHotspot
     }
 

@@ -109,23 +109,29 @@ namespace TileEngine.Entities
                     if (e != null)
                     {
                         //e.Summoner = eg.Summoner;
-                        SetEnemyPosition(e, eg);
-                        e.WayPoints = eg.WayPoints;
-                        if (eg.WanderRadius > 0)
+                        if (SetEnemyPosition(e, eg))
                         {
-                            e.Wander = true;
-                            e.SetWanderArea(eg.WanderRadius);
-                        }
-                        engine.EntityManager.AddEntity(e);
-                        int dir = eg.Direction;
-                        if (dir < 0) dir = Utils.Rand() % 7;
-                        if (e.InitAnimation(EntityStance.Spawning, dir))
-                        {
-                            Logger.Info("Enemy", $"{e.Name} (Level {e.Level}) spawned at {new FPoint(e.MapPosX, e.MapPosY)}");
+                            e.WayPoints = eg.WayPoints;
+                            if (eg.WanderRadius > 0)
+                            {
+                                e.Wander = true;
+                                e.SetWanderArea(eg.WanderRadius);
+                            }
+                            engine.EntityManager.AddEntity(e);
+                            int dir = eg.Direction;
+                            if (dir < 0) dir = Utils.Rand() % 7;
+                            if (e.InitAnimation(EntityStance.Spawning, dir))
+                            {
+                                Logger.Info("Enemy", $"{e.Name} (Level {e.Level}) spawned at {new FPoint(e.MapPosX, e.MapPosY)}");
+                            }
+                            else
+                            {
+                                Logger.Warn("Enemy", $"Could not load enemy animations {e.Name}");
+                            }
                         }
                         else
                         {
-                            Logger.Warn("Enemy", $"Could not load enemy animations {e.Name}");
+                            Logger.Warn("Enemy", $"Cold not place enemy {e.Name} at {new Rect(eg.PosX, eg.PosY, eg.Width, eg.Height)}");
                         }
                     }
                     else
@@ -174,12 +180,12 @@ namespace TileEngine.Entities
             return null;
         }
 
-        private void SetEnemyPosition(Entity ent, EnemyGroup eg)
+        private bool SetEnemyPosition(Entity ent, EnemyGroup eg)
         {
             int x = -1;
             int y = -1;
             int count = 0;
-            while (!engine.Collision.IsValidTile(x, y, MovementType.Normal, false) && count < 10)
+            while (!engine.Collision.IsValidTile(x, y, ent.MovementType, false) && count < 10)
             {
                 if (count == 0)
                 {
@@ -193,8 +199,13 @@ namespace TileEngine.Entities
                 }
                 count++;
             }
-            ent.MapPosX = x + 0.5f;
-            ent.MapPosY = y + 0.5f;
+            if (engine.Collision.IsValidTile(x, y, ent.MovementType, false))
+            {
+                ent.MapPosX = x + 0.5f;
+                ent.MapPosY = y + 0.5f;
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -24,5 +24,7 @@ namespace TileEngine.Savers
     {
         void Save(Map map, string fileId);
         void Save(TileSet tileSet, string fileId);
+        void Save(MapParallax parallax, string fileId);
+        bool FitsExtension(string fileId);
     }
 }

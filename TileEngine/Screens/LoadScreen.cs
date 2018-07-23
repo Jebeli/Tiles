@@ -60,7 +60,7 @@ namespace TileEngine.Screens
             Task.Run(() =>
             {
                 engine.LoadMap(mapLoadInfo.MapId, mapLoadInfo.PosX, mapLoadInfo.PosY);
-                engine.LoadPlayer(playerLoadInfo.EntityId, playerLoadInfo.PosX, playerLoadInfo.PosY);
+                engine.LoadPlayer(playerLoadInfo.EntityId, playerLoadInfo.PosX, playerLoadInfo.PosY, playerLoadInfo.Direction);
             });
         }
 

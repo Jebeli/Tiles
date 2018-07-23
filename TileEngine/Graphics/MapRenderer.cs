@@ -96,21 +96,55 @@ namespace TileEngine.Graphics
         {
             if (InitMapValues(map))
             {
+                RenderParallax(map, "");
                 CalculatePriosIso(renderList);
                 CalculatePriosIso(deadRenderList);
                 renderList.Sort();
                 deadRenderList.Sort();
                 RenderIso(map, renderList, deadRenderList);
+                if (gfx.DebugOptions.ShowGrid || gfx.DebugOptions.ShowTileCounter || gfx.DebugOptions.ShowCoordinates) RenderGrid(map);
+                if (gfx.DebugOptions.ShowHighlight) RenderHighlight(map);
+                if (gfx.DebugOptions.ShowSelected) RenderSelected(map);
+                if (gfx.DebugOptions.ShowEntities || gfx.DebugOptions.ShowPaths) RenderEntitiesPaths(map, gfx.DebugOptions.ShowEntities, gfx.DebugOptions.ShowPaths);
 
             }
         }
 
+        private void RenderEntitiesPaths(Map map, bool es, bool ps)
+        {
+            Color colorEntity = new Color(0, 255, 0, 255);
+            Color colorPath = new Color(0, 0, 255, 255);
+
+            int crossSize = tileHeight / 8;
+            foreach (var e in engine.EntityManager.Entities)
+            {
+                engine.Camera.MapToScreen(e.MapPosX, e.MapPosY, out int sX, out int sY);
+                if (es) DrawCross(sX, sY, crossSize, colorEntity);
+                if (ps) DrawPath(e.Path, crossSize, colorPath);
+            }
+
+        }
+
+        private void DrawPath(IList<FPoint> path, int crossSize, Color color)
+        {
+            if (path != null && path.Count > 0)
+            {
+                foreach (var p in path)
+                {
+                    engine.Camera.MapToScreen(p.X, p.Y, out int sX, out int sY);
+                    DrawCross(sX, sY, crossSize, color);
+                }
+            }
+        }
+
+        private void DrawCross(int x, int y, int crossSize, Color color)
+        {
+            gfx.DrawLine(x - crossSize, y, x + crossSize, y, color);
+            gfx.DrawLine(x, y - crossSize, x, y + crossSize, color);
+        }
+
         private void RenderIso(Map map, IList<RenderTextureRegion> r, IList<RenderTextureRegion> rDead)
         {
-            foreach (var pLayer in map.ParallaxLayers)
-            {
-                RenderParallax(map, pLayer);
-            }
             foreach (var layer in map.Layers)
             {
                 if (layer.ObjectLayer)
@@ -122,10 +156,7 @@ namespace TileEngine.Graphics
                 {
                     RenderIsoLayer(layer);
                 }
-                foreach(var pLayer in layer.ParallaxLayers)
-                {
-                    RenderParallax(map, pLayer);
-                }
+                RenderParallax(map, layer.Name);
             }
         }
 
@@ -280,7 +311,7 @@ namespace TileEngine.Graphics
 
                     if (drawNETile && !drawTile && drawnTiles[i, j] == 0)
                     {
-                        RenderTile(layer, layer[i , j ], tileNECenter.X, tileNECenter.Y);
+                        RenderTile(layer, layer[i, j], tileNECenter.X, tileNECenter.Y);
                         drawnTiles[i, j] = 1;
                     }
 
@@ -409,10 +440,10 @@ namespace TileEngine.Graphics
         public void OldRenderMap(Map map, IList<RenderTextureRegion> renderList, IList<RenderTextureRegion> deadRenderList)
         {
             InitRenderMap();
-            foreach (var pl in map.ParallaxLayers)
-            {
-                RenderParallax(map, pl);
-            }
+            //foreach (var pl in map.ParallaxLayers)
+            //{
+            //    RenderParallax(map, pl);
+            //}
             int index = 0;
             foreach (Layer layer in map.Layers)
             {
@@ -433,10 +464,10 @@ namespace TileEngine.Graphics
                     {
                         TileLoop(layer, RenderTile);
                     }
-                    foreach (var pl in layer.ParallaxLayers)
-                    {
-                        RenderParallax(map, pl);
-                    }
+                    //foreach (var pl in layer.ParallaxLayers)
+                    //{
+                    //    RenderParallax(map, pl);
+                    //}
                 }
                 index++;
             }
@@ -602,7 +633,7 @@ namespace TileEngine.Graphics
             int y = engine.Camera.SelectedTileY;
             if ((x >= 0) && (y >= 0))
             {
-                engine.Camera.MapToScreen(x, y, out int sX, out int sY, map.Orientation);
+                engine.Camera.MapToScreen(x, y + 1, out int sX, out int sY, map.Orientation);
                 gfx.DrawTileSelected(sX, sY, tileWidth, tileHeight, map.Orientation);
             }
         }
@@ -611,8 +642,19 @@ namespace TileEngine.Graphics
         {
             int x = engine.Camera.HoverTileX;
             int y = engine.Camera.HoverTileY;
-            engine.Camera.MapToScreen(x, y, out int sX, out int sY, map.Orientation);
+            engine.Camera.MapToScreen(x, y + 1, out int sX, out int sY, map.Orientation);
             gfx.DrawTileSelected(sX, sY, tileWidth, tileHeight, map.Orientation);
+        }
+
+        private void RenderParallax(Map map, string mapLayer)
+        {
+            if (map.Parallax != null)
+            {
+                foreach (var p in map.Parallax.GetMatchingLayers(mapLayer))
+                {
+                    RenderParallax(map, p);
+                }
+            }
         }
 
         private void RenderParallax(Map map, ParallaxLayer parallax)

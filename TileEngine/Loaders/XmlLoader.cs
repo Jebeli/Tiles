@@ -61,7 +61,7 @@ namespace TileEngine.Loaders
                             {
                                 type = FileType.TileSet;
                             }
-                            else if (root.Name.LocalName.Equals("tileset"))
+                            else if (root.Name.LocalName.Equals("parallax"))
                             {
                                 string pName = root.Attribute("name").Value;
                                 if (!string.IsNullOrEmpty(pName))
@@ -188,18 +188,25 @@ namespace TileEngine.Loaders
             int? height = (int?)root.Attribute("height");
             int? tileWidth = (int?)root.Attribute("tileWidth");
             int? tileHeight = (int?)root.Attribute("tileHeight");
+            int? startX = (int?)root.Attribute("startX");
+            int? startY = (int?)root.Attribute("startY");
+            string music = (string)root.Attribute("music");
             if (name != null && orientation != null && width != null && height != null && tileWidth != null && tileHeight != null)
             {
                 MapOrientation mapOrientation;
                 if (Enum.TryParse(orientation, true, out mapOrientation))
                 {
                     map = new Map(title, (int)width, (int)height, (int)tileWidth, (int)tileHeight, mapOrientation);
+                    map.MusicName = music;
+                    map.StartX = startX ?? ((int)width / 2);
+                    map.StartY = startY ?? ((int)height / 2);
                     foreach (var node in from item in root.Descendants("layer") select item)
                     {
                         string layerName = (string)node.Attribute("name");
                         int? layerWidth = (int?)node.Attribute("width");
                         int? layerHeight = (int?)node.Attribute("height");
                         bool? visible = (bool?)node.Attribute("visible");
+                        bool? objects = (bool?)node.Attribute("objects");
                         string tileSetName = (string)node.Attribute("tileset");
                         var data = node.Descendants().FirstOrDefault();
                         if (layerName != null && layerWidth != null && layerHeight != null && data != null && tileSetName != null)
@@ -211,6 +218,7 @@ namespace TileEngine.Loaders
                             {
                                 Layer layer = map.AddLayer(layerName);
                                 if (visible != null && visible == false) { layer.Visible = false; }
+                                if (objects != null && objects == true) { layer.ObjectLayer = true; }
                                 layer.TileSet = tileSet;
                                 if (encoding.Equals("csv", StringComparison.OrdinalIgnoreCase))
                                 {
@@ -218,6 +226,19 @@ namespace TileEngine.Loaders
                                 }
                             }
                         }
+                    }
+                    foreach (var node in from item in root.Descendants("npc") select item)
+                    {
+                        string npcName = (string)node.Attribute("name");
+                        string npcEntity = (string)node.Attribute("entity");
+                        int? posX = (int?)node.Attribute("posX");
+                        int? posY = (int?)node.Attribute("posY");
+                        if (npcName != null && npcEntity != null && posX != null && posY != null)
+                        {
+                            EntityLoadInfo npc = new EntityLoadInfo(npcName, npcEntity, (int)posX, (int)posY);
+                            map.AddLoadNPC(npc);
+                        }
+
                     }
                 }
             }
@@ -236,7 +257,8 @@ namespace TileEngine.Loaders
                 Texture tex = engine.GetTexture(image);
                 if (tex != null)
                 {
-                    ts = new TileSet(name, tex);
+                    ts = new TileSet(name);
+                    ts.AddImage(tex);
                     ts.TileWidth = (int)tileWidth;
                     ts.TileHeight = (int)tileHeight;
                     foreach (var node in from item in root.Descendants("tile") select item)

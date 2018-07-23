@@ -199,18 +199,28 @@ namespace SDLTiles
             }
             else
             {
+
                 SDL.SDL_SetRenderDrawBlendMode(game.ren, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
                 SDL.SDL_SetRenderDrawColor(game.ren, color.R, color.G, color.B, color.Alpha);
-                int x1 = x;
-                int x2 = x + width / 2;
-                int x3 = x + width;
-                int y1 = y;
-                int y2 = y + height / 2;
-                int y3 = y + height;
-                SDL.SDL_RenderDrawLine(game.ren, x1, y2, x2, y1);
-                SDL.SDL_RenderDrawLine(game.ren, x2, y1, x3, y2);
-                SDL.SDL_RenderDrawLine(game.ren, x3, y2, x2, y3);
-                SDL.SDL_RenderDrawLine(game.ren, x2, y3, x1, y2);
+                int leftX = x;
+                int leftY = y;
+                int topX = x + width / 2;
+                int topY = y - height / 2;
+                int rightX = x + width;
+                int rightY = y;
+                int bottomX = x + width / 2;
+                int bottomY = y + height / 2;
+
+                //int x1 = x;
+                //int x2 = x + width / 2;
+                //int x3 = x + width;
+                //int y1 = y;
+                //int y2 = y + height / 2;
+                //int y3 = y + height;
+                SDL.SDL_RenderDrawLine(game.ren, leftX, leftY, topX,topY);
+                SDL.SDL_RenderDrawLine(game.ren, topX, topY, rightX,rightY);
+                SDL.SDL_RenderDrawLine(game.ren, rightX, rightY, bottomX, bottomY);
+                SDL.SDL_RenderDrawLine(game.ren, bottomX, bottomY, leftX, leftY);
             }
         }
 

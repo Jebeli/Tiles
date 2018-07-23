@@ -34,11 +34,22 @@ namespace TileEngine
     using TileEngine.Entities;
     using TileEngine.Logging;
     using TileEngine.Audio;
+    using System.IO;
+
+    public enum EngineState
+    {
+        Run,
+        Pause,
+        Load,
+        Trace,
+        Done
+    }
 
     public class Engine : ITimeInfoProvider
     {
         private int maxFramesPerSecond = 60;
         private float interactRange = 2.5f;
+        private string saveFormtExtension = ".txt";
         private IFileResolver fileResolver;
         private IGraphics graphics;
         private ITimeInfoProvider timeProvider;
@@ -52,6 +63,7 @@ namespace TileEngine
         private EventManager eventManager;
         private EntityManager entityManager;
         private EnemyManager enemyManager;
+        private CampaignManager campaignManager;
         private IScreen currentScreen;
         private SplashScreen splashScreen;
         private TitleScreen titleScreen;
@@ -67,11 +79,12 @@ namespace TileEngine
         private FrameCounter frameCounter;
         private List<ILoader> loaders;
         private List<ISaver> savers;
-        private bool paused;
+        private EngineState state;
         private string playerName;
         private string playerId;
         private Entity player;
         private bool guiUsesMouse;
+
 
         public Engine(IFileResolver fileResolver, IGraphics graphics, IFontEngine fonts, ISounds sounds = null)
         {
@@ -89,6 +102,7 @@ namespace TileEngine
             eventManager = new EventManager(this);
             entityManager = new EntityManager(this);
             enemyManager = new EnemyManager(this);
+            campaignManager = new CampaignManager();
             currentScreen = new NullScreen(this);
             mapScreen = new MapScreen(this);
             loadScreen = new LoadScreen(this);
@@ -103,6 +117,7 @@ namespace TileEngine
             loaders.Add(new XmlLoader(this));
             loaders.Add(new IniLoader(this));
             savers = new List<ISaver>();
+            savers.Add(new IniSaver(this));
             savers.Add(new XmlSaver(this));
             nextEnemyTemplates = new List<string>();
         }
@@ -178,6 +193,11 @@ namespace TileEngine
             get { return enemyManager; }
         }
 
+        public CampaignManager CampaignManager
+        {
+            get { return campaignManager; }
+        }
+
         public MapScreen MapScreen
         {
             get { return mapScreen; }
@@ -207,12 +227,27 @@ namespace TileEngine
 
         public bool IsRunning
         {
-            get { return !paused; }
+            get { return state == EngineState.Run; }
         }
 
         public bool IsPaused
         {
-            get { return paused; }
+            get { return state == EngineState.Pause; }
+        }
+
+        public bool IsLoading
+        {
+            get { return state == EngineState.Load; }
+        }
+
+        public bool IsTracing
+        {
+            get { return state == EngineState.Trace; }
+        }
+
+        public bool IsDone
+        {
+            get { return state == EngineState.Done; }
         }
 
         public int FPS
@@ -268,7 +303,6 @@ namespace TileEngine
         {
             if (time.ElapsedGameTime.TotalSeconds >= FrameRate)
             {
-                map.Update(time);
                 currentScreen.Update(time);
                 return true;
             }
@@ -323,7 +357,8 @@ namespace TileEngine
                     Texture tex = GetTexture(tilesetId);
                     if (tex != null)
                     {
-                        tileSet = new TileSet(tilesetId, tex);
+                        tileSet = new TileSet(tilesetId);
+                        tileSet.AddImage(tex);
                         tileSetManager.Add(tileSet);
                     }
                 }
@@ -383,11 +418,13 @@ namespace TileEngine
             string icoName = fileResolver.Resolve(@"fonts/entypo.ttf");
             string tpzName = fileResolver.Resolve(@"fonts/Topaz.ttf");
             fonts.Init(defName, 12, tpzName, 12, icoName, 16);
+            state = EngineState.Run;
             SwitchToSplashScreen();
         }
 
         public void Exit()
         {
+            state = EngineState.Done;
             graphics.ExitRequested();
         }
 
@@ -413,6 +450,7 @@ namespace TileEngine
 
         public void SwitchToLoadScreen()
         {
+            nextPlayer.Direction = player != null ? player.Direction : -1;
             loadScreen.MapLoadInfo = nextMap;
             loadScreen.PlayerLoadInfo = nextPlayer;
             SetScreen(loadScreen);
@@ -428,16 +466,16 @@ namespace TileEngine
             nextMap = new MapLoadInfo(name, posX, posY);
         }
 
-        public void SetNextPlayer(string pname, string name, int posX = -1, int posY = -1)
+        public void SetNextPlayer(string pname, string name, int posX = -1, int posY = -1, int dir = -1)
         {
             playerName = pname;
             playerId = name;
-            nextPlayer = new EntityLoadInfo(playerName, playerId, posX, posY);
+            nextPlayer = new EntityLoadInfo(playerName, playerId, posX, posY, dir);
         }
 
         public void ResetNextPlayer()
         {
-            SetNextPlayer(playerName, playerId, -1, -1);
+            SetNextPlayer(playerName, playerId, -1, -1, -1);
         }
 
         public void SetMap(Map map, int posX = -1, int posY = -1)
@@ -468,11 +506,11 @@ namespace TileEngine
                     if (map != null)
                     {
                         map.FileName = fileResolver.Resolve(mapId);
-                        if (!map.HasLayer("buildings"))
-                        {
-                            Layer layer = map.AddLayer("buildings");
-                            layer.TileSet = MapFactory.MakeMediTileSet(this);
-                        }
+                        //if (!map.HasLayer("buildings"))
+                        //{
+                        //    Layer layer = map.AddLayer("buildings");
+                        //    layer.TileSet = MapFactory.MakeMediTileSet(this);
+                        //}
                         SetMap(map, posX, posY);
                         OnMapLoaded(map);
                         break;
@@ -572,7 +610,7 @@ namespace TileEngine
             return enemy;
         }
 
-        public Entity LoadPlayer(string fileId, int posX = -1, int posY = -1)
+        public Entity LoadPlayer(string fileId, int posX = -1, int posY = -1, int dir = -1)
         {
             player = LoadEntity(fileId);
             if (player != null)
@@ -591,6 +629,8 @@ namespace TileEngine
                 player.TrackWithCamera = true;
                 player.MoveWithMouse = true;
                 player.TriggersEvents = true;
+                if (dir >= 0)
+                    player.Direction = dir;
                 entityManager.AddEntity(player);
                 OnPlayerLoaded(player);
             }
@@ -599,30 +639,75 @@ namespace TileEngine
 
         public void PlayMusic(string name)
         {
-            Music music = GetMusic(name);
-            sounds.PlayMusic(music);
+            if (!string.IsNullOrEmpty(name))
+            {
+                Music music = GetMusic(name);
+                sounds.PlayMusic(music);
+            }
+        }
+
+        private ISaver GetSaver(string fileId)
+        {
+            foreach (ISaver saver in savers)
+            {
+                if (saver.FitsExtension(fileId))
+                {
+                    return saver;
+                }
+            }
+            return null;
+        }
+
+        private string AdjustFileName(string fileId)
+        {
+            //string ext = Path.GetExtension(fileId);
+            string temp = Path.ChangeExtension(fileId, "").TrimEnd('.');
+            temp += "_1.";
+            return Path.ChangeExtension(temp, saveFormtExtension);
         }
 
         public void SaveTileSet(TileSet tileSet, string fileId = null)
         {
+            if (tileSet == null) return;
             if (fileId == null) fileId = tileSet.Name;
-            fileId = fileId.Replace(".txt", ".xml");
-            foreach (ISaver saver in savers)
+            fileId = AdjustFileName(fileId);
+            ISaver saver = GetSaver(fileId);
+            if (saver != null)
             {
                 saver.Save(tileSet, fileId);
-                break;
+            }
+        }
+
+        public void SaveParallax(MapParallax parallax, string fileId = null)
+        {
+            if (parallax == null) return;
+            if (fileId == null) fileId = parallax.Name;
+            fileId = AdjustFileName(fileId);
+            ISaver saver = GetSaver(fileId);
+            if (saver != null)
+            {
+                saver.Save(parallax, fileId);
             }
         }
 
         public void SaveMap(Map map, string fileId = null)
         {
-            if (fileId == null) fileId = map.Name;
-            fileId = fileId.Replace(".txt", ".xml");
-            foreach (ISaver saver in savers)
+            if (map == null) return;
+            if (fileId == null) fileId = map.FileName;
+            fileId = AdjustFileName(fileId);
+            ISaver saver = GetSaver(fileId);
+            if (saver != null)
             {
                 saver.Save(map, fileId);
-                break;
             }
+        }
+
+        public void FullSaveMap(Map map, string fileId = null)
+        {
+            if (map == null) return;
+            SaveMap(map, fileId);
+            SaveTileSet(map.TileSet);
+            SaveParallax(map.Parallax);
         }
 
         public bool CanExecuteEvent(Event evt)
@@ -634,6 +719,15 @@ namespace TileEngine
         {
             switch (ec.Type)
             {
+                case EventComponentType.Repeat:
+                    if (!ec.BoolParam) { evt.RemoveNow = true; }
+                    break;
+                case EventComponentType.Stash:
+                    if (ec.BoolParam)
+                    {
+
+                    }
+                    break;
                 case EventComponentType.InterMap:
                     if (TravelTo(ec.StringParam, ec.MapX, ec.MapY))
                     {
@@ -657,6 +751,9 @@ namespace TileEngine
                     {
                         enemyManager.SpawnMapSpawn(spawn);
                     }
+                    break;
+                case EventComponentType.ShakyCam:
+                    camera.ShakyCamTicks = ec.IntParam;
                     break;
                 case EventComponentType.Music:
                     PlayMusic(ec.StringParam);
@@ -687,11 +784,18 @@ namespace TileEngine
                         sounds.PlaySound(sound, pos, loop);
                     }
                     break;
+                case EventComponentType.SetStatus:
+                    campaignManager.SetStatus(ec.StringParams);
+                    break;
+                case EventComponentType.UnsetStatus:
+                    campaignManager.UnsetStatus(ec.StringParams);
+                    break;
             }
         }
 
         public bool TravelTo(string mapName, int posX, int posY)
         {
+            player.Stop();
             SetNextMap(mapName, posX, posY);
             SetNextPlayer(playerName, playerId, posX, posY);
             SwitchToLoadScreen();
@@ -700,6 +804,7 @@ namespace TileEngine
 
         public bool TeleportTo(int posX, int posY)
         {
+            player.Stop();
             map.Collision.Unblock(player.MapPosX, player.MapPosY);
             player.MapPosX = posX + 0.5f;
             player.MapPosY = posY + 0.5f;
@@ -816,7 +921,7 @@ namespace TileEngine
             {
                 eventManager.AddEvent(info);
             }
-            map.ClearLoadEvents();
+            //map.ClearLoadEvents();
         }
 
         private void TransferNPCs(Map map)
@@ -830,7 +935,7 @@ namespace TileEngine
                     CreateNPCEvent(npc);
                 }
             }
-            map.ClearLoadNPCs();
+            //map.ClearLoadNPCs();
         }
 
         private void TransferEnemyGroups(Map map)
@@ -840,7 +945,7 @@ namespace TileEngine
                 enemyManager.AddEnemyGroup(eg);
             }
             enemyManager.SpwanEnemies();
-            map.ClearEnemyGroups();
+            //map.ClearEnemyGroups();
         }
 
         private void CreateNPCEvent(Entity npc)

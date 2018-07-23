@@ -40,6 +40,15 @@ namespace TileEngine.Loaders
             return def;
         }
 
+        public static bool ToBoolValue(this string v, bool def = true)
+        {
+            if (v.Equals("false", StringComparison.OrdinalIgnoreCase)) return false;
+            if (v.Equals("true", StringComparison.OrdinalIgnoreCase)) return true;
+            if (v.Equals("0", StringComparison.OrdinalIgnoreCase)) return false;
+            if (v.Equals("1", StringComparison.OrdinalIgnoreCase)) return true;
+            return def;
+        }
+
         public static int[] ToIntValues(this string v)
         {
             List<int> list = new List<int>();

@@ -33,6 +33,8 @@ namespace TileEngine.Graphics
         private int halfViewHeight;
         private float unitsPerPixelX;
         private float unitsPerPixelY;
+        private float shakyCamX;
+        private float shakyCamY;
         private float cameraX;
         private float cameraY;
         private int hoverTileX;
@@ -40,12 +42,14 @@ namespace TileEngine.Graphics
         private int clickTileX;
         private int clickTileY;
         private bool mapClicked;
+        private bool mapClickDone;
         private int selectedTileX;
         private int selectedTileY;
         private float cameraSpeed;
         private bool immediateCamera;
         private Map map;
         private MapOrientation orientation;
+        private int shakyCamTicks;
 
         public Camera(Engine engine, Map map, int posX = -1, int posY = -1)
         {
@@ -179,15 +183,54 @@ namespace TileEngine.Graphics
         public bool MapClicked
         {
             get { return mapClicked; }
-            set { mapClicked = value; }
+            set
+            {
+                mapClicked = value;
+                if (value) mapClickDone = false;
+            }
+        }
+
+        public bool MapClickDone
+        {
+            get { return mapClickDone; }
+            set { mapClickDone = value; }
+        }
+
+        public int ShakyCamTicks
+        {
+            get { return shakyCamTicks; }
+            set { shakyCamTicks = value; }
+        }
+
+        public void Update()
+        {
+            if (shakyCamTicks > 0) shakyCamTicks--;
+            if (shakyCamTicks > 0)
+            {
+                shakyCamX = cameraX + (Utils.Rand() % 16 - 8) * 0.0078125f;
+                shakyCamY = cameraY + (Utils.Rand() % 16 - 8) * 0.0078125f;
+            }
+            else
+            {
+                shakyCamX = cameraX;
+                shakyCamY = cameraY;
+            }
+            if (mapClickDone)
+            {
+                mapClicked = false;
+            }
         }
 
         public void SetPosition(float posX, float posY)
         {
-            cameraX = posX;
-            cameraY = posY;
-            Utils.CleanFloat(ref cameraX);
-            Utils.CleanFloat(ref cameraY);
+            if (cameraX != posX || cameraY != posY)
+            {
+                cameraX = posX;
+                cameraY = posY;
+                Utils.CleanFloat(ref cameraX);
+                Utils.CleanFloat(ref cameraY);
+                Update();
+            }
         }
 
         public void SetMapPosition(float mapX, float mapY)
@@ -287,12 +330,12 @@ namespace TileEngine.Graphics
 
         public void MapToScreen(float mapX, float mapY, out int screenX, out int screenY, MapOrientation orientation)
         {
-            MapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY, orientation);
+            MapToScreen(mapX, mapY, shakyCamX, shakyCamY, out screenX, out screenY, orientation);
         }
 
         public void OrthoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            OrthoMapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY);
+            OrthoMapToScreen(mapX, mapY, shakyCamX, shakyCamY, out screenX, out screenY);
         }
 
         public void OrthoMapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY)
@@ -305,7 +348,7 @@ namespace TileEngine.Graphics
 
         public void OrthoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            OrthoScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY);
+            OrthoScreenToMap(screenX, screenY, shakyCamX, shakyCamY, out mapX, out mapY);
         }
 
         public void OrthoScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
@@ -316,7 +359,7 @@ namespace TileEngine.Graphics
 
         public void IsoScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            IsoScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY);
+            IsoScreenToMap(screenX, screenY, shakyCamX, shakyCamY, out mapX, out mapY);
         }
 
         public void IsoScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
@@ -329,7 +372,7 @@ namespace TileEngine.Graphics
 
         public void IsoMapToScreen(float mapX, float mapY, out int screenX, out int screenY)
         {
-            IsoMapToScreen(mapX, mapY, cameraX, cameraY, out screenX, out screenY);
+            IsoMapToScreen(mapX, mapY, shakyCamX, shakyCamY, out screenX, out screenY);
         }
 
         public void IsoMapToScreen(float mapX, float mapY, float camX, float camY, out int screenX, out int screenY)
@@ -342,7 +385,7 @@ namespace TileEngine.Graphics
 
         public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY)
         {
-            ScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY, orientation);
+            ScreenToMap(screenX, screenY, shakyCamX, shakyCamY, out mapX, out mapY, orientation);
         }
 
         public void ScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY)
@@ -352,7 +395,7 @@ namespace TileEngine.Graphics
 
         public void ScreenToMap(float screenX, float screenY, out float mapX, out float mapY, MapOrientation orientation)
         {
-            ScreenToMap(screenX, screenY, cameraX, cameraY, out mapX, out mapY, orientation);
+            ScreenToMap(screenX, screenY, shakyCamX, shakyCamY, out mapX, out mapY, orientation);
         }
 
         public void ScreenToMap(float screenX, float screenY, float camX, float camY, out float mapX, out float mapY, MapOrientation orientation)

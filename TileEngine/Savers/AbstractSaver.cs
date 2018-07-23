@@ -19,21 +19,49 @@ Tiles.  If not, see http://www.gnu.org/licenses/
 namespace TileEngine.Savers
 {
     using Maps;
+    using System;
+    using System.Collections.Generic;
     using System.IO;
 
     public abstract class AbstractSaver : ISaver
     {
         protected Engine engine;
-        public AbstractSaver(Engine engine)
+        protected List<string> extensions;
+
+        public AbstractSaver(Engine engine, params string[] exts)
         {
             this.engine = engine;
+            extensions = new List<string>();
+            foreach (string ext in exts) AddExtension(ext);
+
+
         }
         public abstract void Save(Map map, string fileId);
+
         public abstract void Save(TileSet tileSet, string fileId);
+
+        public abstract void Save(MapParallax parallax, string fileId);
+
+        public bool FitsExtension(string fileId)
+        {
+            foreach (string ext in extensions)
+            {
+                if (fileId.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         protected Stream GetOutputStream(string fileId)
         {
             return engine.FileResolver.CreateFile(fileId);
+        }
+
+        protected void AddExtension(string ext)
+        {
+            extensions.Add(ext);
         }
 
         protected abstract string AdjustName(string fileId);

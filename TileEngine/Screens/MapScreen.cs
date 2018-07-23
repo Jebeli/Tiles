@@ -76,11 +76,7 @@ namespace TileEngine.Screens
             {
                 GadgetUpEvent = (o, i) =>
                 {
-                    engine.SaveMap(engine.Map);
-                    foreach (var layer in engine.Map.Layers)
-                    {
-                        engine.SaveTileSet(layer.TileSet);
-                    }
+                    engine.FullSaveMap(engine.Map);
                 }
             };
             new ButtonGadget(window, "Options")
@@ -103,11 +99,11 @@ namespace TileEngine.Screens
 
         public override void Show()
         {
-            if (engine.Map != null)
-            {
-                BackgroundColor = engine.Map.BackgroundColor;
-                engine.EventManager.ExecuteOnMapLoadEvents();
-            }
+            //if (engine.Map != null)
+            //{
+            BackgroundColor = engine.Map.BackgroundColor;
+            engine.EventManager.ExecuteOnMapLoadEvents();
+            //}
             HideEditor();
             base.Show();
         }
@@ -115,14 +111,17 @@ namespace TileEngine.Screens
         public override void Hide()
         {
             base.Hide();
-            if (engine.Map != null)
-            {
-                engine.EventManager.ExecuteOnMapExitEvents();
-            }
+            //if (engine.Map != null)
+            //{
+            engine.EventManager.ExecuteOnMapExitEvents();
+            //}
         }
+
         public override void Update(TimeInfo time)
         {
             base.Update(time);
+            engine.Map.Update(time);
+            engine.Camera.Update();
             engine.EventManager.Update(time);
             engine.EntityManager.Update(time);
             engine.Sounds.Update(new FPoint(engine.Camera.CameraX, engine.Camera.CameraY));
@@ -270,6 +269,9 @@ namespace TileEngine.Screens
                 engine.Camera.SelectedTileX = x;
                 engine.Camera.SelectedTileY = y;
                 editor.SetTile(engine.Map, x, y);
+                engine.Graphics.DebugOptions.ShowHighlight = true;
+                engine.Graphics.DebugOptions.ShowEntities = true;
+                engine.Graphics.DebugOptions.ShowPaths = true;
                 screen.ShowWindow(editor);
                 screen.WindowToFront(editor);
                 screen.ActivateWindow(editor);
@@ -317,54 +319,57 @@ namespace TileEngine.Screens
             private void Init(Map map)
             {
                 this.map = map;
-                foreach (var pl in map.GetAllParallaxLayers())
+                if (map.Parallax != null)
                 {
-                    new LabelGadget(this, "Parallax " + pl.Texture.Name);
-                    var bl = new BoxGadget(this, Orientation.Horizontal);
-                    new LabelGadget(bl, "Speed:")
+                    foreach (var pl in map.Parallax.Layers)
                     {
-                        FixedWidth = 100
-                    };
-                    new NumericalGadget(bl)
-                    {
-                        Increment = 0.01,
-                        DoubleValue = pl.Speed,
-                        FixedWidth = 100,
-                        GadgetUpEvent = (o, i) =>
+                        new LabelGadget(this, "Parallax " + pl.Texture.Name);
+                        var bl = new BoxGadget(this, Orientation.Horizontal);
+                        new LabelGadget(bl, "Speed:")
                         {
-                            pl.Speed = (float)((NumericalGadget)o).DoubleValue;
-                        }
-                    };
-                    var blX = new BoxGadget(this, Orientation.Horizontal);
-                    new LabelGadget(blX, "Fixed Speed X:")
-                    {
-                        FixedWidth = 100
-                    };
-                    new NumericalGadget(blX)
-                    {
-                        Increment = 0.01,
-                        DoubleValue = pl.FixedSpeedX,
-                        FixedWidth = 100,
-                        GadgetUpEvent = (o, i) =>
+                            FixedWidth = 100
+                        };
+                        new NumericalGadget(bl)
                         {
-                            pl.FixedSpeedX = (float)((NumericalGadget)o).DoubleValue;
-                        }
-                    };
-                    var blY = new BoxGadget(this, Orientation.Horizontal);
-                    new LabelGadget(blY, "Fixed Speed Y:")
-                    {
-                        FixedWidth = 100
-                    };
-                    new NumericalGadget(blY)
-                    {
-                        Increment = 0.01,
-                        DoubleValue = pl.FixedSpeedY,
-                        FixedWidth = 100,
-                        GadgetUpEvent = (o, i) =>
+                            Increment = 0.01,
+                            DoubleValue = pl.Speed,
+                            FixedWidth = 100,
+                            GadgetUpEvent = (o, i) =>
+                            {
+                                pl.Speed = (float)((NumericalGadget)o).DoubleValue;
+                            }
+                        };
+                        var blX = new BoxGadget(this, Orientation.Horizontal);
+                        new LabelGadget(blX, "Fixed Speed X:")
                         {
-                            pl.FixedSpeedY = (float)((NumericalGadget)o).DoubleValue;
-                        }
-                    };
+                            FixedWidth = 100
+                        };
+                        new NumericalGadget(blX)
+                        {
+                            Increment = 0.01,
+                            DoubleValue = pl.FixedSpeedX,
+                            FixedWidth = 100,
+                            GadgetUpEvent = (o, i) =>
+                            {
+                                pl.FixedSpeedX = (float)((NumericalGadget)o).DoubleValue;
+                            }
+                        };
+                        var blY = new BoxGadget(this, Orientation.Horizontal);
+                        new LabelGadget(blY, "Fixed Speed Y:")
+                        {
+                            FixedWidth = 100
+                        };
+                        new NumericalGadget(blY)
+                        {
+                            Increment = 0.01,
+                            DoubleValue = pl.FixedSpeedY,
+                            FixedWidth = 100,
+                            GadgetUpEvent = (o, i) =>
+                            {
+                                pl.FixedSpeedY = (float)((NumericalGadget)o).DoubleValue;
+                            }
+                        };
+                    }
                 }
             }
         }

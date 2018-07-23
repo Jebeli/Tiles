@@ -24,6 +24,8 @@ namespace TileEngine.Graphics
         private bool showCoordinates;
         private bool showHighlight;
         private bool showSelected;
+        private bool showEntities;
+        private bool showPaths;
 
         public bool ShowGrid
         {
@@ -53,6 +55,18 @@ namespace TileEngine.Graphics
         {
             get { return showCoordinates; }
             set { showCoordinates = value; }
+        }
+
+        public bool ShowEntities
+        {
+            get { return showEntities; }
+            set { showEntities = value; }
+        }
+
+        public bool ShowPaths
+        {
+            get { return showPaths; }
+            set { showPaths = value; }
         }
     }
 }

@@ -142,5 +142,10 @@ namespace TileEngine.Graphics
         {
             get { return new Color(255, 69, 0); }
         }
+
+        public string ToIniString()
+        {
+            return $"{r},{g},{b},{a}";
+        }
     }
 }

@@ -39,6 +39,7 @@
     <Compile Include="Audio\Music.cs" />
     <Compile Include="Audio\NoSounds.cs" />
     <Compile Include="Audio\Sound.cs" />
+    <Compile Include="Core\CampaignManager.cs" />
     <Compile Include="Core\EngineEvents.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Core\FPoint.cs" />
@@ -116,7 +117,9 @@
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="Savers\AbstractSaver.cs" />
+    <Compile Include="Savers\IniSaver.cs" />
     <Compile Include="Savers\ISaver.cs" />
+    <Compile Include="Savers\SaverExtensions.cs" />
     <Compile Include="Savers\XmlSaver.cs" />
     <Compile Include="Screens\AbstractScreen.cs" />
     <Compile Include="Screens\ExitScreen.cs" />

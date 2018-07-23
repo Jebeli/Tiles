@@ -30,12 +30,37 @@ namespace TileEngine.Entities
     {
         private Engine engine;
         private List<Entity> entities;
+        private Entity selectedEntity;
         private Entity selectedEnemy;
 
         public EntityManager(Engine engine)
         {
             this.engine = engine;
             entities = new List<Entity>();
+        }
+
+        public Entity SelectedEntity
+        {
+            get { return selectedEntity; }
+            set
+            {
+                if (selectedEntity != value)
+                {
+                    if (selectedEntity != null)
+                    {
+
+                    }
+                    selectedEntity = value;
+                    if (selectedEntity != null)
+                    {
+                        Logger.Info("Entity", $"{selectedEntity.Name} selected");
+                    }
+                    else
+                    {
+                        Logger.Info("Entity", $"none selected");
+                    }
+                }
+            }
         }
 
         public Entity SelectedEnemy
@@ -52,7 +77,11 @@ namespace TileEngine.Entities
                     selectedEnemy = value;
                     if (selectedEnemy != null)
                     {
-                        Logger.Info("Entity", $"{selectedEnemy.Name} selected");
+                        Logger.Info("Enemy", $"{selectedEnemy.Name} selected");
+                    }
+                    else
+                    {
+                        Logger.Info("Enemy", $"none selected");
                     }
                 }
             }
@@ -69,6 +98,8 @@ namespace TileEngine.Entities
         public void Clear()
         {
             entities.Clear();
+            selectedEntity = null;
+            selectedEnemy = null;
         }
 
         public void Update(TimeInfo time)
@@ -80,8 +111,14 @@ namespace TileEngine.Entities
             HandleHoverSelection();
         }
 
+        public IEnumerable<Entity> Entities
+        {
+            get { return GetVisibleEntities(); }
+        }
+
         private void HandleHoverSelection()
         {
+            SelectedEntity = GetEntityAt(engine.Input.ScaledMouseX, engine.Input.ScaledMouseY);
             SelectedEnemy = GetEnemyAt(engine.Input.ScaledMouseX, engine.Input.ScaledMouseY);
         }
 
@@ -104,6 +141,11 @@ namespace TileEngine.Entities
                 }
             }
             return list;
+        }
+
+        public Entity GetEntityAt(float mx, float my)
+        {
+            return GetEntityAt(mx, my, GetVisibleEntities());
         }
 
         public Entity GetEnemyAt(float mx, float my)

@@ -22,13 +22,15 @@ namespace TileEngine.Maps
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using TileEngine.Core;
 
-    public class MapParallax
+    public class MapParallax : NamedObject
     {
 
         private List<ParallaxLayer> layers;
 
-        public MapParallax()
+        public MapParallax(string name)
+            : base(name)
         {
             layers = new List<ParallaxLayer>();
         }
@@ -38,9 +40,37 @@ namespace TileEngine.Maps
             get { return layers; }
         }
 
+        public IList<ParallaxLayer> GetMatchingLayers(string mapLayer)
+        {
+            List<ParallaxLayer> list = new List<ParallaxLayer>();
+            foreach (var layer in layers)
+            {
+                if (string.IsNullOrEmpty(mapLayer))
+                {
+                    if (string.IsNullOrEmpty(layer.MapLayer))
+                    {
+                        list.Add(layer);
+                    }
+                }
+                else if (mapLayer.Equals(layer.MapLayer, StringComparison.OrdinalIgnoreCase))
+                {
+                    list.Add(layer);
+                }
+            }
+            return list;
+        }
+
         public void AddLayer(ParallaxLayer layer)
         {
             layers.Add(layer);
+        }
+
+        public void Update()
+        {
+            foreach (var layer in layers)
+            {
+                layer.Update();
+            }
         }
     }
 }

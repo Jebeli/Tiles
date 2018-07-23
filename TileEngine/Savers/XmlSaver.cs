@@ -26,7 +26,7 @@ namespace TileEngine.Savers
     public class XmlSaver : AbstractSaver
     {
         public XmlSaver(Engine engine)
-            : base(engine)
+            : base(engine, ".xml")
         {
         }
 
@@ -46,6 +46,9 @@ namespace TileEngine.Savers
                 writer.WriteAttributeString("height", map.Height.ToString());
                 writer.WriteAttributeString("tileWidth", map.TileWidth.ToString());
                 writer.WriteAttributeString("tileHeight", map.TileHeight.ToString());
+                writer.WriteAttributeString("startX", map.StartX.ToString());
+                writer.WriteAttributeString("startY", map.StartY.ToString());
+                writer.WriteAttributeString("music", map.MusicName);
                 foreach (Layer layer in map.Layers)
                 {
                     writer.WriteStartElement("layer");
@@ -54,10 +57,44 @@ namespace TileEngine.Savers
                     writer.WriteAttributeString("height", layer.Height.ToString());
                     writer.WriteAttributeString("tileset", AdjustName(layer.TileSet.Name));
                     writer.WriteAttributeString("visible", layer.Visible.ToString().ToLowerInvariant());
+                    writer.WriteAttributeString("objects", layer.ObjectLayer.ToString().ToLowerInvariant());
                     writer.WriteStartElement("data");
                     writer.WriteAttributeString("encoding", "csv");
                     writer.WriteString(layer.GetCSV());
                     writer.WriteEndElement();
+                    writer.WriteEndElement();
+                }
+                foreach (var npc in map.LoadNPCs)
+                {
+                    writer.WriteStartElement("npc");
+                    writer.WriteAttributeString("name", npc.Name);
+                    writer.WriteAttributeString("entity", npc.EntityId);
+                    writer.WriteAttributeString("posX", npc.PosX.ToString());
+                    writer.WriteAttributeString("posY", npc.PosY.ToString());
+                    writer.WriteEndElement();
+                }
+                foreach (var evt in map.LoadEvents)
+                {
+                    writer.WriteStartElement("event");
+                    writer.WriteAttributeString("name", evt.Name);
+                    writer.WriteAttributeString("type", evt.Type.ToString());
+                    writer.WriteAttributeString("location", GetLocationString(evt.PosX, evt.PosY, evt.Width, evt.Height));
+                    if (evt.HotSpot)
+                    {
+                        if (evt.HotPosX == evt.PosX && evt.HotPosY == evt.PosY && evt.HotWidth == evt.Width && evt.HotHeight == evt.HotHeight)
+                        {
+                            writer.WriteAttributeString("hotspot", "location");
+                        }
+                        else
+                        {
+                            writer.WriteAttributeString("hotspot", GetLocationString(evt.HotPosX, evt.HotPosY, evt.HotWidth, evt.HotHeight));
+                        }
+                    }
+                    if (evt.Cooldown > 0) { writer.WriteAttributeString("cooldown", evt.Cooldown.ToString()); }
+                    foreach (var ec in evt.Components)
+                    {
+
+                    }
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
@@ -117,10 +154,20 @@ namespace TileEngine.Savers
             }
         }
 
+        public override void Save(MapParallax parallax, string fileId)
+        {
+            
+        }
+
         protected override string AdjustName(string fileId)
         {
             fileId = Path.GetFileName(fileId);
             return fileId.Replace(".txt", ".xml");
+        }
+
+        private static string GetLocationString(int x, int y, int width, int height)
+        {
+            return $"{x},{y},{width},{height}";
         }
     }
 }

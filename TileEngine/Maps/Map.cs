@@ -44,7 +44,7 @@ namespace TileEngine.Maps
         private int width;
         private int height;
         private IList<Layer> layers;
-        private IList<ParallaxLayer> parallaxLayers;
+        private MapParallax parallax;
         private EventLayer eventLayer;
         private MapCollision collision;
         private MapOrientation orientation;
@@ -62,7 +62,6 @@ namespace TileEngine.Maps
             : base(name)
         {
             backgroundColor = new Color(0, 0, 0, 255);
-            parallaxLayers = new List<ParallaxLayer>();
             this.width = width;
             this.height = height;
             this.tileWidth = tileWidth;
@@ -97,6 +96,36 @@ namespace TileEngine.Maps
         {
             get { return musicName; }
             set { musicName = value; }
+        }
+
+        public string TileSetName
+        {
+            get
+            {
+                foreach (var layer in layers)
+                {
+                    if (layer.TileSet != null)
+                    {
+                        return layer.TileSet.Name;
+                    }
+                }
+                return "";
+            }
+        }
+
+        public TileSet TileSet
+        {
+            get
+            {
+                foreach (var layer in layers)
+                {
+                    if (layer.TileSet != null)
+                    {
+                        return layer.TileSet;
+                    }
+                }
+                return null;
+            }
         }
 
         public Color BackgroundColor
@@ -164,37 +193,7 @@ namespace TileEngine.Maps
 
         public void AddMapParallax(MapParallax parallax)
         {
-            parallaxLayers.Clear();
-            foreach (var layer in layers)
-            {
-                layer.ParallaxLayers.Clear();
-            }
-            if (parallax != null)
-            {
-                foreach (var pl in parallax.Layers)
-                {
-                    var layer = GetLayer(pl.MapLayer);
-                    if (layer != null)
-                    {
-                        layer.ParallaxLayers.Add(pl);
-                    }
-                    else
-                    {
-                        parallaxLayers.Add(pl);
-                    }
-                }
-            }
-        }
-
-        public IList<ParallaxLayer> GetAllParallaxLayers()
-        {
-            List<ParallaxLayer> list = new List<ParallaxLayer>();
-            list.AddRange(parallaxLayers);
-            foreach (var l in layers)
-            {
-                list.AddRange(l.ParallaxLayers);
-            }
-            return list;
+            this.parallax = parallax;
         }
 
         public void InvalidateRenderLists()
@@ -221,6 +220,11 @@ namespace TileEngine.Maps
             get { return collision; }
         }
 
+        public MapParallax Parallax
+        {
+            get { return parallax; }
+        }
+
         public int TileWidth
         {
             get { return tileWidth; }
@@ -235,10 +239,7 @@ namespace TileEngine.Maps
 
         public void Update(TimeInfo time)
         {
-            foreach (var pl in parallaxLayers)
-            {
-                pl.Update();
-            }
+            parallax?.Update();
             foreach (var l in layers)
             {
                 l.Update(time);
@@ -306,11 +307,6 @@ namespace TileEngine.Maps
         public IEnumerable<Layer> Layers
         {
             get { return layers; }
-        }
-
-        public IEnumerable<ParallaxLayer> ParallaxLayers
-        {
-            get { return parallaxLayers; }
         }
 
         public IList<Event> GetEventsAt(int x, int y)

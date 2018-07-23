@@ -313,13 +313,25 @@ namespace TileEngine.Loaders
                                                 evt.AddComponent(EventComponentType.Msg, k.Value);
                                                 break;
                                             case "repeat":
-                                                if (k.Value.Equals("false", StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    evt.Repeat = false;
-                                                }
+                                                evt.AddComponent(EventComponentType.Repeat, k.Value.ToBoolValue());
+                                                break;
+                                            case "stash":
+                                                evt.AddComponent(EventComponentType.Stash, k.Value.ToBoolValue());
                                                 break;
                                             case "shakycam":
                                                 evt.AddComponent(EventComponentType.ShakyCam, k.Value.ToDuration());
+                                                break;
+                                            case "requires_status":
+                                                evt.AddComponent(EventComponentType.RequiresStatus, k.Value.ToStrValues());
+                                                break;
+                                            case "requires_not_status":
+                                                evt.AddComponent(EventComponentType.RequiresNotStatus, k.Value.ToStrValues());
+                                                break;
+                                            case "set_status":
+                                                evt.AddComponent(EventComponentType.SetStatus, k.Value.ToStrValues());
+                                                break;
+                                            case "unset_status":
+                                                evt.AddComponent(EventComponentType.UnsetStatus, k.Value.ToStrValues());
                                                 break;
                                             case "intermap":
                                                 sValues = k.Value.ToStrValues();
@@ -358,6 +370,9 @@ namespace TileEngine.Loaders
                                                 break;
                                             case "cooldown":
                                                 evt.Cooldown = k.Value.ToDuration();
+                                                break;
+                                            case "delay":
+                                                evt.Delay = k.Value.ToDuration();
                                                 break;
                                             case "music":
                                                 evt.AddComponent(EventComponentType.Music, k.Value);
@@ -481,7 +496,7 @@ namespace TileEngine.Loaders
                 Texture tex = engine.GetTexture(img);
                 if (tex != null)
                 {
-                    ts = new TileSet(fileId, tex);
+                    ts = new TileSet(fileId);
                     var sec = ini.Sections.FirstOrDefault(sn => sn.Name.Equals(""));
                     int[] values = null;
                     if (sec != null)
@@ -501,10 +516,6 @@ namespace TileEngine.Loaders
                                         int clipH = values[4];
                                         int offsetX = values[5];
                                         int offsetY = values[6];
-
-                                        //int offsetX = 32 - values[5];
-                                        //int offsetY = 16 - values[6];
-
                                         ts.AddTile(index, clipX, clipY, clipW, clipH, offsetX, offsetY);
                                     }
                                     break;
@@ -522,6 +533,10 @@ namespace TileEngine.Loaders
                                         }
                                     }
                                     break;
+                                case "img":
+                                    tex = engine.GetTexture(k.Value);
+                                    ts.AddImage(tex);
+                                    break;
                             }
                         }
                     }
@@ -532,7 +547,7 @@ namespace TileEngine.Loaders
 
         private MapParallax InternalLoadParallax(IniFile ini, string filename)
         {
-            MapParallax parallax = new MapParallax();
+            MapParallax parallax = new MapParallax(filename);
             ParallaxLayer layer = null;
             foreach (var sec in ini.Sections)
             {
@@ -650,8 +665,14 @@ namespace TileEngine.Loaders
                 ent = new Entity(engine, name);
                 ent.Categories = ini.ReadString("", "categories").ToStrValues();
                 ent.Rarity = ini.ReadString("", "rarity", "common");
+                ent.Flying = ini.ReadBool("", "flying", false);
+                ent.Intangible = ini.ReadBool("", "intangible", false);
+                ent.Facing = ini.ReadBool("", "facing", true);
                 ent.Level = ini.ReadInt("", "level", 1);
                 ent.Speed = (float)(ini.ReadDouble("", "speed") / engine.MaxFramesPerSecond);
+                ent.MeleeRange = (float)ini.ReadDouble("", "melee_range", 1.0);
+                ent.TurnDelay = ini.ReadString("", "turn_delay").ToDuration();
+                ent.WayPointPause = ini.ReadString("", "waypoint_pause").ToDuration();
                 string animId = ini.ReadString("", "animations");
                 if (string.IsNullOrEmpty(animId)) animId = ini.ReadString("", "gfx");
 
